@@ -1,6 +1,12 @@
 <?php
 
+
+
+
+
+
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Inicio;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,3 +21,5 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+Route::get('/inicio', Inicio::class)->name('inicioapp');
