@@ -1,8 +1,7 @@
 <div>
     <x-app-layout>
         <!-- Hero Section con imagen de fondo -->
-        <div class="relative bg-cover bg-center h-96"
-            style="background-image: url('https://source.unsplash.com/random/1200x600/?travel,landscape')">
+        <div class="relative bg-cover bg-center h-96" style="background-image: url('inicioarriba.jpg')">
             <div class="absolute inset-0 bg-black opacity-50"></div>
             <div class="relative container mx-auto px-6 flex flex-col items-center justify-center h-full text-white">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4 text-center">Descubre los mejores destinos turísticos</h1>
@@ -27,7 +26,7 @@
                         <select id="destino"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
                             <option value="">Todos los destinos</option>
-                            <option value="playa">Playa</option>
+                            <option value="playa">Lagunas</option>
                             <option value="montaña">Montaña</option>
                             <option value="selva">Selva</option>
                             <option value="ciudad">Ciudad</option>
@@ -67,12 +66,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Servicio 1 -->
                     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                        <img src="https://source.unsplash.com/random/600x400/?beach" alt="Servicio playa"
-                            class="w-full h-48 object-cover">
+                        <img src="{{ 'images.jfif' }}" alt="Servicio playa" class="w-full h-48 object-cover">
                         <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">Paquete Playa Paraíso</h3>
-                            <p class="text-gray-700 mb-4">Disfruta de 5 días en las mejores playas con alojamiento
-                                incluido y tours a islas cercanas.</p>
+                            <h3 class="text-xl font-bold mb-2">Paquete lagunas 69</h3>
+                            <p class="text-gray-700 mb-4">Disfruta de un tour concoiendo una de las lagunas mas famosas
+                                de la laguna 69.</p>
                             <div class="flex justify-between items-center">
                                 <span class="text-blue-600 font-bold">$1,200</span>
                                 <a href="#"
@@ -84,7 +82,7 @@
 
                     <!-- Servicio 2 -->
                     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                        <img src="https://source.unsplash.com/random/600x400/?mountain" alt="Servicio montaña"
+                        <img src="{{ 'huayhuash-coordillera.jpg' }}" alt="Servicio montaña"
                             class="w-full h-48 object-cover">
                         <div class="p-6">
                             <h3 class="text-xl font-bold mb-2">Aventura en Montaña</h3>
@@ -101,7 +99,7 @@
 
                     <!-- Servicio 3 -->
                     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                        <img src="https://source.unsplash.com/random/600x400/?city" alt="Servicio ciudad"
+                        <img src="{{ 'Plaza-de-armas-de-Huaraz.jpg' }}" alt="Servicio ciudad"
                             class="w-full h-48 object-cover">
                         <div class="p-6">
                             <h3 class="text-xl font-bold mb-2">Tour Cultural Urbano</h3>
@@ -333,8 +331,8 @@
                                 ahora</a>
                         </div>
                         <div class="hidden md:block">
-                            <img src="https://source.unsplash.com/random/600x400/?adventure,travel"
-                                alt="Promoción especial" class="h-full w-full object-cover">
+                            <img src="{{ 'huaraz-tour-escolares-580pix.jpg' }}" alt="Promoción especial"
+                                class="h-full w-full object-cover">
                         </div>
                     </div>
                 </div>
@@ -518,7 +516,7 @@
                     </div>
                 </div>
                 <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                    <p>&copy; 2023 Turismo Aventura. Todos los derechos reservados.</p>
+                    <p>&copy; 2025 ReservAncash pagina del Grupo de tecnologia web. Todos los derechos reservados.</p>
                 </div>
             </div>
         </footer>
