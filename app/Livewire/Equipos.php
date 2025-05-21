@@ -8,6 +8,6 @@ class Equipos extends Component
 {
     public function render()
     {
-        return view('livewire.equipos');
+        return view('livewire.equipos')->layout('layouts.layout');
     }
 }

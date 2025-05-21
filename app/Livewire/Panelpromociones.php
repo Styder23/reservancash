@@ -4,10 +4,10 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
-class Inicio extends Component
+class Panelpromociones extends Component
 {
     public function render()
     {
-        return view('livewire.inicio')->layout('layouts.layout');
+        return view('livewire.panelpromociones');
     }
 }
