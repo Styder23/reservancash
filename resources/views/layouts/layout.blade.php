@@ -20,16 +20,16 @@
                         ReservAncash
                     </a>
                 </div>
-                <div class="justify-between px-6 mt-3">
+                <div class="justify-end px-6 mt-3">
                     <input type="text" class="rounded-lg px-2 border-none w-[300px]" placeholder="Buscar...">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
                 <div class="flex items-center space-x-8">
 
                     <a href="{{ route('destinos') }}" class="text-gray-900 font-bold hover:text-gray-500">Destinos</a>
-                    <a href="{{ route('empresas') }}" class="text-gray-900 font-bold hover:text-gray-500">Empresas</a>
+                    {{-- <a href="{{ route('empresas') }}" class="text-gray-900 font-bold hover:text-gray-500">Empresas</a>
                     <a href="{{ route('servicios') }}" class="text-gray-900 font-bold hover:text-gray-500">Servicios</a>
-                    <a href="{{ route('equipos') }}" class="text-gray-900 font-bold hover:text-gray-500">Equipos</a>
+                    <a href="{{ route('equipos') }}" class="text-gray-900 font-bold hover:text-gray-500">Equipos</a> --}}
                     <a href="{{ route('login') }}" class="text-gray-900 font-bold hover:text-gray-500">Login</a>
                     <a href="{{ route('register') }}" class="text-gray-900 font-bold hover:text-gray-500">Registro</a>
                 </div>
