@@ -8,6 +8,8 @@ class Destinos extends Component
 {
     public function render()
     {
-        return view('livewire.destinos')->layout('layouts.layout');
+        $layout = auth()->check() ? 'layouts.app' : 'layouts.layout';
+
+        return view('livewire.destinos')->layout($layout);
     }
 }

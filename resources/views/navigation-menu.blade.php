@@ -1,44 +1,70 @@
-<nav x-data="{ open: false }" class="bg-teal-600 border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-green-600 shadow-md text-white">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex items-center">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ 'logo.webp' }}">
+                {{-- <div class="shrink-0 flex items-center">
+                    <a href="{{ route('inicioapp') }}">
                         <x-application-mark class="block h-9 w-auto" />
                     </a>
-                </div>
+                </div> --}}
+                <a href="" class="text-2xl font-extrabold tracking-wide hover:text-white">
+                    Reserv<span class="text-yellow-300">Ancash</span>
+                </a>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link class="text-gray-700 font-bold text-lg" href="{{ route('dashboard') }}"
-                        :active="request()->routeIs('dashboard')">
-                        {{ __('ReservAncash') }}
-                    </x-nav-link>
+                    @if (session('user_type') == 'cliente')
+                        {{-- Menú para Cliente --}}
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('dashboard.cliente') }}"
+                            :active="request()->routeIs('dashboard.cliente')">
+                            {{ __('Mi Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('destinos') }}"
+                            :active="request()->routeIs('destinos')">
+                            {{ __('Destinos') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('servicios') }}"
+                            :active="request()->routeIs('servicios')">
+                            {{ __('Servicios') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                            {{ __('Mis Reservas') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('empresas') }}"
+                            :active="request()->routeIs('empresas')">
+                            {{ __('Empresas') }}
+                        </x-nav-link>
+                    @elseif(session('user_type') == 'empresa')
+                        {{-- Menú para Empresa --}}
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('dashboard.empresa') }}"
+                            :active="request()->routeIs('dashboard.empresa')">
+                            {{ __('Mi Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                            {{ __('Mis Servicios') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                            {{ __('Mis Equipos') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                            {{ __('Reservas') }}
+                        </x-nav-link>
+                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                            {{ __('Estadísticas') }}
+                        </x-nav-link>
+                    @else
+                        {{-- Menú por defecto --}}
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('dashboard') }}"
+                            :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link class="text-gray-700 font-bold text-lg" href="" :active="request()->routeIs('servicios')">
-                        {{ __('Servicios') }}
-                    </x-nav-link>
-                    <x-nav-link class="text-gray-700 font-bold text-lg" href="" :active="request()->routeIs('equipos')">
-                        {{ __('Equipos') }}
-                    </x-nav-link>
-                    <x-nav-link class="text-gray-700 font-bold text-lg" href="" :active="request()->routeIs('empresas')">
-                        {{ __('Empresas') }}
-                    </x-nav-link>
-                    <x-nav-link class="text-gray-700 font-bold text-lg" href="" :active="request()->routeIs('destinos')">
-                        {{ __('Destinos') }}
-                    </x-nav-link>
-                    <x-nav-link class="text-gray-700 font-bold text-lg" href="" :active="request()->routeIs('nosotros')">
-                        {{ __('Nosotros') }}
-                    </x-nav-link>
-                </div>
-
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                     <div class="ms-3 relative">
@@ -109,6 +135,11 @@
                                     <button type="button"
                                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
                                         {{ Auth::user()->name }}
+                                        @if (session('user_type'))
+                                            <span class="ms-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                {{ ucfirst(session('user_type')) }}
+                                            </span>
+                                        @endif
 
                                         <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg"
                                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -124,6 +155,9 @@
                             <!-- Account Management -->
                             <div class="block px-4 py-2 text-xs text-gray-400">
                                 {{ __('Manage Account') }}
+                                @if (session('user_type'))
+                                    <div class="text-blue-600 font-semibold">{{ ucfirst(session('user_type')) }}</div>
+                                @endif
                             </div>
 
                             <x-dropdown-link href="{{ route('profile.show') }}">
@@ -170,9 +204,46 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @if (session('user_type') == 'cliente')
+                {{-- Menú móvil para Cliente --}}
+                <x-responsive-nav-link href="{{ route('dashboard.cliente') }}" :active="request()->routeIs('dashboard.cliente')">
+                    {{ __('Mi Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('destinos') }}" :active="request()->routeIs('destinos')">
+                    {{ __('Destinos') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('servicios') }}" :active="request()->routeIs('servicios')">
+                    {{ __('Servicios') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Mis Reservas') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('empresas') }}" :active="request()->routeIs('empresas')">
+                    {{ __('Empresas') }}
+                </x-responsive-nav-link>
+            @elseif(session('user_type') == 'empresa')
+                {{-- Menú móvil para Empresa --}}
+                <x-responsive-nav-link href="{{ route('dashboard.empresa') }}" :active="request()->routeIs('dashboard.empresa')">
+                    {{ __('Mi Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Mis Servicios') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Mis Equipos') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Reservas') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Estadísticas') }}
+                </x-responsive-nav-link>
+            @else
+                {{-- Menú móvil por defecto --}}
+                <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -188,6 +259,9 @@
                 <div>
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                    @if (session('user_type'))
+                        <div class="text-xs text-blue-600 font-semibold">{{ ucfirst(session('user_type')) }}</div>
+                    @endif
                 </div>
             </div>
 

@@ -1,5 +1,4 @@
 <div>
-    <x-app-layout>
         <!-- Hero Section con imagen de fondo -->
         <div class="relative bg-cover bg-center h-96" style="background-image: url('inicioarriba.jpg')">
             <div class="absolute inset-0 bg-black opacity-50"></div>
@@ -520,5 +519,4 @@
                 </div>
             </div>
         </footer>
-    </x-app-layout>
 </div>

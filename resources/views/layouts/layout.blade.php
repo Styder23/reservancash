@@ -11,31 +11,62 @@
 </head>
 
 <body class="font-sans bg-gray-100">
-    <!-- Menú básico público -->
-    <nav class="bg-green-500 shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 gap-4">
-                <div class="flex items-center">
-                    <a href="{{ route('inicioapp') }}" class="text-lg font-bold">
-                        ReservAncash
-                    </a>
-                </div>
-                <div class="justify-between px-6 mt-3">
-                    <input type="text" class="rounded-lg px-2 border-none w-[300px]" placeholder="Buscar...">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <div class="flex items-center space-x-8">
+    <!-- Menú público mejorado -->
+<!-- Menú público mejorado y responsive -->
+<nav class="bg-green-600 shadow-md text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <a href="{{ route('inicioapp') }}" class="text-2xl font-extrabold tracking-wide hover:text-white">
+                Reserv<span class="text-yellow-300">Ancash</span>
+            </a>
 
-                    <a href="{{ route('destinos') }}" class="text-gray-900 font-bold hover:text-gray-500">Destinos</a>
-                    <a href="{{ route('empresas') }}" class="text-gray-900 font-bold hover:text-gray-500">Empresas</a>
-                    <a href="{{ route('servicios') }}" class="text-gray-900 font-bold hover:text-gray-500">Servicios</a>
-                    <a href="{{ route('equipos') }}" class="text-gray-900 font-bold hover:text-gray-500">Equipos</a>
-                    <a href="{{ route('login') }}" class="text-gray-900 font-bold hover:text-gray-500">Login</a>
-                    <a href="{{ route('register') }}" class="text-gray-900 font-bold hover:text-gray-500">Registro</a>
+            <!-- Botón hamburguesa -->
+            <div class="md:hidden">
+                <button id="menu-toggle" class="focus:outline-none">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Enlaces + buscador (desktop) -->
+            <div class="hidden md:flex items-center space-x-6">
+                <div class="flex items-center space-x-2">
+                    <input 
+                        type="text" 
+                        class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-64" 
+                        placeholder="Buscar...">
+                    <i class="fa-solid fa-magnifying-glass text-white text-lg"></i>
                 </div>
+                <a href="{{ route('destinos') }}" class="hover:text-yellow-300 font-semibold">Destinos</a>
+                <a href="{{ route('login') }}" class="hover:text-yellow-300 font-semibold">Login</a>
+                <a href="{{ route('register') }}" class="hover:text-yellow-300 font-semibold">Registro</a>
             </div>
         </div>
-    </nav>
+
+        <!-- Menú colapsado (móvil) -->
+        <div id="mobile-menu" class="md:hidden hidden flex-col space-y-2 py-4">
+            <input 
+                type="text" 
+                class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-full" 
+                placeholder="Buscar...">
+            <a href="{{ route('destinos') }}" class="block px-2 hover:text-yellow-300 font-semibold">Destinos</a>
+            <a href="{{ route('login') }}" class="block px-2 hover:text-yellow-300 font-semibold">Login</a>
+            <a href="{{ route('register') }}" class="block px-2 hover:text-yellow-300 font-semibold">Registro</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Script toggle -->
+<script>
+    const toggleBtn = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    toggleBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+</script>
+
+
 
     <!-- Contenido principal -->
     <main>

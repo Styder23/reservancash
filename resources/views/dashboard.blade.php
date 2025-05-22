@@ -12,8 +12,4 @@
             </div>
         </div>
     </div>
-
-    <x-wireui-alert title="Any Message!" />
-    <x-wireui-alert title="Any Message!" description="This is a description" />
-    <x-wireui-button label="Default" />
 </x-app-layout>

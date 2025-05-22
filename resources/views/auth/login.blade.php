@@ -7,7 +7,6 @@
         {{-- Contenedor del formulario con z-index para estar encima --}}
         <div class="relative w-full max-w-md p-8 bg-white bg-opacity-90 rounded-lg shadow-lg">
             <div class="flex flex-col items-center mb-8">
-                {{-- <x-authentication-card-logo class="w-24 h-24 mb-4" /> --}}
                 <img src="{{ asset('logo.webp') }}" alt="Logo" class="w-24 h-24 mb-4 rounded-full shadow" />
 
                 <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
@@ -29,6 +28,20 @@
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
+
+                {{-- Selector de tipo de usuario --}}
+                <div class="mb-4">
+                    <x-label for="user_type" value="{{ __('Tipo de Usuario') }}" />
+                    <select id="user_type" name="user_type"
+                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        required>
+                        <option value="">{{ __('Selecciona tipo de usuario') }}</option>
+                        <option value="cliente" {{ old('user_type') == 'cliente' ? 'selected' : '' }}>
+                            {{ __('Cliente') }}</option>
+                        <option value="empresa" {{ old('user_type') == 'empresa' ? 'selected' : '' }}>
+                            {{ __('Empresa') }}</option>
+                    </select>
+                </div>
 
                 <div>
                     <x-label for="email" value="{{ __('Email') }}" />

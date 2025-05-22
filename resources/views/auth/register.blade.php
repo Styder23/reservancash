@@ -407,7 +407,7 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="document_number"
-                                        name="document_number" required>
+                                        name="document_number">
                                 </div>
                             </div>
                         </div>
