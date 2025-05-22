@@ -1,3 +1,4 @@
+
 <div>
     <div class="max-w-8xl mx-auto px-6 sm:px-6 lg:px-8 py-3">
         <!-- Filtros mejorados -->
@@ -104,7 +105,7 @@
                                 <span class="text-lg font-bold text-blue-600">$1,200</span>
                                 <span class="text-sm text-gray-500">/por persona</span>
                             </div>
-                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                            <a href="{{ route('destino_detalle') }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                                 Ver detalles
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +151,7 @@
                                 <span class="text-lg font-bold text-blue-600">$2,500</span>
                                 <span class="text-sm text-gray-500">/por persona</span>
                             </div>
-                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                            <a href="{{ route('destino_detalle') }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                                 Ver detalles
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">

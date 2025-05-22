@@ -11,6 +11,7 @@ use App\Livewire\Empresas;
 use App\Livewire\Dashcliente;
 use App\Livewire\Dashempresa;
 use App\Http\Controllers\Auth\LoginController;
+use App\Livewire\DestinoDetalle;
 
 Route::get('/', function () {
     return redirect('/inicio');
@@ -46,3 +47,5 @@ Route::middleware([
     Route::get('/dashboard/empresa', Dashempresa::class)->name('dashboard.empresa');
     
 });
+
+Route::get('/destino-detalle', DestinoDetalle::class)->name('destino_detalle');
