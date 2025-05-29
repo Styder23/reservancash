@@ -12,6 +12,8 @@ use App\Livewire\Dashcliente;
 use App\Livewire\Dashempresa;
 use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\DestinoDetalle;
+use App\Livewire\Pantalladividida;
+use App\Livewire\dividida;
 
 Route::get('/', function () {
     return redirect('/inicio');
@@ -23,6 +25,10 @@ Route::get('/destinos', Destinos::class)->name('destinos');
 Route::get('/equipos', Equipos::class)->name('equipos');
 Route::get('/paquetes', Paquetes::class)->name('paquetes');
 Route::get('/empresas', Empresas::class)->name('empresas');
+Route::get('/pantalladividida', Pantalladividida::class)->name('pantalladividida');
+
+
+
 
 // Rutas personalizadas de autenticación
 Route::get('/login', [LoginController::class, 'create'])->name('login');

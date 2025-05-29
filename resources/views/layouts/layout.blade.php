@@ -12,59 +12,76 @@
 
 <body class="font-sans bg-gray-100">
     <!-- Menú público mejorado -->
-<!-- Menú público mejorado y responsive -->
-<nav class="bg-green-600 shadow-md text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <!-- Logo -->
-            <a href="{{ route('inicioapp') }}" class="text-2xl font-extrabold tracking-wide hover:text-white">
-                Reserv<span class="text-yellow-300">Ancash</span>
-            </a>
+    <!-- Menú público mejorado y responsive -->
+    <nav class="bg-green-500 shadow-md text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <a href="{{ route('inicioapp') }}" class="text-2xl font-extrabold tracking-wide hover:text-white">
+                    Reserv<span class="text-yellow-300">Ancash</span>
+                </a>
 
-            <!-- Botón hamburguesa -->
-            <div class="md:hidden">
-                <button id="menu-toggle" class="focus:outline-none">
-                    <i class="fa-solid fa-bars text-2xl"></i>
-                </button>
-            </div>
-
-            <!-- Enlaces + buscador (desktop) -->
-            <div class="hidden md:flex items-center space-x-6">
-                <div class="flex items-center space-x-2">
-                    <input 
-                        type="text" 
-                        class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-64" 
-                        placeholder="Buscar...">
-                    <i class="fa-solid fa-magnifying-glass text-white text-lg"></i>
+                <!-- Botón hamburguesa -->
+                <div class="">
+                    <img src="{{ 'menu.png' }}" alt="botonmenu" class="w-10 h-10 mr-1">
                 </div>
-                <a href="{{ route('destinos') }}" class="hover:text-yellow-300 font-semibold">Destinos</a>
-                <a href="{{ route('login') }}" class="hover:text-yellow-300 font-semibold">Login</a>
-                <a href="{{ route('register') }}" class="hover:text-yellow-300 font-semibold">Registro</a>
+
+                <!-- Enlaces + buscador (desktop) -->
+                <div class="flex justify-between items-center h-16">
+                    <!-- Enlaces + buscador (desktop) -->
+                    <div class="hidden md:flex items-center space-x-6">
+                        <div class="flex items-center space-x-2">
+                            <input type="text"
+                                class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-64"
+                                placeholder="Buscar...">
+                            <i class="fa-solid fa-magnifying-glass text-white text-lg"></i>
+                        </div>
+                        <a href="{{ route('pantalladividida') }}" class="hover:text-yellow-300 font-semibold flex items-center">
+                            <img src="{{ 'me-gusta.png' }}" alt="destinos" class="w-8 h-8 mr-1">
+                            Favoritos
+                        </a>
+                        <a href="{{ route('destinos') }}" class="hover:text-yellow-300 font-semibold flex items-center">
+                            <img src="{{ 'destino.png' }}" alt="destinos" class="w-8 h-8 mr-1">
+                            Destinos
+                        </a>
+                        <a href="{{ route('pantalladividida') }}" class="hover:text-yellow-300 font-semibold flex items-center">
+                            <img src="{{ 'pantalla-dividida.png' }}" alt="destinos" class="w-8 h-8 mr-1">
+                            Comparar
+                        </a>
+                        <a href="{{ route('login') }}" class="hover:text-yellow-300 font-semibold flex items-center">
+                            <img src="{{ 'usuario.png' }}" alt="login" class="w-8 h-8 mr-1">
+                            Login
+                        </a>
+                        <a href="{{ route('register') }}" class="hover:text-yellow-300 font-semibold flex items-center">
+                            <img src="{{ 'me-gusta.png' }}" alt="registro" class="w-8 h-8 mr-1">
+                            Registro
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Menú colapsado (móvil) -->
+                <div id="mobile-menu" class="md:hidden hidden flex-col space-y-2 py-4">
+                    <input type="text"
+                        class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-full"
+                        placeholder="Buscar...">
+                    <a href="{{ route('destinos') }}"
+                        class="block px-2 hover:text-yellow-300 font-semibold">Destinos</a>
+                    <a href="{{ route('login') }}" class="block px-2 hover:text-yellow-300 font-semibold">Login</a>
+                    <a href="{{ route('register') }}"
+                        class="block px-2 hover:text-yellow-300 font-semibold">Registro</a>
+                </div>
             </div>
-        </div>
+    </nav>
 
-        <!-- Menú colapsado (móvil) -->
-        <div id="mobile-menu" class="md:hidden hidden flex-col space-y-2 py-4">
-            <input 
-                type="text" 
-                class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-full" 
-                placeholder="Buscar...">
-            <a href="{{ route('destinos') }}" class="block px-2 hover:text-yellow-300 font-semibold">Destinos</a>
-            <a href="{{ route('login') }}" class="block px-2 hover:text-yellow-300 font-semibold">Login</a>
-            <a href="{{ route('register') }}" class="block px-2 hover:text-yellow-300 font-semibold">Registro</a>
-        </div>
-    </div>
-</nav>
+    <!-- Script toggle -->
+    <script>
+        const toggleBtn = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-<!-- Script toggle -->
-<script>
-    const toggleBtn = document.getElementById('menu-toggle');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    toggleBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
-</script>
+        toggleBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
 
 
 

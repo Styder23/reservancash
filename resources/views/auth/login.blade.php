@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="min-h-screen bg-cover bg-center flex items-center justify-center relative"
-        style="background-image: url('turismo-fondo.jpg');">
+        style="background-image: url('Alpamayo en 4k.jpg');">
         {{-- Overlay transparente oscuro para mejor contraste --}}
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
 
