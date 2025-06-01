@@ -37,9 +37,9 @@
                         required>
                         <option value="">{{ __('Selecciona tipo de usuario') }}</option>
                         <option value="cliente" {{ old('user_type') == 'cliente' ? 'selected' : '' }}>
-                            {{ __('Cliente') }}</option>
+                            {{ __('Cliente') }} </option>
                         <option value="empresa" {{ old('user_type') == 'empresa' ? 'selected' : '' }}>
-                            {{ __('Empresa') }}</option>
+                            {{ __('Empresa') }} </option>
                     </select>
                 </div>
 
@@ -61,18 +61,29 @@
                         <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                     </label>
                 </div>
+                <div class="text-center mt-6">
+                    <x-button class="hover:bg-blue-600 py-3 px-20 rounded-lg  transition-colors duration-200">
+                        {{ __('Log in') }}
+                    </x-button>
+                </div>
 
-                <div class="flex items-center justify-end mt-4">
+                
+                <div class="flex items-center justify-between mt-6">
                     @if (Route::has('password.request'))
                         <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             href="{{ route('password.request') }}">
-                            {{ __('Forgot your password?') }}
+                            {{ __('¿Olvidaste tu contraseña?') }}
                         </a>
+                    @else
+                        <div></div> {{-- Espaciador para mantener la alineación --}}
                     @endif
 
-                    <x-button class="ms-4">
-                        {{ __('Log in') }}
-                    </x-button>
+                    @if (Route::has('register'))
+                        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            href="{{ route('register') }}">
+                            {{ __('Registrarse') }}
+                        </a>
+                    @endif
                 </div>
             </form>
         </div>
