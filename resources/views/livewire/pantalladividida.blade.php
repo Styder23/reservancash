@@ -47,7 +47,7 @@
                 <!-- Lista de Cards -->
                 <div class="space-y-4">
                     <!-- Card 1 con imagen referencial -->
-                    <a href="detalle.php?id=1" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Recomendado</span>
@@ -68,7 +68,7 @@
                     </a>
                     
                     <!-- Card 2 con imagen referencial -->
-                    <a href="detalle.php?id=2" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
@@ -89,7 +89,7 @@
                     </a>
 
                      <!-- Card 3 con imagen referencial -->
-                    <a href="detalle.php?id=2" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
@@ -110,7 +110,7 @@
                     </a>
 
                      <!-- Card 4 con imagen referencial -->
-                    <a href="detalle.php?id=2" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
@@ -174,7 +174,7 @@
                 <!-- Lista de Cards -->
                 <div class="space-y-4">
                     <!-- Card 3 con imagen referencial -->
-                    <a href="detalle.php?id=3" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle"" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna Churup" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">Nuevo</span>
@@ -195,7 +195,7 @@
                     </a>
                     
                     <!-- Card 4 con imagen referencial -->
-                    <a href="detalle.php?id=4" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna Parón" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">Últimos cupos</span>
@@ -216,7 +216,7 @@
                     </a>
 
                      <!-- Card 3 con imagen referencial -->
-                    <a href="detalle.php?id=2" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
@@ -237,7 +237,7 @@
                     </a>
 
                      <!-- Card 4 con imagen referencial -->
-                    <a href="detalle.php?id=2" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
+                    <a href="destino-detalle" class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
                         <div class="relative h-40">
                             <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
                             <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>

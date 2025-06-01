@@ -10,26 +10,17 @@
     @livewireStyles
 </head>
 
-
 <body class="font-sans bg-gray-100">
-    <!-- Menú público mejorado -->
-    <!-- Menú público mejorado y responsive -->
+
+    <!-- NAVBAR -->
     <nav class="bg-green-500 shadow-md text-white">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
                 <a href="{{ route('inicioapp') }}" class="text-2xl font-extrabold tracking-wide hover:text-white">
                     reserv<span class="text-yellow-300">Áncash</span>
                 </a>
-
-                <!-- Botón hamburguesa -->
-                <div class="">
-                    <img src="{{ 'menu.png' }}" alt="botonmenu" class="w-10 h-10 mr-1">
-                </div>
-
-                <!-- Enlaces + buscador (desktop) -->
+                <!--div><img src="{{ 'menu.png' }}" alt="botonmenu" class="w-10 h-10 mr-1"></div-->
                 <div class="flex justify-between items-center h-16">
-                    <!-- Enlaces + buscador (desktop) -->
                     <div class="hidden md:flex items-center space-x-6">
                         <div class="flex items-center space-x-2">
                             <input type="text"
@@ -38,7 +29,7 @@
                             <i class="fa-solid fa-magnifying-glass text-white text-lg"></i>
                         </div>
                         <a href="{{ route('pantalladividida') }}"
-                            class="hover:text-yellow-300 font-semibold items-center object-contain align-middle">
+                            class="hover:text-yellow-300 font-semibold items-center">
                             <img src="{{ 'me-gusta.png' }}" alt="destinos" class="w-8 h-8 ml-0 md:ml-4 ">
                             Favoritos
                         </a>
@@ -47,23 +38,16 @@
                             Destinos
                         </a>
                         <a href="{{ route('pantalladividida') }}"
-                            class="hover:text-yellow-300 font-semibold  items-center">
+                            class="hover:text-yellow-300 font-semibold items-center">
                             <img src="{{ 'pantalla-dividida.png' }}" alt="destinos" class="w-8 h-8 ml-0 md:ml-5">
                             Comparar
                         </a>
-                        <a href="{{ route('login') }}" class="hover:text-yellow-300 font-semibold  items-center">
+                        <a href="{{ route('login') }}" class="hover:text-yellow-300 font-semibold items-center">
                             <img src="{{ 'usuario.png' }}" alt="login" class="w-8 h-8 ml-0 md:ml-1">
                             Login
                         </a>
-                        <!--a href="{{ route('register') }}"
-                            class="hover:text-yellow-300 font-semibold  items-center">
-                            <img src="{{ 'me-gusta.png' }}" alt="registro" class="w-8 h-8 mr-1">
-                            Registro
-                        </a-->
                     </div>
                 </div>
-
-                <!-- Menú colapsado (móvil) -->
                 <div id="mobile-menu" class="md:hidden hidden flex-col space-y-2 py-4">
                     <input type="text"
                         class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-full"
@@ -75,86 +59,109 @@
                         class="block px-2 hover:text-yellow-300 font-semibold">Registro</a>
                 </div>
             </div>
+        </div>
     </nav>
 
-    <!-- Script toggle -->
-    <script>
-        const toggleBtn = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        toggleBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    </script>
-
-
-
-    <!-- Contenido principal -->
+    <!-- CONTENIDO PRINCIPAL -->
     <main>
         {{ $slot }}
     </main>
 
     @livewireScripts
-</body>
 
-
-<footer class="bg-gray-500 text-white py-4 mt-8">
-    <!-- Es el div principal -->
-    <div class="container mx-auto px-6">
-        <!-- Div para las 4 columnas de letras -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-
-            <!-- 1ª Columna -> Te ayudamos -->
-            <div>
-                <h3 class="text-lg font-semibold mb-6">Te ayudamos</h3>
-                <ul class="space-y-2">
-                    <li class="flex items-center gap-3"><a href="#" class="text-gray-300 hover:text-white transition-colors">Libro de Reclamaciones</a></li>
-                    <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Atención por WhatsApp</a></li>
-                    <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Centro de ayuda</a></li>
-                    <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Política de prevención de delitos</a></li>
-                    <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Textos legales</a></li>
-                </ul>
-            </div>
-
-            <!-- 2ª Columna -> Nuestras empresas -->
-            <div>
-                <h3 class="text-lg font-semibold mb-6">Nuestras empresas</h3>
-                <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Nuestra empresa</a>
-                    </li>
-                </ul>
-            </div>
+    <h1>
+        <div class="text-center text-2xl font-bold mt-8">
+            Bienvenido a {{ config('app.name') }}
         </div>
+    </h1>
 
-        <!-- Social Media -->
-        <!--div class="flex gap-3 mb-8">
-            <a href="#"
-                class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-500 transition-colors">
-                <i class="fab fa-facebook-f text-white"></i>
-            </a>
-            <a href="#"
-                class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-500 transition-colors">
-                <i class="fab fa-instagram text-white"></i>
-            </a>
-        </div-->
-
-        <!-- Legal Links -->
-        <div class="border-t border-gray-600 pt-6 mb-6">
-            <div class="flex flex-wrap gap-6 text-sm">
-                <a href="#" class="text-gray-300 hover:text-white transition-colors">Términos y condiciones</a>
-                <a href="#" class="text-gray-300 hover:text-white transition-colors">Política de cookies</a>
-                <a href="#" class="text-gray-300 hover:text-white transition-colors">Política de privacidad</a>
-            </div>
+    <!-- CHATBOT FLOTANTE -->
+    <div id="chatbot-box"
+        class="fixed bottom-24 right-5 w-80 max-h-[400px] bg-white rounded-2xl shadow-2xl hidden flex-col z-[9999] overflow-hidden">
+        <div id="chatbot-header" class="bg-emerald-500 text-white p-4 font-bold flex justify-between items-center">
+            Chatbot
+            <button onclick="toggleChatbot()" class="text-white font-bold">✖</button>
         </div>
-
-        <!-- Copyright -->
-        <div class="text-sm text-gray-400">
-            <p class="mb-1">© TODOS LOS DERECHOS RESERVADOS</p>
-            <p>@ reservÁncash</p>
+        <div id="chatbot-body" class="p-4 h-[250px] overflow-y-auto">
+            <p>Hola 👋, ¿en qué puedo ayudarte hoy?</p>
+        </div>
+        <div id="chatbot-input" class="flex border-t border-gray-300">
+            <input type="text" placeholder="Escribe tu mensaje..." class="flex-1 p-2 outline-none border-none">
+            <button class="bg-emerald-500 text-white px-4 py-2">Enviar</button>
         </div>
     </div>
 
-</footer>
+    <div id="chatbot-button" onclick="toggleChatbot()"
+        class="fixed bottom-5 right-5 z-[9999] bg-emerald-500 text-white rounded-full w-14 h-14 flex justify-center items-center cursor-pointer shadow-md">
+        <i class="fas fa-comments text-2xl"></i>
+    </div>
 
+    <div id="chatbot-button" onclick="toggleChatbot()">
+        <i class="fas fa-comments text-2xl"></i>
+    </div>
+
+    <script>
+        function toggleChatbot() {
+            const chatbot = document.getElementById('chatbot-box');
+            chatbot.style.display = chatbot.style.display === 'flex' ? 'none' : 'flex';
+        }
+    </script>
+
+</body>
+
+<footer class="bg-gray-900 text-white py-8 mt-8">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-lg font-bold mb-4">Turismo Aventura</h3>
+                <p class="text-gray-400">Descubre los mejores destinos y experiencias turísticas con nuestros
+                    servicios especializados.</p>
+            </div>
+            <div>
+                <h4 class="text-md font-bold mb-4">Enlaces rápidos</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Inicio</a></li>
+                    <li><a href="#servicios"
+                            class="text-gray-400 hover:text-white transition duration-300">Servicios</a></li>
+                    <li><a href="#contacto" class="text-gray-400 hover:text-white transition duration-300">Contacto</a>
+                    </li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Blog</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-md font-bold mb-4">Servicios</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Paquetes
+                            turísticos</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Alquiler de
+                            equipos</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Guías
+                            especializados</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Transporte</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-md font-bold mb-4">Suscríbete</h4>
+                <p class="text-gray-400 mb-4">Recibe nuestras ofertas y novedades en tu correo.</p>
+                <form class="flex">
+                    <input type="email" placeholder="Tu email"
+                        class="px-4 py-2 rounded-l-lg focus:outline-none text-gray-800 w-full">
+                    <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg transition duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 ReservAncash pagina del Grupo de tecnologia web. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
 
 </html>
