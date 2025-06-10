@@ -12,42 +12,53 @@
 
 <body class="font-sans bg-gray-100">
 
-    <!-- NAVBAR -->
-    <nav class="bg-green-500 shadow-md text-white">
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- NAVBAR FIJO -->
+    <nav class="fixed top-0 left-0 right-0 bg-green-500 shadow-md text-white z-50">
+        <div class="max-w-7xl mx-auto px-8">
             <div class="flex justify-between items-center h-16">
-                <a href="{{ route('inicioapp') }}" class="text-2xl font-extrabold tracking-wide hover:text-white">
-                    reserv<span class="text-yellow-300">Áncash</span>
-                </a>
-                <!--div><img src="{{ 'menu.png' }}" alt="botonmenu" class="w-10 h-10 mr-1"></div-->
-                <div class="flex justify-between items-center h-16">
-                    <div class="hidden md:flex items-center space-x-6">
-                        <div class="flex items-center space-x-2">
+                <!-- Logo -->
+                <div class="flex-shrink-0 ml-4">
+                    <a href="{{ route('inicioapp') }}" class="text-2xl font-extrabold tracking-wide hover:text-white">
+                        reserv<span class="text-white">Áncash</span>
+                    </a>
+                </div>
+
+                <!-- Centro: Buscador y Enlaces -->
+                <div class="flex-1 flex justify-center items-center">
+                    <div class="hidden md:flex items-center space-x-8">
+                        <!-- Buscador más grande -->
+                        <div class="flex items-center space-x-3 bg-white rounded-full px-2 py-1">
                             <input type="text"
-                                class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-64"
-                                placeholder="Buscar...">
-                            <i class="fa-solid fa-magnifying-glass text-white text-lg"></i>
+                                class="rounded-full px-4 py-2 text-black focus:outline-none w-32 sm:w-48 md:w-64 lg:w-80 xl:w-96 bg-transparent"
+                                placeholder="Buscar destinos, actividades...">
+                            <i class="fa-solid fa-magnifying-glass text-green-500 text-lg pr-2"></i>
                         </div>
+
+                        <!-- Enlaces de navegación -->
                         <a href="{{ route('pantalladividida') }}"
-                            class="hover:text-yellow-300 font-semibold items-center">
-                            <img src="{{ 'me-gusta.png' }}" alt="destinos" class="w-8 h-8 ml-0 md:ml-4 ">
-                            Favoritos
+                            class="flex items-center space-x-2 hover:text-yellow-300 font-semibold">
+                            <img src="{{ 'me-gusta.png' }}" alt="favoritos" class="w-6 h-6">
+                            <span>Favoritos</span>
                         </a>
-                        <a href="{{ route('destinos') }}" class="hover:text-yellow-300 font-semibold items-center">
-                            <img src="{{ 'destino.png' }}" alt="destinos" class="w-8 h-8 ml-0 md:ml-4">
-                            Destinos
+                        <a href="{{ route('destinos') }}"
+                            class="flex items-center space-x-2 hover:text-yellow-300 font-semibold">
+                            <img src="{{ 'destino.png' }}" alt="destinos" class="w-6 h-6">
+                            <span>Destinos</span>
                         </a>
                         <a href="{{ route('pantalladividida') }}"
-                            class="hover:text-yellow-300 font-semibold items-center">
-                            <img src="{{ 'pantalla-dividida.png' }}" alt="destinos" class="w-8 h-8 ml-0 md:ml-5">
-                            Comparar
+                            class="flex items-center space-x-2 hover:text-yellow-300 font-semibold">
+                            <img src="{{ 'pantalla-dividida.png' }}" alt="comparar" class="w-6 h-6">
+                            <span>Comparar</span>
                         </a>
-                        <a href="{{ route('login') }}" class="hover:text-yellow-300 font-semibold items-center">
-                            <img src="{{ 'usuario.png' }}" alt="login" class="w-8 h-8 ml-0 md:ml-1">
-                            Login
+                        <a href="{{ route('login') }}"
+                            class="flex items-center space-x-2 hover:text-yellow-300 font-semibold">
+                            <img src="{{ 'usuario.png' }}" alt="login" class="w-6 h-6">
+                            <span>Login</span>
                         </a>
                     </div>
                 </div>
+
+
                 <div id="mobile-menu" class="md:hidden hidden flex-col space-y-2 py-4">
                     <input type="text"
                         class="rounded-full px-4 py-1 text-black focus:outline-none focus:ring-2 focus:ring-yellow-300 w-full"
@@ -62,34 +73,38 @@
         </div>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main>
+
+    <!-- CONTENIDO PRINCIPAL CON MARGEN SUPERIOR -->
+    <main class="pt-16">
         {{ $slot }}
     </main>
 
+
     @livewireScripts
 
-    <h1>
-        <div class="text-center text-2xl font-bold mt-8">
-            Bienvenido a {{ config('app.name') }}
-        </div>
-    </h1>
+   
+
+
 
     <!-- CHATBOT FLOTANTE -->
-    <div id="chatbot-box"
-        class="fixed bottom-24 right-5 w-80 max-h-[400px] bg-white rounded-2xl shadow-2xl hidden flex-col z-[9999] overflow-hidden">
+    <div id="chatbot-box" class="fixed bottom-24 right-5 w-80 max-h-[400px] bg-white rounded-2xl shadow-2xl hidden flex-col z-[9999] overflow-hidden">
         <div id="chatbot-header" class="bg-emerald-500 text-white p-4 font-bold flex justify-between items-center">
             Chatbot
             <button onclick="toggleChatbot()" class="text-white font-bold">✖</button>
         </div>
+
+        <!-- AQUÍ VA EL COMPONENTE LIVEWIRE -->
         <div id="chatbot-body" class="p-4 h-[250px] overflow-y-auto">
-            <p>Hola 👋, ¿en qué puedo ayudarte hoy?</p>
+            @livewire('pantalladividida')
         </div>
+
         <div id="chatbot-input" class="flex border-t border-gray-300">
-            <input type="text" placeholder="Escribe tu mensaje..." class="flex-1 p-2 outline-none border-none">
-            <button class="bg-emerald-500 text-white px-4 py-2">Enviar</button>
+            <input type="text" placeholder="Escribe tu mensaje..." class="flex-1 p-2 outline-none border-none"
+                disabled>
+            <button class="bg-emerald-500 text-white px-4 py-2" disabled>Enviar</button>
         </div>
     </div>
+
 
     <div id="chatbot-button" onclick="toggleChatbot()"
         class="fixed bottom-5 right-5 z-[9999] bg-emerald-500 text-white rounded-full w-14 h-14 flex justify-center items-center cursor-pointer shadow-md">
@@ -109,6 +124,10 @@
 
 </body>
 
+
+
+
+<!-- Todo el pie de pagina -->
 <footer class="bg-gray-900 text-white py-8 mt-8">
     <div class="container mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">

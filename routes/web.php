@@ -14,6 +14,10 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\DestinoDetalle;
 use App\Livewire\Pantalladividida;
 use App\Livewire\dividida;
+use App\Livewire\Favoritos;
+use App\Livewire\Panelservicios;
+use App\Livewire\Crearpaquete;
+
 
 Route::get('/', function () {
     return redirect('/inicio');
@@ -25,7 +29,13 @@ Route::get('/destinos', Destinos::class)->name('destinos');
 Route::get('/equipos', Equipos::class)->name('equipos');
 Route::get('/paquetes', Paquetes::class)->name('paquetes');
 Route::get('/empresas', Empresas::class)->name('empresas');
+
 Route::get('/pantalladividida', Pantalladividida::class)->name('pantalladividida');
+Route::get('/dividida', Dividida::class)->name('dividida');
+Route::get('/favoritos', Favoritos::class)->name('favoritos');
+Route::get('/panelservicios', Panelservicios::class)->name('panelservicios');
+Route::get('/dashempresa', Dashempresa::class)->name('dashempresa');
+Route::get('/crearpaquete', Crearpaquete::class)->name('crearpaquete');
 
 
 
