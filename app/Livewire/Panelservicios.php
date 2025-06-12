@@ -8,6 +8,6 @@ class Panelservicios extends Component
 {
     public function render()
     {
-        return view('livewire.panelservicios');
+        return view('livewire.panelservicios')->layout('layouts.layout');
     }
 }

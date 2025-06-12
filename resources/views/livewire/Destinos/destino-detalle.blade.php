@@ -25,7 +25,7 @@
             <!-- Contenido Principal -->
             <div class="lg:col-span-2">
                 <!-- Galería de Imágenes -->
-                <div class="mb-8">
+                <div class="mb-24">
                     <div class="grid grid-cols-4 gap-2 h-96">
                         <div class="col-span-2 row-span-2">
                             <img src="{{ 'huayhuash-coordillera.jpg' }}"
