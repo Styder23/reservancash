@@ -4,12 +4,15 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Inicio;
 use App\Livewire\Destinos;
 use App\Livewire\Servicios;
-use App\Livewire\Equipos;
+use App\Livewire\Equipos\Equipos;
+use App\Livewire\Equipos\DetalleEquipos;
+use App\Livewire\Admin\PanelDestino;
 use App\Livewire\Paquetes;
 use App\Livewire\Promociones;
 use App\Livewire\Empresas;
 use App\Livewire\Dashcliente;
 use App\Livewire\Dashempresa;
+use App\Livewire\Admin;
 use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\DestinoDetalle;
 
@@ -20,7 +23,6 @@ Route::get('/', function () {
 Route::get('/inicio', Inicio::class)->name('inicioapp');
 Route::get('/servicios', Servicios::class)->name('servicios');
 Route::get('/destinos', Destinos::class)->name('destinos');
-Route::get('/equipos', Equipos::class)->name('equipos');
 Route::get('/paquetes', Paquetes::class)->name('paquetes');
 Route::get('/empresas', Empresas::class)->name('empresas');
 
@@ -49,3 +51,7 @@ Route::middleware([
 });
 
 Route::get('/destino-detalle', DestinoDetalle::class)->name('destino_detalle');
+Route::get('/admin', Admin::class)->name('administrador');
+Route::get('/equipo', Equipos::class)->name('equipos');
+Route::get('/det_equipo', DetalleEquipos::class)->name('det_equipos');
+Route::get('/det_destinos', PanelDestino::class)->name('det_destinos');

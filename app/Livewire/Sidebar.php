@@ -4,10 +4,10 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
-class Equipos extends Component
+class Sidebar extends Component
 {
     public function render()
     {
-        return view('livewire.equipos')->layout('layouts.layout');
+        return view('livewire.sidebar');
     }
 }

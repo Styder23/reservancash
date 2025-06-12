@@ -1,0 +1,38 @@
+Tablas Orden:
+
+DESTINO
+
+PROMOCIONES
+
+PAQUETES
+
+DETALLE_PAQUETES: PAQUETES, DESTINOS, PROMOCIONES
+
+DETALLE_EQUIPOS: EQUIPOS , agregar el iduser
+
+DETALLE_SERVICIOS: SERVICIOS , agregar el iduser
+
+carpetas:
+DESTINOS:
+Destinos_Web
+Destinos_Detalle
+
+SERVICIOS:
+Servicios_Web
+Servicios_Detalle
+
+EQUIPOS:
+Equipos_Web
+Equipos_Detalle
+
+PAQUETES:
+Paquetes_Web
+Paquetes_Detalle
+
+Admin:
+Destinos_Panel (creación, edición, eliminación)
+Servicios_Panel
+Equipos_Panel
+Paquetes_Panel
+
+   
