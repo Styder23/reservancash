@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Inicio;
-use App\Livewire\Destinos;
+use App\Livewire\Destinos\Destinos;
 use App\Livewire\Servicios;
 use App\Livewire\Equipos\Equipos;
 use App\Livewire\Equipos\DetalleEquipos;

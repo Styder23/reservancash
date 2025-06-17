@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
+
+
 <body class="bg-gray-100">
     <div class="flex">
         @include('livewire.sidebar')
@@ -54,6 +56,8 @@
     </script>
 
 </body>
+
+
 
 <!-- Todo el pie de pagina -->
 <footer class="bg-gray-900 text-white py-8 mt-8">
