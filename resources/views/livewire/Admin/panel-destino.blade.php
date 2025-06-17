@@ -223,7 +223,7 @@
                 </div>
 
                 <div
-                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
                     <!-- Modal Header -->
                     <div class="gradient-bg px-6 py-4 flex justify-between items-center">
                         <h2 class="text-xl font-bold text-white">
@@ -237,106 +237,183 @@
                         </button>
                     </div>
 
-                    <!-- Modal Body -->
-                    <form wire:submit="saveDestino" class="p-6 space-y-6">
-                        <!-- Nombre -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Destino</label>
-                            <input type="text" wire:model="namedestino"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors @error('namedestino') border-red-500 @enderror"
-                                placeholder="Ingresa el nombre del destino">
-                            @error('namedestino')
-                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Tipo y Distrito -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Destino</label>
-                                <select wire:model="fk_idtipodestino"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('fk_idtipodestino') border-red-500 @enderror">
-                                    <option value="">Seleccionar tipo</option>
-                                    @foreach ($tiposDestino as $tipo)
-                                        <option value="{{ $tipo->id }}">{{ $tipo->nametipo_destinos }}</option>
-                                    @endforeach
-                                </select>
-                                @error('fk_idtipodestino')
-                                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
-                                <select wire:model="fk_iddistrito"
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('fk_iddistrito') border-red-500 @enderror">
-                                    <option value="">Seleccionar distrito</option>
-                                    @foreach ($distritos as $distrito)
-                                        <option value="{{ $distrito->id }}">{{ $distrito->namedistrito }}</option>
-                                    @endforeach
-                                </select>
-                                @error('fk_iddistrito')
-                                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Descripción -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                            <textarea wire:model="descripciondestino" rows="4"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none @error('descripciondestino') border-red-500 @enderror"
-                                placeholder="Describe el destino turístico..."></textarea>
-                            @error('descripciondestino')
-                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <!-- Imagen -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagen</label>
-                            <input type="file" wire:model="imagenes" accept="image/*"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('imagenes') border-red-500 @enderror">
-                            @error('imagenes')
-                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-
-                            <!-- Vista previa de imagen -->
-                            @if ($imagenes)
-                                <div class="mt-2">
-                                    <img src="{{ $imagenes->temporaryUrl() }}" alt="Vista previa"
-                                        class="w-32 h-32 object-cover rounded-lg">
+                    <div class="flex flex-col lg:flex-row">
+                        <!-- Modal Body -->
+                        <div class="flex-1 p-6 border-r border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Información del Destino</h3>
+                            <form wire:submit="saveDestino" class="space-y-6">
+                                <!-- Nombre -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del
+                                        Destino</label>
+                                    <input type="text" wire:model="namedestino"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors @error('namedestino') border-red-500 @enderror"
+                                        placeholder="Ingresa el nombre del destino">
+                                    @error('namedestino')
+                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                            @endif
-                        </div>
 
-                        <!-- Ubicación -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación</label>
-                            <input type="text" wire:model="ubicaciondestino"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('ubicaciondestino') border-red-500 @enderror"
-                                placeholder="Ej: Av. Principal 123, Centro de la ciudad">
-                            @error('ubicaciondestino')
-                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-                            <p class="text-sm text-gray-500 mt-1">Ingresa la dirección o descripción de la ubicación
-                            </p>
-                        </div>
+                                <!-- Tipo y Distrito -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de
+                                            Destino</label>
+                                        <select wire:model="fk_idtipodestino"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('fk_idtipodestino') border-red-500 @enderror">
+                                            <option value="">Seleccionar tipo</option>
+                                            @foreach ($tiposDestino as $tipo)
+                                                <option value="{{ $tipo->id }}">{{ $tipo->nametipo_destinos }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('fk_idtipodestino')
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
 
-                        <!-- Buttons -->
-                        <div class="flex justify-end space-x-4 pt-4 border-t">
-                            <button type="button" wire:click="closeModal"
-                                class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                                Cancelar
-                            </button>
-                            <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg font-medium">
-                                {{ $editingId ? 'Actualizar' : 'Crear' }}
-                            </button>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
+                                        <select wire:model="fk_iddistrito"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('fk_iddistrito') border-red-500 @enderror">
+                                            <option value="">Seleccionar distrito</option>
+                                            @foreach ($distritos as $distrito)
+                                                <option value="{{ $distrito->id }}">{{ $distrito->namedistrito }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('fk_iddistrito')
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Descripción -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                                    <textarea wire:model="descripciondestino" rows="4"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none @error('descripciondestino') border-red-500 @enderror"
+                                        placeholder="Describe el destino turístico..."></textarea>
+                                    @error('descripciondestino')
+                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <!-- Ubicación -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación</label>
+                                    <input type="text" wire:model="ubicaciondestino"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('ubicaciondestino') border-red-500 @enderror"
+                                        placeholder="Ej: Av. Principal 123, Centro de la ciudad">
+                                    @error('ubicaciondestino')
+                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                    <p class="text-sm text-gray-500 mt-1">Ingresa la dirección o descripción de la
+                                        ubicación
+                                    </p>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="flex justify-end space-x-4 pt-4 border-t">
+                                    <button type="button" wire:click="closeModal"
+                                        class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit"
+                                        class="btn-primary text-white px-6 py-3 rounded-lg font-medium">
+                                        {{ $editingId ? 'Actualizar' : 'Crear' }}
+                                    </button>
+                                </div>
+                            </form>
+
+
                         </div>
-                    </form>
+                        <div class="flex-1 p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Imágenes</h3>
+
+                            <!-- Imagen Principal -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Imagen Principal</label>
+                                <input type="file" wire:model="imagenPrincipal" accept="image/*"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('imagenPrincipal') border-red-500 @enderror">
+                                @error('imagenPrincipal')
+                                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                @enderror
+
+                                @if ($imagenPrincipal)
+                                    <div class="mt-2">
+                                        <img src="{{ $imagenPrincipal->temporaryUrl() }}"
+                                            alt="Vista previa principal" class="w-32 h-32 object-cover rounded-lg">
+                                    </div>
+                                @elseif ($editingId && $imagenPrincipalActual)
+                                    <div class="mt-2">
+                                        <img src="{{ Storage::url($imagenPrincipalActual) }}" alt="Imagen actual"
+                                            class="w-32 h-32 object-cover rounded-lg">
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Imágenes Adicionales -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Imágenes
+                                    Adicionales</label>
+                                <input type="file" wire:model="imagenesAdicionales" accept="image/*" multiple
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('imagenesAdicionales') border-red-500 @enderror @error('imagenesAdicionales.*') border-red-500 @enderror">
+
+                                @error('imagenesAdicionales')
+                                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                @enderror
+
+                                @error('imagenesAdicionales.*')
+                                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                @enderror
+
+                                <div class="text-xs text-gray-500 mt-1">
+                                    Puedes seleccionar múltiples imágenes. Máximo 2MB por imagen.
+                                </div>
+
+                                <!-- Vista previa de imágenes adicionales -->
+                                @if ($imagenesAdicionales && count($imagenesAdicionales) > 0)
+                                    <div class="mt-2 grid grid-cols-3 gap-2">
+                                        @foreach ($imagenesAdicionales as $index => $imagen)
+                                            @if ($imagen)
+                                                <div class="relative">
+                                                    <img src="{{ $imagen->temporaryUrl() }}" alt="Vista previa"
+                                                        class="w-20 h-20 object-cover rounded-lg">
+                                                    <div
+                                                        class="absolute -top-1 -right-1 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                                                        {{ $index + 1 }}
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- Imágenes adicionales existentes (en edición) -->
+                                @if ($editingId && $imagenesAdicionalesActuales && count($imagenesAdicionalesActuales) > 0)
+                                    <div class="mt-4">
+                                        <h4 class="text-sm font-medium text-gray-700 mb-2">Imágenes actuales:</h4>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            @foreach ($imagenesAdicionalesActuales as $index => $imagen)
+                                                <div class="relative">
+                                                    <img src="{{ Storage::url($imagen['url']) }}" alt="Imagen actual"
+                                                        class="w-20 h-20 object-cover rounded-lg">
+                                                    <button type="button"
+                                                        wire:click="eliminarImagenAdicional({{ $index }})"
+                                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors">
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
     @endif
 
     <!-- Modal de confirmación de eliminación -->

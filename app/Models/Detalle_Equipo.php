@@ -17,27 +17,27 @@ class Detalle_Equipo extends Model
         'fk_idmarca','fk_idmodelo','fk_idtipoequipo'
     ];
 
-    public function Modelo()
+    public function modelo()
     {
         return $this->belongsTo(Modelo::class ,'fk_idmodelo');
     }
 
-    public function Marca()
+    public function marca()
     {
         return $this->belongsTo(Marca::class ,'fk_idmarca');
     }
 
-    public function Serie()
+    public function serie()
     {
         return $this->belongsTo(Serie::class ,'fk_idserie');
     }
 
-    public function Categoria()
+    public function categoria()
     {
         return $this->belongsTo(Categoria::class ,'fk_idcategoria');
     }
 
-    public function Tipoequipo()
+    public function tipoequipo()
     {
         return $this->belongsTo(TipoEquipo::class ,'fk_idtipoequipo');
     }

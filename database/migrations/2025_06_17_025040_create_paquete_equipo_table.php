@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('imagenes', function (Blueprint $table) {
+        Schema::create('paquete_equipo', function (Blueprint $table) {
             $table->id();
-            $table->string('url'); 
-            $table->string('tipo')->nullable(); //principal o segundaria
-            $table->morphs('imageable'); // Esto crea imageable_id (entero) y imageable_type (string)
-            $table->timestamps(); // mantenemos los timestamps
+            $table->foreignId('paquete_id')->constrained()->onDelete('cascade');
+            $table->foreignId('equipo_id')->constrained()->onDelete('cascade');
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('imagenes');
+        Schema::dropIfExists('paquete_equipo');
     }
 };

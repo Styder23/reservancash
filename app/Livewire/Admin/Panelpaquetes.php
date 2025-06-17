@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 
@@ -8,6 +8,6 @@ class Panelpaquetes extends Component
 {
     public function render()
     {
-        return view('livewire.panelpaquetes');
+        return view('livewire.admin.panelpaquetes');
     }
 }

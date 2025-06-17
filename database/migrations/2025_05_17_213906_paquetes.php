@@ -16,6 +16,9 @@ return new class extends Migration
             $table->decimal('preciopaquete', 10, 2);
             $table->string('nombrepaquete');
             $table->integer('cantidadpaquete');
+            $table->text('descripcion')->nullable();
+            $table->string('imagen_principal')->nullable();
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
             $table->unsignedBigInteger('fk_idempresa')->nullable();
 
             // Foreign key constraints
