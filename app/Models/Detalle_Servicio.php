@@ -5,25 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Destinos extends Model
+class Detalle_Servicio extends Model
 {
     use HasFactory;
+    
     public $timestamps = false;
+    protected $table = 'detalle_servicios';
+
     protected $fillable = [
-        'namedestino','descripciondestino','imagenes','ubicaciondestino','fk_iddistrito','fk_idtipodestino'	
+        'nombreservicio','descripcionservicio','imageneservicio','precioservicio','fk_idtiposervicio'
     ];
 
-    protected $casts = [
-        'ubicacion' => 'array'
-    ];
-
-    public function distrito()
+    public function tiposervicio()
     {
-        return $this->belongsTo(Distritos::class ,'fk_iddistrito');
+        return $this->belongsTo(TipoServicios::class ,'fk_idtiposervicio');
     }
-    public function tipoDestino()
+
+    public function servicios()
     {
-        return $this->belongsTo(TipoDestinos::class, 'fk_idtipodestino');
+        return $this->hasMany('App\Models\Servicios', 'fk_iddetalle_servicios');
     }
 
     public function imagenes()

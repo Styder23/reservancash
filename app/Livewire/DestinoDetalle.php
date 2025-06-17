@@ -8,6 +8,6 @@ class DestinoDetalle extends Component
 {
     public function render()
     {
-        return view('livewire.destino-detalle')->layout('layouts.layout');
+        return view('livewire.destinos.destino-detalle')->layout('layouts.layout');
     }
 }

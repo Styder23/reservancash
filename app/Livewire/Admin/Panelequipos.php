@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Equipos;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Equipos;
@@ -13,7 +13,7 @@ use App\Models\TipoEquipo;
 use App\Models\Detalle_Equipo;
 use Livewire\WithFileUploads;
 
-class DetalleEquipos extends Component
+class Panelequipos extends Component
 {
     use WithFileUploads;
 
@@ -78,7 +78,7 @@ class DetalleEquipos extends Component
             ->orderBy('id', 'desc')
             ->get();
 
-        return view('livewire.equipos.detalle-equipos', [
+        return view('livewire.admin.panelequipos', [
             'equipos' => $equipos
         ])->layout('layouts.layout');
     }

@@ -10,6 +10,6 @@ class Destinos extends Component
     {
         $layout = auth()->check() ? 'layouts.app' : 'layouts.layout';
 
-        return view('livewire.destinos')->layout($layout);
+        return view('livewire.destinos.destinos')->layout($layout);
     }
 }

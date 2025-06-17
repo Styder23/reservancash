@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_itinerario', function (Blueprint $table) {
             $table->id();
-            $table->string('comentario')->nullable();
+            $table->text('comentario')->nullable();
             $table->date('fecha')->nullable();
             $table->string('foto')->nullable();
             $table->unsignedBigInteger('fk_idusers')->nullable();
