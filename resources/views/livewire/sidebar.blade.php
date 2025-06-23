@@ -5,8 +5,7 @@
 
 <div x-data="{ sidebarOpen: true }" class="flex min-h-screen bg-gray-100 ">
     <!-- Sidebar -->
-    <div :class="sidebarOpen ? 'w-64' : 'w-20'"
-        class="bg-gray-800 text-white transition-all duration-300 flex flex-col">
+    <div :class="sidebarOpen ? 'w-64' : 'w-20'" class="bg-gray-800 text-white transition-all duration-300 flex flex-col">
         <!-- Encabezado con botón -->
         <div class="flex items-center justify-between p-4 border-b border-gray-700">
             <div class="flex items-center space-x-2">
@@ -58,7 +57,6 @@
                 </li>
                 <!-- Iniciar Sesión -->
                 <li x-data="{ open: false }" @mouseleave="open = false" class="p-4 hover:bg-gray-700 relative">
-
                     <!-- Botón principal -->
                     <a href="#" @click.prevent="open = !open" class="flex items-center justify-between w-full">
                         <div class="flex items-center">
@@ -67,7 +65,6 @@
                         </div>
                         <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" x-show="sidebarOpen"></i>
                     </a>
-
                     <!-- Menú desplegable vertical -->
                     <div x-show="open" @click.away="open = false" x-transition
                         class="mt-2 w-full bg-gray-700 rounded shadow-lg z-50" x-cloak>
@@ -91,10 +88,24 @@
                         @endauth
                     </div>
                 </li>
+                <!-- DashEmpresa -->
+                @auth
+                    @if (Auth::user()->user_type === 'Cliente')
+                        <li class="p-4 hover:bg-gray-700 mt-auto">
+                            <a href="{{ route('dashcliente') }}" class="flex items-center">
+                                <i class="fas fa-briefcase mr-2"></i>
+                                <span x-show="sidebarOpen">Perfil Empresa</span>
+                            </a>
+                        </li>
+                    @endif
+                @endauth
 
             </ul>
+
         </nav>
+
     </div>
+    
 </div>
 
 
