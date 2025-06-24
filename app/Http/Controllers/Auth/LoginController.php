@@ -87,7 +87,7 @@ class LoginController extends Controller
         $this->clearFailedAttempts($user);
         
         // Autenticar usuario
-        // Auth::login($user);
+        Auth::login($user);
         $request->session()->regenerate();
         
         // Obtener el tipo de usuario basándose en fk_idtipousu
