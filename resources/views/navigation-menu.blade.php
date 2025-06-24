@@ -42,17 +42,20 @@
                             :active="request()->routeIs('dashboard.empresa')">
                             {{ __('Mi Dashboard') }}
                         </x-nav-link>
-                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('det_servicios') }}"
+                            :active="false">
                             {{ __('Mis Servicios') }}
                         </x-nav-link>
-                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('det_equipos') }}"
+                            :active="false">
                             {{ __('Mis Equipos') }}
                         </x-nav-link>
                         <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
                             {{ __('Reservas') }}
                         </x-nav-link>
-                        <x-nav-link class="text-white font-bold text-lg" href="#" :active="false">
-                            {{ __('Estadísticas') }}
+                        <x-nav-link class="text-white font-bold text-lg" href="{{ route('det_paquetes') }}"
+                            :active="false">
+                            {{ __('Paquetes') }}
                         </x-nav-link>
                     @else
                         {{-- Menú por defecto --}}
@@ -236,7 +239,7 @@
                     {{ __('Reservas') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link href="#" :active="false">
-                    {{ __('Estadísticas') }}
+                    {{ __('Paquetes') }}
                 </x-responsive-nav-link>
             @else
                 {{-- Menú móvil por defecto --}}

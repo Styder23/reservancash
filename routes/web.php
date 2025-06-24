@@ -1,20 +1,27 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Inicio;
-use App\Livewire\Destinos\Destinos;
-use App\Livewire\Servicios;
-use App\Livewire\Equipos\Equipos;
-use App\Livewire\Equipos\DetalleEquipos;
+use App\Livewire\Admin;
 
-use App\Livewire\Paquetes;
-use App\Livewire\Promociones;
-use App\Livewire\Empresas;
+// login
+use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\Dashcliente;
 use App\Livewire\Dashempresa;
-use App\Livewire\Admin;
-use App\Http\Controllers\Auth\LoginController;
-use App\Livewire\DestinoDetalle;
+
+// publico
+use App\Livewire\Inicio;
+use App\Livewire\Destinos\Destinos;
+use App\Livewire\Servicios\Servicios;
+use App\Livewire\Equipos\Equipos;
+use App\Livewire\Empresas;
+use App\Livewire\Paquetes\Paquetes;
+use App\Livewire\Promociones\Promociones;
+
+// vistas pública
+use App\Livewire\Equipos\DetalleEquipos;
+use App\Livewire\Servicios\DetalleServicios;
+use App\Livewire\Destinos\DestinoDetalle;
+
 use App\Livewire\Pantalladividida;
 use App\Livewire\dividida;
 use App\Livewire\Favoritos;
@@ -31,11 +38,19 @@ Route::get('/', function () {
     return redirect('/inicio');
 });
 
+// rutas publicas
 Route::get('/inicio', Inicio::class)->name('inicioapp');
 Route::get('/servicios', Servicios::class)->name('servicios');
 Route::get('/destinos', Destinos::class)->name('destinos');
 Route::get('/paquetes', Paquetes::class)->name('paquetes');
 Route::get('/empresas', Empresas::class)->name('empresas');
+Route::get('/promociones', Promociones::class)->name('Promociones');
+
+// detalles de los elementos
+Route::get('/vista_equipo/{id}', DetalleEquipos::class)->name('vistaequipo');
+Route::get('/vista_destino/{id}', DestinoDetalle::class)->name('vistadestino');
+Route::get('/vista_servicios/{id}', DetalleServicios::class)->name('vistaservicio');
+// Route::get('/vista_empresas', Promociones::class)->name('Promociones'); // mas adelante
 
 Route::get('/pantalladividida', Pantalladividida::class)->name('pantalladividida');
 Route::get('/dividida', Dividida::class)->name('dividida');

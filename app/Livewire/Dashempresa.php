@@ -8,6 +8,6 @@ class Dashempresa extends Component
 {
     public function render()
     {
-        return view('livewire.dashempresa')->layout('layouts.app');
+        return view('livewire.dashempresa')->layout('layouts.prueba');
     }
 }

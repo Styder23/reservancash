@@ -110,8 +110,8 @@
                         <div class="bg-white rounded-xl card-shadow hover-lift overflow-hidden animate-fade-in">
                             <!-- Image -->
                             <div class="h-48 bg-gradient-to-br from-purple-400 to-blue-500 relative overflow-hidden">
-                                @if ($servicio->Det_servicio->imageneservicio)
-                                    <img src="{{ asset('storage/' . $servicio->Det_servicio->imageneservicio) }}"
+                                @if ($servicio->Det_servicio->imagenes->where('tipo', 'principal')->first())
+                                    <img src="{{ asset('storage/' . $servicio->Det_servicio->imagenes->where('tipo', 'principal')->first()->url) }}"
                                         alt="{{ $servicio->Det_servicio->nombreservicio }}"
                                         class="w-full h-full object-cover">
                                 @else
@@ -543,14 +543,4 @@
             </div>
         </div>
     @endif
-    <!-- Script para confirmación de eliminación -->
-    {{-- <script>
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('confirmarEliminar', (id) => {
-                if (confirm('¿Estás seguro de que quieres eliminar este servicio?')) {
-                    @this.eliminar(id);
-                }
-            });
-        });
-    </script> --}}
 </div>

@@ -29,8 +29,23 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo_path',
+        'fk_idpersona',
+        'fk_idtipousu',
+        'intentos_fallidos',
+        'bloqueado_hasta',
+        'ultimo_acceso'
     ];
 
+    public function persona()
+    {
+        return $this->belongsTo(Personas::class ,'fk_idpersona');
+    }
+
+    // public function persona()
+    // {
+    //     return $this->belongsTo(Personas::class ,'fk_idtipousu');
+    // }
     /**
      * The attributes that should be hidden for serialization.
      *

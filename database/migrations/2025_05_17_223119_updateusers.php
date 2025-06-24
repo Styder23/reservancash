@@ -15,7 +15,9 @@ return new class extends Migration
             $table->boolean('estado_usu')->default(1);
             $table->unsignedBigInteger('fk_idpersona')->nullable();
             $table->unsignedBigInteger('fk_idtipousu')->nullable();
-
+            $table->integer('intentos_fallidos')->default(0);
+            $table->timestamp('bloqueado_hasta')->nullable();
+            $table->timestamp('ultimo_acceso')->nullable();
 
             $table->foreign('fk_idpersona')
                 ->references('id')->on('personas')

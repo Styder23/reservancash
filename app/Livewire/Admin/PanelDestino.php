@@ -85,7 +85,7 @@ class PanelDestino extends Component
 
         return view('livewire.admin.panel-destino', [
             'destinos' => $destinos
-        ])->layout('layouts.layout');
+        ])->layout('layouts.prueba');
     }
 
     public function openModal()

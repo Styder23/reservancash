@@ -1,12 +1,9 @@
-<!-- resources/views/layouts/app.blade.php o similar -->
-
 <!-- AlpineJS ya debe estar cargado -->
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 <div x-data="{ sidebarOpen: true }" class="flex min-h-screen bg-gray-100 ">
     <!-- Sidebar -->
-    <div :class="sidebarOpen ? 'w-64' : 'w-20'"
-        class="bg-gray-800 text-white transition-all duration-300 flex flex-col">
+    <div :class="sidebarOpen ? 'w-64' : 'w-20'" class="bg-gray-800 text-white transition-all duration-300 flex flex-col">
         <!-- Encabezado con botón -->
         <div class="flex items-center justify-between p-4 border-b border-gray-700">
             <div class="flex items-center space-x-2">

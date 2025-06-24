@@ -12,6 +12,7 @@ use App\Models\Serie;
 use App\Models\TipoEquipo;
 use App\Models\Detalle_Equipo;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\DB;
 
 class Panelequipos extends Component
 {
@@ -80,7 +81,7 @@ class Panelequipos extends Component
 
         return view('livewire.admin.panelequipos', [
             'equipos' => $equipos
-        ])->layout('layouts.layout');
+        ])->layout('layouts.prueba');
     }
 
     public function abrirModalCrear()
@@ -116,6 +117,21 @@ class Panelequipos extends Component
 
     public function guardar()
     {
+        // Obtener el ID del usuario autenticado y la empresa (como ya lo tienes)
+        $userId = auth()->id();
+        $empresa = DB::table('users')
+            ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
+            ->join('representante_legal', 'representante_legal.fk_idpersona', '=', 'personas.id')
+            ->join('empresas', 'empresas.id', '=', 'representante_legal.fk_idempresa')
+            ->where('users.id', $userId)
+            ->select('empresas.id', 'empresas.nameempresa')
+            ->first();
+
+        if (!$empresa) {
+            session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            return;
+        }
+        
         $this->validate([
             'form.name_equipo' => 'required',
             'form.precio_equipo' => 'required|numeric',
@@ -143,8 +159,9 @@ class Panelequipos extends Component
         ]);
 
         Equipos::create([
-            'fk_iddetalle_equipo' => $equipo->id, // Cambiar 'fk_idequipo' por 'fk_iddetalle_equipo'
+            'fk_iddetalle_equipo' => $equipo->id, 
             'cantidadequipo' => $this->form['cantidadequipo'],
+            'fk_idempresa' => $empresa->id,
         ]);
 
         $this->cerrarModal();

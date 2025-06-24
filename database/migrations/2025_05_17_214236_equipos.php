@@ -15,10 +15,14 @@ return new class extends Migration
             $table->id();
             $table->integer('cantidadequipo');
             $table->unsignedBigInteger('fk_iddetalle_equipo')->nullable();
+            $table->unsignedBigInteger('fk_idempresa')->nullable();
 
             // Foreign key constraints
             $table->foreign('fk_iddetalle_equipo')
                 ->references('id')->on('detalle_equipos')
+                ->onDelete('set null');
+            $table->foreign('fk_idempresa')
+                ->references('id')->on('empresas')
                 ->onDelete('set null');
         });
     }

@@ -45,6 +45,21 @@
                 transform: translateY(0);
             }
         }
+
+        .badge-active {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .badge-inactive {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .date-badge {
+            background-color: #3B82F6;
+            color: white;
+        }
     </style>
 
     <div class="min-h-screen bg-gray-50">
@@ -53,13 +68,12 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold text-white">Panel Administrativo</h1>
-                        <p class="text-blue-100 mt-1">Gestión de Promociones</p>
+                        <h1 class="text-3xl font-bold text-white">Panel de Promociones</h1>
+                        <p class="text-blue-100 mt-1">Gestión de promociones de tu empresa</p>
                     </div>
                     <div class="flex items-center space-x-4">
                         <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                            <span class="text-white font-medium">{{ $Promociones->count() }} Promociones
-                                registrados</span>
+                            <span class="text-white font-medium">{{ $promociones->count() }} Promociones</span>
                         </div>
                     </div>
                 </div>
@@ -93,7 +107,7 @@
 
                 <div class="flex items-center space-x-4">
                     <div class="relative">
-                        <input type="text" wire:model.live="searchQuery1" placeholder="Buscar Promciones..."
+                        <input type="text" wire:model.live="searchQuery" placeholder="Buscar promociones..."
                             class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
@@ -104,59 +118,50 @@
                 </div>
             </div>
 
-            <!-- servicios Grid -->
+            <!-- Promociones Grid -->
             @if ($promociones->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach ($promociones as $promos)
+                    @foreach ($promociones as $promo)
                         <div class="bg-white rounded-xl card-shadow hover-lift overflow-hidden animate-fade-in">
-                            <!-- Image -->
+                            <!-- Imagen de la promoción -->
                             <div class="h-48 bg-gradient-to-br from-purple-400 to-blue-500 relative overflow-hidden">
-                                @if ($promos->Det_servicio->imageneservicio)
-                                    <img src="{{ asset('storage/' . $promos->Det_servicio->imageneservicio) }}"
-                                        alt="{{ $promos->Det_servicio->nombreservicio }}"
-                                        class="w-full h-full object-cover">
+                                @if ($promo->imagenes->count() > 0)
+                                    <img src="{{ asset('storage/' . $promo->imagenes->first()->url) }}"
+                                        alt="{{ $promo->namepromocion }}" class="w-full h-full object-cover">
                                 @else
-                                    <div class="relative h-full w-full">
-                                        @if ($promos->Det_servicio->imagenes->count() > 0)
-                                            @foreach ($promos->Det_servicio->imagenes as $imagen)
-                                                <div
-                                                    class="absolute inset-0 transition-opacity duration-300 {{ $loop->first ? 'opacity-100' : 'opacity-0' }}">
-                                                    <img src="{{ asset('storage/' . $imagen->url) }}"
-                                                        alt="{{ $promos->Det_servicio->nombreservicio }}"
-                                                        class="w-full h-full object-cover">
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <p class="font-medium">Sin imagen</p>
-                                        @endif
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-white opacity-70" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
                                     </div>
                                 @endif
 
-                                <!-- Badge categoria -->
+                                <!-- Badge de estado -->
                                 <div class="absolute top-4 left-4">
                                     <span
-                                        class="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                                        {{ $promos->Det_servicio->tiposervicio->nametipo_servicios ?? 'Sin tipo' }}
+                                        class="px-3 py-1 rounded-full text-sm font-medium {{ $promo->estado == 'Promocion Activa' ? 'badge-active' : 'badge-inactive' }}">
+                                        {{ $promo->estado }}
                                     </span>
                                 </div>
 
-                                <!-- Badge cantidad -->
+                                <!-- Badge de descuento -->
                                 <div class="absolute top-4 right-4">
                                     <span
-                                        class="bg-blue-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
-                                        {{ $promos->cantidadservicio }} unidades
+                                        class="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                                        {{ $promo->descuento }}% OFF
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- Content -->
+                            <!-- Contenido -->
                             <div class="p-6">
                                 <div class="flex justify-between items-start mb-3">
-                                    <h3 class="text-xl font-bold text-gray-900">
-                                        {{ $promos->Det_servicio->nombreservicio }}
-                                    </h3>
+                                    <h3 class="text-xl font-bold text-gray-900">{{ $promo->namepromocion }}</h3>
                                     <div class="flex space-x-1">
-                                        <button wire:click="editar({{ $promos->id }})"
+                                        <button wire:click="editar({{ $promo->id }})"
                                             class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -165,7 +170,7 @@
                                                 </path>
                                             </svg>
                                         </button>
-                                        <button wire:click="eliminar({{ $promos->id }})"
+                                        <button wire:click="eliminar({{ $promo->id }})"
                                             class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -177,29 +182,38 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center text-green-600 mb-3">
-                                    <span class="text-lg font-bold">S/
-                                        {{ $promos->Det_servicio->precioservicio }}</span>
-                                </div>
-
                                 <p class="text-gray-600 text-sm mb-4 line-clamp-3">
-                                    {{ Str::limit($promos->Det_servicio->descripcionservicio ?? 'Sin descripción disponible', 120) }}
+                                    {{ Str::limit($promo->descripcion, 120) }}
                                 </p>
+
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="date-badge px-2 py-1 rounded-full text-xs">
+                                        Inicio: {{ \Carbon\Carbon::parse($promo->fechainicio)->format('d/m/Y') }}
+                                    </span>
+                                    <span class="date-badge px-2 py-1 rounded-full text-xs">
+                                        Fin: {{ \Carbon\Carbon::parse($promo->fechafin)->format('d/m/Y') }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
+
+                <!-- Paginación -->
+                {{-- <div class="mt-6">
+                    {{ $promociones->links() }}
+                </div> --}}
             @else
                 <!-- Empty State -->
                 <div class="text-center py-12">
                     <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                         </path>
                     </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No hay Promociones</h3>
-                    <p class="text-gray-600 mb-4">Comienza creando tu primera promoción</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No hay promociones registradas</h3>
+                    <p class="text-gray-600 mb-4">Comienza creando tu primera promoción para atraer más clientes</p>
                     <button wire:click="abrirModalCrear"
                         class="btn-primary text-white px-6 py-3 rounded-lg font-medium">
                         Crear promoción
@@ -209,7 +223,7 @@
         </main>
     </div>
 
-    <!-- Modal Crear/Editar Equipo -->
+    <!-- Modal Crear/Editar Promoción -->
     @if ($modal)
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -218,11 +232,11 @@
                 </div>
 
                 <div
-                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
+                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
                     <!-- Modal Header -->
                     <div class="gradient-bg px-6 py-4 flex justify-between items-center">
                         <h2 class="text-xl font-bold text-white">
-                            {{ $modoEditar ? 'Editar Equipo' : 'Crear Nuevo Equipo' }}
+                            {{ $modoEditar ? 'Editar Promoción' : 'Crear Nueva Promoción' }}
                         </h2>
                         <button wire:click="cerrarModal" class="text-white hover:text-gray-200 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,247 +249,213 @@
                     <!-- Modal Body -->
                     <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
                         <form wire:submit.prevent="{{ $modoEditar ? 'actualizar' : 'guardar' }}">
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <!-- Formulario - 2 columnas -->
-                                <div class="lg:col-span-2 space-y-6">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del
-                                                servicio</label>
-                                            <input type="text" wire:model="form.nombreservicio"
-                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.nombreservicio') border-red-500 @enderror"
-                                                placeholder="Ingresa el nombre del servicio" required>
-                                            @error('form.nombreservicio')
-                                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                                            <div class="relative">
-                                                <span class="absolute left-3 top-3 text-gray-500">S/</span>
-                                                <input type="number" wire:model="form.precioservicio" step="0.01"
-                                                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.precioservicio') border-red-500 @enderror"
-                                                    placeholder="0.00" required>
-                                            </div>
-                                            @error('form.precioservicio')
-                                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-                                    </div>
-
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                                        <textarea wire:model="form.descripcionservicio" rows="4"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none @error('form.descripcionservicio') border-red-500 @enderror"
-                                            placeholder="Describe las características del servicio"></textarea>
-                                        @error('form.descripcionservicio')
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de la
+                                            promoción</label>
+                                        <input type="text" wire:model="form.namepromocion"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.namepromocion') border-red-500 @enderror"
+                                            placeholder="Ej: Verano 2023" required>
+                                        @error('form.namepromocion')
                                             <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                                         @enderror
                                     </div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
-                                            <select wire:model="form.fk_idtiposervicio"
-                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.fk_idtiposervicio') border-red-500 @enderror">
-                                                <option value="">-- Selecciona un tipo --</option>
-                                                @foreach ($tipos as $tipo)
-                                                    <option value="{{ $tipo->id }}">
-                                                        {{ $tipo->nametipo_servicios }}</option>
-                                                @endforeach
-                                            </select>
-                                            @error('form.fk_idtiposervicio')
-                                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
-                                        </div>
-
-                                        <div>
-                                            <label
-                                                class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
-                                            <input type="number" wire:model="form.cantidadservicio"
-                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.cantidadservicio') border-red-500 @enderror"
-                                                placeholder="1" min="1" required>
-                                            @error('form.cantidadservicio')
-                                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                            @enderror
-                                        </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Descuento
+                                            (%)</label>
+                                        <input type="number" wire:model="form.descuento" min="1"
+                                            max="100"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.descuento') border-red-500 @enderror"
+                                            placeholder="Ej: 20" required>
+                                        @error('form.descuento')
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
 
-                                <!-- Sección de imagen principal - 1 columna -->
-                                <div class="lg:col-span-1">
-                                    <div class="bg-gray-50 rounded-lg p-6 h-full">
-                                        <label class="block text-sm font-medium text-gray-700 mb-4">Imagen del
-                                            servicio</label>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                                    <textarea wire:model="form.descripcion" rows="4"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none @error('form.descripcion') border-red-500 @enderror"
+                                        placeholder="Describe los detalles de la promoción"></textarea>
+                                    @error('form.descripcion')
+                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
+                                </div>
 
-                                        <!-- Vista previa de imagen principal -->
-                                        <div class="mb-4">
-                                            @if ($form['imageneservicio'])
-                                                <div class="relative">
-                                                    <img src="{{ $form['imageneservicio']->temporaryUrl() }}"
-                                                        alt="Vista previa"
-                                                        class="w-full h-48 object-cover rounded-lg border-2 border-dashed border-gray-300">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de
+                                            inicio</label>
+                                        <input type="date" wire:model="form.fechainicio"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.fechainicio') border-red-500 @enderror"
+                                            required>
+                                        @error('form.fechainicio')
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de
+                                            fin</label>
+                                        <input type="date" wire:model="form.fechafin"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('form.fechafin') border-red-500 @enderror"
+                                            required>
+                                        @error('form.fechafin')
+                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <!-- Sección de imágenes -->
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-4">Imágenes de la
+                                        promoción</label>
+
+                                    <!-- Vista previa de imágenes existentes -->
+                                    @if ($modoEditar && $imagenesExistentes->count() > 0)
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
+                                            @foreach ($imagenesExistentes as $imagen)
+                                                <div class="relative aspect-square group">
+                                                    <img src="{{ asset('storage/' . $imagen->url) }}"
+                                                        class="w-full h-full object-cover rounded-lg border-2 border-gray-200">
                                                     <button type="button"
-                                                        wire:click="$set('form.imageneservicio', null)"
-                                                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        wire:click="eliminarImagen({{ $imagen->id }})"
+                                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                         </svg>
                                                     </button>
                                                 </div>
-                                            @elseif ($modoEditar && $imagenPrincipalExistente)
-                                                <!-- Mostrar imagen principal existente en modo edición -->
-                                                <div class="relative">
-                                                    <img src="{{ asset('storage/' . $imagenPrincipalExistente->url) }}"
-                                                        alt="Imagen actual"
-                                                        class="w-full h-48 object-cover rounded-lg border-2 border-dashed border-gray-300">
-                                                    <div
-                                                        class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                                                        Imagen actual
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div
-                                                    class="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-100">
-                                                    <div class="text-center">
-                                                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4"
-                                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    <!-- Vista previa de nuevas imágenes -->
+                                    @if ($imagenesAdicionales && count($imagenesAdicionales) > 0)
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
+                                            @foreach ($imagenesAdicionales as $index => $imagen)
+                                                <div class="relative aspect-square group">
+                                                    <img src="{{ $imagen->temporaryUrl() }}"
+                                                        class="w-full h-full object-cover rounded-lg border-2 border-green-200">
+                                                    <button type="button"
+                                                        wire:click="removeImage({{ $index }})"
+                                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                            </path>
+                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                         </svg>
-                                                        <p class="text-gray-500 text-sm">Sin imagen seleccionada</p>
-                                                    </div>
+                                                    </button>
                                                 </div>
-                                            @endif
+                                            @endforeach
                                         </div>
+                                    @endif
 
-                                        <!-- Input de archivo principal -->
-                                        <div class="relative">
-                                            <input type="file" wire:model="form.imageneservicio"
-                                                id="imagen-upload"
-                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                accept="image/*">
-                                            <label for="imagen-upload"
-                                                class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                                    </path>
-                                                </svg>
-                                                <span class="text-sm text-gray-600">
-                                                    {{ $modoEditar && $imagenPrincipalExistente ? 'Cambiar imagen' : 'Seleccionar imagen' }}
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <p class="text-xs text-gray-500 mt-2">
-                                            Formatos: JPG, PNG, GIF (máx. 2MB)
-                                        </p>
-                                        @error('form.imageneservicio')
-                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                        @enderror
+                                    <!-- Input para subir imágenes -->
+                                    <div class="relative">
+                                        <input type="file" wire:model="imagenesAdicionales"
+                                            id="imagenes-promocion" multiple
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            accept="image/*">
+                                        <label for="imagenes-promocion"
+                                            class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <svg class="w-5 h-5 mr-2 text-gray-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                </path>
+                                            </svg>
+                                            <span class="text-sm text-gray-600">
+                                                {{ $modoEditar ? 'Añadir más imágenes' : 'Seleccionar imágenes' }}
+                                            </span>
+                                        </label>
                                     </div>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        Formatos: JPG, PNG, GIF (máx. 5MB cada una)
+                                    </p>
+                                    @error('imagenesAdicionales.*')
+                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
                                 </div>
 
-                                <!-- Sección de imágenes adicionales - FUERA del grid principal -->
-                                <div class="lg:col-span-3 mt-6">
-                                    <div class="bg-gray-50 rounded-lg p-6">
-                                        <label class="block text-sm font-medium text-gray-700 mb-4">Imágenes
-                                            adicionales</label>
+                                <!-- Sección de videos -->
+                                <div class="bg-gray-50 rounded-lg p-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-4">Videos de la
+                                        promoción</label>
 
-                                        <!-- Contenedor con grid responsive para todas las imágenes -->
-                                        <div
-                                            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-4">
-
-                                            <!-- Imágenes existentes (solo en edición) -->
-                                            @if ($modoEditar && $imagenesExistentes->count() > 0)
-                                                @foreach ($imagenesExistentes as $imagen)
-                                                    <div class="relative aspect-square group">
-                                                        <img src="{{ asset('storage/' . $imagen->url) }}"
-                                                            class="w-full h-full object-cover rounded-lg border-2 border-gray-200 group-hover:border-purple-300 transition-colors">
-                                                        <button type="button"
-                                                            wire:click="eliminarImagen({{ $imagen->id }})"
-                                                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                            </svg>
-                                                        </button>
-                                                        <div
-                                                            class="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
-                                                            Actual
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            @endif
-
-                                            <!-- Nuevas imágenes seleccionadas -->
-                                            @if ($imagenesAdicionales && count($imagenesAdicionales) > 0)
-                                                @foreach ($imagenesAdicionales as $index => $imagen)
-                                                    <div class="relative aspect-square group">
-                                                        <img src="{{ $imagen->temporaryUrl() }}"
-                                                            class="w-full h-full object-cover rounded-lg border-2 border-green-200 group-hover:border-green-400 transition-colors">
-                                                        <button type="button"
-                                                            wire:click="removeImage({{ $index }})"
-                                                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                            </svg>
-                                                        </button>
-                                                        <div
-                                                            class="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-1 rounded">
-                                                            Nueva
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            @endif
-
-                                            <!-- Botón para agregar más imágenes -->
-                                            <div class="relative aspect-square">
-                                                <input type="file" wire:model="imagenesAdicionales"
-                                                    id="imagenes-adicionales" multiple
-                                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                    accept="image/*">
-                                                <label for="imagenes-adicionales"
-                                                    class="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-gray-100 transition-colors">
-                                                    <svg class="w-8 h-8 text-gray-400 mb-1" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                                    </svg>
-                                                    <span class="text-xs text-gray-600 text-center px-1">Agregar
-                                                        imágenes</span>
-                                                </label>
-                                            </div>
+                                    <!-- Vista previa de videos existentes -->
+                                    @if ($modoEditar && $videosExistentes->count() > 0)
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                            @foreach ($videosExistentes as $video)
+                                                <div class="relative">
+                                                    <video controls class="w-full rounded-lg border border-gray-200">
+                                                        <source src="{{ asset('storage/' . $video->url) }}"
+                                                            type="video/mp4">
+                                                        Tu navegador no soporta el elemento de video.
+                                                    </video>
+                                                    <button type="button"
+                                                        wire:click="eliminarVideo({{ $video->id }})"
+                                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            @endforeach
                                         </div>
-
-                                        <!-- Información sobre formatos -->
-                                        <div class="flex items-center justify-between text-xs text-gray-500">
-                                            <span>Formatos: JPG, PNG, GIF (máx. 2MB cada una)</span>
-                                            <span>
-                                                @if ($imagenesAdicionales && count($imagenesAdicionales) > 0)
-                                                    {{ count($imagenesAdicionales) }} imagen(es) nueva(s)
-                                                    seleccionada(s)
-                                                @endif
-                                                @if ($modoEditar && $imagenesExistentes->count() > 0)
-                                                    {{ $imagenesExistentes->count() }} imagen(es) existente(s)
-                                                @endif
+                                    @endif
+                                    @if ($videosAdicionales && count($videosAdicionales) > 0)
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                            @foreach ($videosAdicionales as $index => $video)
+                                                <div class="relative">
+                                                    <video controls class="w-full rounded-lg border border-green-200">
+                                                        <source src="{{ $video->temporaryUrl() }}" type="video/mp4">
+                                                        Tu navegador no soporta el elemento de video.
+                                                    </video>
+                                                    <button type="button"
+                                                        wire:click="removeVideo({{ $index }})"
+                                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    <!-- Input para subir videos -->
+                                    <div class="relative">
+                                        <input type="file" wire:model="videosAdicionales" id="videos-promocion"
+                                            multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            accept="video/*">
+                                        <label for="videos-promocion"
+                                            class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                            <svg class="w-5 h-5 mr-2 text-gray-400" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                            <span class="text-sm text-gray-600">
+                                                {{ $modoEditar ? 'Añadir más videos' : 'Seleccionar videos' }}
                                             </span>
-                                        </div>
-
-                                        @error('imagenesAdicionales.*')
-                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                        @enderror
+                                        </label>
                                     </div>
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        Formatos: MP4, MOV (máx. 10MB cada uno)
+                                    </p>
+                                    @error('videosAdicionales.*')
+                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -497,7 +477,7 @@
         </div>
     @endif
 
-    <!-- Modal Eliminar Equipo -->
+    <!-- Modal Eliminar Promoción -->
     @if ($modalConfirmacion)
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -514,7 +494,8 @@
                                 <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                    </path>
                                 </svg>
                             </div>
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -523,7 +504,7 @@
                                 </h3>
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500">
-                                        ¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede
+                                        ¿Estás seguro de que deseas eliminar esta promoción? Esta acción no se puede
                                         deshacer.
                                     </p>
                                 </div>

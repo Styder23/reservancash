@@ -29,20 +29,6 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
-                {{-- Selector de tipo de usuario --}}
-                <div class="mb-4">
-                    <x-label for="user_type" value="{{ __('Tipo de Usuario') }}" />
-                    <select id="user_type" name="user_type"
-                        class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        required>
-                        <option value="">{{ __('Selecciona tipo de usuario') }}</option>
-                        <option value="cliente" {{ old('user_type') == 'cliente' ? 'selected' : '' }}>
-                            {{ __('Cliente') }} </option>
-                        <option value="empresa" {{ old('user_type') == 'empresa' ? 'selected' : '' }}>
-                            {{ __('Empresa') }} </option>
-                    </select>
-                </div>
-
                 <div>
                     <x-label for="email" value="{{ __('Email') }}" />
                     <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
@@ -67,7 +53,7 @@
                     </x-button>
                 </div>
 
-                
+
                 <div class="flex items-center justify-between mt-6">
                     @if (Route::has('password.request'))
                         <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -79,7 +65,8 @@
                     @endif
 
                     @if (Route::has('register'))
-                        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2            focus:ring-indigo-500"  href="{{ route('register') }}">
+                        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2            focus:ring-indigo-500"
+                            href="{{ route('register') }}">
                             {{ __('Registrarse') }}
                         </a>
                     @endif

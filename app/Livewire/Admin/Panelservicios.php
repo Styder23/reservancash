@@ -8,6 +8,7 @@ use App\Models\Detalle_Servicio;
 use Livewire\WithFileUploads;
 use App\Models\imagenes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class Panelservicios extends Component
 {
@@ -62,7 +63,7 @@ class Panelservicios extends Component
 
     public function render()
     {
-        return view('livewire.admin.panelservicios')->layout('layouts.layout');
+        return view('livewire.admin.panelservicios')->layout('layouts.prueba');
     }
 
     public function abrirModalCrear()
@@ -104,35 +105,50 @@ class Panelservicios extends Component
 
     public function guardar()
     {
+        // Obtener el ID del usuario autenticado y la empresa (como ya lo tienes)
+        $userId = auth()->id();
+        $empresa = DB::table('users')
+            ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
+            ->join('representante_legal', 'representante_legal.fk_idpersona', '=', 'personas.id')
+            ->join('empresas', 'empresas.id', '=', 'representante_legal.fk_idempresa')
+            ->where('users.id', $userId)
+            ->select('empresas.id', 'empresas.nameempresa')
+            ->first();
+
+        if (!$empresa) {
+            session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            return;
+        }
+
         $this->validate([
             'form.nombreservicio' => 'required|string|max:255',
             'form.descripcionservicio' => 'nullable|string',
             'form.precioservicio' => 'required|numeric|min:0',
             'form.fk_idtiposervicio' => 'required|exists:tipo_servicios,id',
             'form.cantidadservicio' => 'required|integer|min:1',
-            'form.imageneservicio' => 'nullable|image|max:2048',
+            'form.imageneservicio' => 'required|image|max:2048', // Cambiado a required
             'imagenesAdicionales.*' => 'nullable|image|max:2048'
         ]);
 
-        // Guardar el detalle del servicio
+        // Primero guardar la imagen principal
+        $pathPrincipal = $this->form['imageneservicio']->store('servicios', 'public');
+
+        // Ahora guardar el detalle del servicio CON la ruta de la imagen
         $detalleServicio = Detalle_Servicio::create([
             'nombreservicio' => $this->form['nombreservicio'],
             'descripcionservicio' => $this->form['descripcionservicio'],
             'precioservicio' => $this->form['precioservicio'],
             'fk_idtiposervicio' => $this->form['fk_idtiposervicio'],
-            'imageneservicio' => null // Ya no usamos este campo
+            'imageneservicio' => $pathPrincipal // Guardamos la ruta aquí
         ]);
 
-        // Guardar imagen principal si existe
-        if ($this->form['imageneservicio']) {
-            $path = $this->form['imageneservicio']->store('servicios', 'public');
-            $detalleServicio->imagenes()->create([
-                'url' => $path,
-                'tipo' => 'principal'
-            ]);
-        }
+        // Guardar la misma imagen en la tabla polimórfica como tipo 'principal'
+        $detalleServicio->imagenes()->create([
+            'url' => $pathPrincipal,
+            'tipo' => 'principal'
+        ]);
 
-        // Guardar imágenes adicionales
+        // Guardar imágenes adicionales (opcional)
         if ($this->imagenesAdicionales && count($this->imagenesAdicionales) > 0) {
             foreach ($this->imagenesAdicionales as $imagen) {
                 if ($imagen) {
@@ -148,7 +164,8 @@ class Panelservicios extends Component
         // Guardar el servicio (cantidad)
         Servicios::create([
             'cantidadservicio' => $this->form['cantidadservicio'],
-            'fk_iddetalle_servicios' => $detalleServicio->id
+            'fk_iddetalle_servicios' => $detalleServicio->id,
+            'fk_idempresa' => $empresa->id,
         ]);
 
         $this->cerrarModal();
@@ -227,7 +244,7 @@ class Panelservicios extends Component
 
         $servicio = Servicios::with('Det_servicio.imagenes')->findOrFail($this->form['id']);
 
-        // Actualizar detalle del servicio
+        // Preparar datos para actualizar
         $detalleData = [
             'nombreservicio' => $this->form['nombreservicio'],
             'descripcionservicio' => $this->form['descripcionservicio'],
@@ -235,10 +252,13 @@ class Panelservicios extends Component
             'fk_idtiposervicio' => $this->form['fk_idtiposervicio']
         ];
 
-        $servicio->Det_servicio->update($detalleData);
-
         // Manejar imagen principal nueva
         if ($this->form['imageneservicio']) {
+            $pathPrincipal = $this->form['imageneservicio']->store('servicios', 'public');
+            
+            // Actualizar ruta en detalle_servicios
+            $detalleData['imageneservicio'] = $pathPrincipal;
+
             // Eliminar imagen principal anterior si existe
             $imagenPrincipalAnterior = $servicio->Det_servicio->imagenes()
                 ->where('tipo', 'principal')
@@ -249,13 +269,15 @@ class Panelservicios extends Component
                 $imagenPrincipalAnterior->delete();
             }
             
-            // Guardar nueva imagen principal
-            $path = $this->form['imageneservicio']->store('servicios', 'public');
+            // Guardar nueva imagen principal en tabla polimórfica
             $servicio->Det_servicio->imagenes()->create([
-                'url' => $path,
+                'url' => $pathPrincipal,
                 'tipo' => 'principal'
             ]);
         }
+
+        // Actualizar detalle del servicio
+        $servicio->Det_servicio->update($detalleData);
 
         // Guardar nuevas imágenes adicionales
         if ($this->imagenesAdicionales && count($this->imagenesAdicionales) > 0) {

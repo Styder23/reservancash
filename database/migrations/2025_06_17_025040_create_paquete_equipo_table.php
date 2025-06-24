@@ -13,8 +13,17 @@ return new class extends Migration
     {
         Schema::create('paquete_equipo', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('paquete_id')->constrained()->onDelete('cascade');
-            $table->foreignId('equipo_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('fk_idpaquete')->nullable();
+            $table->unsignedBigInteger('fk_idequipo')->nullable();
+
+            // Foreign key constraints
+            $table->foreign('fk_idpaquete')
+                ->references('id')->on('paquetes')
+                ->onDelete('set null');
+            
+            $table->foreign('fk_idequipo')
+                ->references('id')->on('equipos')
+                ->onDelete('set null'); 
         });
     }
 

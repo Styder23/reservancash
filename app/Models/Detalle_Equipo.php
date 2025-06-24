@@ -46,4 +46,9 @@ class Detalle_Equipo extends Model
     {
         return $this->hasMany('App\Models\Equipos', 'fk_iddetalle_equipo');
     }
+    
+    public function imagenes()
+    {
+        return $this->morphMany(imagenes::class, 'imageable');
+    }
 }
