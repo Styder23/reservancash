@@ -38,8 +38,22 @@
                             </span>
                         </div>
 
-                        <!-- Stock Badge -->
+                        <!-- Favorite/Heart Icon -->
                         <div class="absolute top-4 right-4">
+                            <button wire:click="toggleFavorito({{ $equipo->id }})"
+                                class="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors">
+                                <svg class="w-4 h-4 {{ in_array($equipo->id, $favoritos) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
+                                    fill="{{ in_array($equipo->id, $favoritos) ? 'currentColor' : 'none' }}"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Stock Badge - Movido a la parte inferior izquierda -->
+                        <div class="absolute bottom-4 left-4">
                             <span
                                 class="bg-blue-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-sm">
                                 {{ $equipo->equipos->sum('cantidadequipo') }} unidades
@@ -200,4 +214,15 @@
             {{ $equipos->links() }}
         </div> --}}
     </div>
+    <script>
+        // Script para ocultar las notificaciones después de 3 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const notifications = document.querySelectorAll('.fixed.top-4.right-4');
+                notifications.forEach(function(notification) {
+                    notification.style.display = 'none';
+                });
+            }, 3000);
+        });
+    </script>
 </div>

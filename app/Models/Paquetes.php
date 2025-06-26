@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -31,12 +30,13 @@ class Paquetes extends Model
         return $this->hasMany('App\Models\DisponibilidadPaquete', 'fk_idpaquete');
     }
 
-    public function img_paquete()
+    public function imagenes()
     {
-        return $this->hasMany('App\Models\ImagenPaquete', 'fk_idpaquete');
+        return $this->morphMany(imagenes::class, 'imageable');
     }
 
-    public function iti_paquete()
+    // CORREGIDO: Para que coincida con la vista
+    public function itinerarios()
     {
         return $this->hasMany('App\Models\Itinerarios', 'fk_idpaquete');
     }
@@ -59,5 +59,10 @@ class Paquetes extends Model
     public function reservas()
     {
         return $this->hasMany('App\Models\Reservas', 'fk_idpaquete');
+    }
+
+    public function favoritos()
+    {
+        return $this->morphMany(favoritos::class, 'favoritable');
     }
 }

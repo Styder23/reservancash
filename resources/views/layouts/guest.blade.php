@@ -36,7 +36,7 @@
 
         <!-- AQUÍ VA EL COMPONENTE LIVEWIRE -->
         <div id="chatbot-body" class="p-4 h-[250px] overflow-y-auto">
-            @livewire('pantalladividida')
+            @livewire('clientes.pantalladividida')
         </div>
 
         <div id="chatbot-input" class="flex border-t border-gray-300">

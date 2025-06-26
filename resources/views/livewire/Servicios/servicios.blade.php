@@ -27,10 +27,11 @@
 
                         <!-- Favorite/Heart Icon (opcional) -->
                         <div class="absolute top-4 right-4">
-                            <button
+                            <button wire:click="toggleFavorito({{ $servicio->id }})"
                                 class="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors">
-                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 {{ in_array($servicio->id, $favoritos) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
+                                    fill="{{ in_array($servicio->id, $favoritos) ? 'currentColor' : 'none' }}"
+                                    stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
                                     </path>
@@ -38,7 +39,18 @@
                             </button>
                         </div>
                     </div>
+                    {{-- Mensajes de notificación --}}
+                    @if (session()->has('success'))
+                        <div class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
+                    @if (session()->has('error'))
+                        <div class="fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                     <!-- Content -->
                     <div class="p-6">
                         <!-- Title and Rating -->
@@ -119,5 +131,17 @@
         {{-- <div class="mt-8">
             {{ $equipos->links() }}
         </div> --}}
+
     </div>
+    <script>
+        // Script para ocultar las notificaciones después de 3 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const notifications = document.querySelectorAll('.fixed.top-4.right-4');
+                notifications.forEach(function(notification) {
+                    notification.style.display = 'none';
+                });
+            }, 3000);
+        });
+    </script>
 </div>

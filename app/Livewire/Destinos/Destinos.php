@@ -8,6 +8,9 @@ class Destinos extends Component
 {
     public function render()
     {
-        return view('livewire.destinos.destinos')->layout('layouts.guest');
+        // Verificar si el usuario está autenticado
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        
+        return view('livewire.destinos.destinos')->layout($layout);
     }
 }

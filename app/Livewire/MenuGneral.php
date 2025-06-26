@@ -22,23 +22,35 @@ class MenuGneral extends Component
             'keywords' => ['promociones', 'descuentos', 'ofertas', 'rebaja']
         ],
         [
-            'name' => 'Destinos',
-            'icon' => 'fas fa-map-marker-alt',
-            'route' => 'destinos',
-            'keywords' => ['destinos', 'lugares', 'ciudades', 'países']
-        ],
-        [
-            'name' => 'Servicios',
-            'icon' => 'fas fa-concierge-bell',
-            'route' => 'servicios',
-            'keywords' => ['servicios', 'atención', 'soporte', 'ayuda']
-        ],
-        [
-            'name' => 'Equipos',
+            'name' => 'Empresas',
             'icon' => 'fas fa-users',
-            'route' => 'equipos',
-            'keywords' => ['equipos', 'staff', 'equipo', 'personal']
+            'route' => 'empresas',
+            'keywords' => ['empresas', 'descuentos', 'ofertas', 'rebaja']
         ],
+        [
+            'name' => 'Comparar',
+            'icon' => 'fas fa-concierge-bell',
+            'route' => 'pantalladividida',
+            'keywords' => ['comparar', 'dividida', 'ofertas', 'rebaja']
+        ],
+        // [
+        //     'name' => 'Destinos',
+        //     'icon' => 'fas fa-map-marker-alt',
+        //     'route' => 'destinos',
+        //     'keywords' => ['destinos', 'lugares', 'ciudades', 'países']
+        // ],
+        // [
+        //     'name' => 'Servicios',
+        //     'icon' => 'fas fa-concierge-bell',
+        //     'route' => 'servicios',
+        //     'keywords' => ['servicios', 'atención', 'soporte', 'ayuda']
+        // ],
+        // [
+        //     'name' => 'Equipos',
+        //     'icon' => 'fas fa-users',
+        //     'route' => 'equipos',
+        //     'keywords' => ['equipos', 'staff', 'equipo', 'personal']
+        // ],
         [
             'name' => 'Login',
             'icon' => 'fas fa-sign-in-alt',

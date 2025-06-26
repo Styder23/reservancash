@@ -42,6 +42,10 @@ class User extends Authenticatable
         return $this->belongsTo(Personas::class ,'fk_idpersona');
     }
 
+    public function favoritos()
+    {
+        return $this->hasMany(favoritos::class, 'fk_iduser');
+    }
     // public function persona()
     // {
     //     return $this->belongsTo(Personas::class ,'fk_idtipousu');

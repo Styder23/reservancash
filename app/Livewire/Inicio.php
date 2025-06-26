@@ -8,6 +8,7 @@ class Inicio extends Component
 {
     public function render()
     {
-        return view('livewire.inicio')->layout('layouts.guest');
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        return view('livewire.inicio')->layout($layout);
     }
 }

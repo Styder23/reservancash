@@ -85,11 +85,18 @@
                                 <span x-show="sidebarOpen" class="ml-3">Mi Dashboard</span>
                             </a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="{{ route('destinos') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('destinos') ? 'bg-purple-600' : '' }}">
                                 <i class="fas fa-map-marked-alt w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Destinos</span>
+                            </a>
+                        </li> --}}
+                        <li>
+                            <a href="{{ route('paquetes') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-heart w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Paquetes Generales</span>
                             </a>
                         </li>
                         <li>
@@ -100,17 +107,25 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#"
+                            <a href="{{ route('equipos') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-heart w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Equipos</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('reservacli') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
                                 <i class="fas fa-calendar-check w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Mis Reservas</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('empresas') }}"
+                            <a href="{{ route('paquetecliente') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('empresas') ? 'bg-purple-600' : '' }}">
                                 <i class="fas fa-building w-5"></i>
-                                <span x-show="sidebarOpen" class="ml-3">Empresas</span>
+                                <span x-show="sidebarOpen" class="ml-3">Mis Paquetes</span>
                             </a>
                         </li>
                         <li>

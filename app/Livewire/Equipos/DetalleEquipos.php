@@ -57,6 +57,7 @@ class DetalleEquipos extends Component
     }
     public function render()
     {
-        return view('livewire.equipos.detalle-equipos')->layout('layouts.guest');
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        return view('livewire.equipos.detalle-equipos')->layout($layout);
     }
 }

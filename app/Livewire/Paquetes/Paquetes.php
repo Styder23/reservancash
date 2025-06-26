@@ -13,11 +13,13 @@ class Paquetes extends Component
     
     public function mount(){
         
-        $this->paquetes=ModelPaquetes::all();
+        $this->paquetes = ModelPaquetes::all();
     }
 
     public function render()
     {
-        return view('livewire.paquetes.paquetes')->layout('layouts.guest');
+        // Verificar si el usuario está autenticado
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        return view('livewire.paquetes.paquetes')->layout($layout);
     }
 }
