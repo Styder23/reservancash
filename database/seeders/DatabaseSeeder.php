@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             ['nametipo_destinos' => 'Historico'],
             ['nametipo_destinos' => 'Trekking'],
         ]);
-                
+
         DB::table('tipo_servicios')->insert([
             ['nametipo_servicios' => 'Tours'],
             ['nametipo_servicios' => 'Guias'],
@@ -43,30 +43,29 @@ class DatabaseSeeder extends Seeder
 
         DB::table('departamentos')->insert([
             ['namedepartamentos' => 'Ancash'],
-        ]);  
+        ]);
 
         DB::table('provincias')->insert([
-            ['nameprovincia' => 'AIJA','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'ANTONIO RAIMONDI','fk_iddepartamento' => '1'],
-            // ['nameprovincia' => 'ANTONIO RAIMONDI','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'ASUNCION','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'BOLOGNESI','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'CARHUAZ','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'CARLOS FERMIN FITZCARRALD','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'CASMA','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'CORONGO','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'HUARAZ','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'HUARI','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'HUARMEY','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'HUAYLAS','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'MARISCAL LUZURIAGA','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'OCROS','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'PALLASCA','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'POMABAMBA','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'RECUAY','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'SANTA','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'SIHUAS','fk_iddepartamento' => '1'],
-            ['nameprovincia' => 'YUNGAY','fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'AIJA', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'ANTONIO RAIMONDI', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'ASUNCION', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'BOLOGNESI', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'CARHUAZ', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'CARLOS FERMIN FITZCARRALD', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'CASMA', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'CORONGO', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'HUARAZ', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'HUARI', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'HUARMEY', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'HUAYLAS', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'MARISCAL LUZURIAGA', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'OCROS', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'PALLASCA', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'POMABAMBA', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'RECUAY', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'SANTA', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'SIHUAS', 'fk_iddepartamento' => '1'],
+            ['nameprovincia' => 'YUNGAY', 'fk_iddepartamento' => '1'],
         ]);
 
         DB::table('distritos')->insert([
@@ -236,7 +235,7 @@ class DatabaseSeeder extends Seeder
             ['namedistrito' => 'SHUPLUY', 'fk_idprovincia' => 20],
             ['namedistrito' => 'YANAMA', 'fk_idprovincia' => 20]
         ]);
-        
+
         DB::table('personas')->insert([
             [
                 'dni' => '12345678',
@@ -244,6 +243,13 @@ class DatabaseSeeder extends Seeder
                 'apellidos' => 'Enriquez Rondan',
                 'telefono' => '981231231',
                 'email' => 'styve@gmail.com',
+            ],
+            [
+                'dni' => '98765432',
+                'nombre' => 'Luis',
+                'apellidos' => 'Santillan Cornelio',
+                'telefono' => '928671412',
+                'email' => 'luissantillan@gmail.com',
             ]
         ]);
 
@@ -340,5 +346,46 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
+
+
+        // Isertar paquetes
+        DB::table('paquetes')->insert([
+            [
+                'preciopaquete' => 120,
+                'nombrepaquete' => 'Laguna 69',
+                'cantidadpaquete' => 10,
+                'descripcion' => 'Tour a la famosa Laguna 69.',
+                'imagen_principal' => 'laguna 69.jpeg',
+                'estado' => 'Disponible',
+                'fk_idempresa' => 1
+            ],
+            [
+                'preciopaquete' => 100,
+                'nombrepaquete' => 'Laguna 69',
+                'cantidadpaquete' => 15,
+                'descripcion' => 'Tour a la inigualable Laguna 69.',
+                'imagen_principal' => 'laguna 69.jpeg',
+                'estado' => 'Disponible',
+                'fk_idempresa' => 2
+            ],
+            [
+                'preciopaquete' => 90,
+                'nombrepaquete' => 'Llanga',
+                'cantidadpaquete' => 8,
+                'descripcion' => 'Aventura en Llanga.',
+                'imagen_principal' => 'llanga.jpeg',
+                'estado' => 'Disponible',
+                'fk_idempresa' => 2
+            ],
+            [
+                'preciopaquete' => 100,
+                'nombrepaquete' => 'Churup',
+                'cantidadpaquete' => 12,
+                'descripcion' => 'Explora la laguna Churup.',
+                'imagen_principal' => 'churup.jpe',
+                'estado' => 'Disponible',
+                'fk_idempresa' => 2
+            ],
+        ]);
     }
 }
