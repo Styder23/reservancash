@@ -90,7 +90,7 @@
                             <div class="flex justify-between items-start mb-3">
                                 <h3 class="text-xl font-bold text-gray-900">{{ $paquete->nombrepaquete }}</h3>
                                 <div class="flex space-x-1">
-                                    <button wire:click="editPaquete({{ $paquete->id }})"
+                                    <button wire:click="editarPaquete({{ $paquete->id }})"
                                         class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -98,7 +98,7 @@
                                             </path>
                                         </svg>
                                     </button>
-                                    <button wire:click="confirmDelete({{ $paquete->id }})"
+                                    <button wire:click="confirmarEliminacion({{ $paquete->id }})"
                                         class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -209,7 +209,9 @@
                 <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                     <!-- Encabezado del modal -->
                     <div class="border-b px-6 py-4 flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-gray-800">Crear Nuevo Paquete Turístico</h2>
+                        <h2 class="text-xl font-bold text-gray-800">
+                            {{ $modoEdicion ? 'Editar Paquete Turístico' : 'Crear Nuevo Paquete Turístico' }}
+                        </h2>
                         <button wire:click="cerrarModal" class="text-gray-500 hover:text-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -226,7 +228,7 @@
 
                     <!-- Contenido del modal -->
                     <div class="p-6">
-                        <form wire:submit.prevent="guardarPaquete">
+                        <form wire:submit.prevent="{{ $modoEdicion ? 'actualizarPaquete' : 'guardarPaquete' }}">
                             <!-- Navegación por pestañas -->
                             <div class="mb-6">
                                 <nav class="flex space-x-8" aria-label="Tabs">
@@ -380,8 +382,13 @@
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                                 @if ($imagen_principal)
                                                     <div class="mt-2">
-                                                        <img src="{{ $imagen_principal->temporaryUrl() }}"
-                                                            class="h-32 w-32 object-cover rounded-lg">
+                                                        @if (is_string($imagen_principal))
+                                                            <img src="{{ asset('storage/' . $imagen_principal) }}"
+                                                                class="h-32 w-32 object-cover rounded-lg">
+                                                        @else
+                                                            <img src="{{ $imagen_principal->temporaryUrl() }}"
+                                                                class="h-32 w-32 object-cover rounded-lg">
+                                                        @endif
                                                     </div>
                                                 @endif
                                             </div>
@@ -1206,7 +1213,7 @@
                                 <div class="mt-8 flex justify-between items-center">
                                     @if ($tab_activo !== 'general')
                                         <button type="button" wire:click="anteriorTab"
-                                            class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                                             Anterior
                                         </button>
                                     @else
@@ -1214,54 +1221,19 @@
                                     @endif
 
                                     <div class="flex space-x-3">
-                                        <!-- Botón Guardar para cada paso -->
-                                        @if ($tab_activo === 'general')
-                                            <button type="button" wire:click="guardarPasoGeneral"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Guardar
-                                            </button>
-                                        @elseif ($tab_activo === 'servicios')
-                                            <button type="button" wire:click="guardarPasoServicios"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Guardar
-                                            </button>
-                                        @elseif ($tab_activo === 'disponibilidad')
-                                            <button type="button" wire:click="guardarPasoDisponibilidad"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Guardar
-                                            </button>
-                                        @elseif ($tab_activo === 'imagenes')
-                                            <button type="button" wire:click="guardarPasoImagenes"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Guardar
-                                            </button>
-                                        @elseif ($tab_activo === 'itinerario')
-                                            <button type="button" wire:click="guardarPasoItinerario"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Guardar
-                                            </button>
-                                        @endif
-
-                                        <!-- Botón Siguiente o Guardar Completo -->
                                         @if ($tab_activo !== 'itinerario')
                                             <button type="button" wire:click="siguienteTab"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                                                 Siguiente
                                             </button>
                                         @else
                                             <button type="submit"
-                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                Guardar Paquete Completo
+                                                class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                                                {{ $modoEdicion ? 'Actualizar Paquete' : 'Guardar Paquete' }}
                                             </button>
                                         @endif
                                     </div>
                                 </div>
-                                @if (session()->has('mensaje_paso'))
-                                    <div
-                                        class="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md">
-                                        {{ session('mensaje_paso') }}
-                                    </div>
-                                @endif
                             </div>
                         </form>
                     </div>
@@ -1269,7 +1241,57 @@
             </div>
         @endif
 
+        <!-- Modal de Confirmación para Eliminar -->
+        @if ($paquete_a_eliminar)
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+                    <div class="border-b px-6 py-4">
+                        <h2 class="text-xl font-bold text-gray-800">Confirmar Eliminación</h2>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-4">¿Estás seguro que deseas eliminar este paquete? Esta acción no se
+                            puede deshacer.</p>
+
+                        <div class="flex justify-end space-x-3">
+                            <button wire:click="$set('paquete_a_eliminar', null)"
+                                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                Cancelar
+                            </button>
+                            <button wire:click="eliminarPaquete"
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                                Eliminar Paquete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
-</div>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Confirmación antes de eliminar
+            Livewire.on('mostrarModalConfirmacion', () => {
+                // Puedes personalizar con SweetAlert o similar si lo prefieres
+                console.log('Modal de confirmación activado');
+            });
+
+            // Deshabilitar botón durante guardado
+            Livewire.on('disableSaveButton', () => {
+                document.querySelectorAll('button[type="submit"]').forEach(btn => {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="animate-pulse">Procesando...</span>';
+                });
+            });
+
+            Livewire.on('enableSaveButton', () => {
+                document.querySelectorAll('button[type="submit"]').forEach(btn => {
+                    btn.disabled = false;
+                    btn.innerHTML =
+                        '{{ $modoEdicion ? 'Actualizar Paquete' : 'Guardar Paquete' }}';
+                });
+            });
+        });
+    </script>
 </div>

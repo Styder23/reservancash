@@ -16,6 +16,7 @@ use App\Models\Rutas;
 use App\Models\ParadasxRutas;
 use App\Models\Imagenes;
 use App\Models\Itinerarios;
+use App\Models\itinerarioxruta;
 use App\Models\Promociones;
 use App\Models\Destinos;
 use Livewire\WithFileUploads;
@@ -41,7 +42,7 @@ class Panelpaquetes extends Component
     public $destinos;
 
     // Datos del detalle del paquete
-    public $descripciondetalle = '';
+    public $descripciondetalle;
     public $fk_iddestino = '';
     public $fk_idpromociones = '';
     public $empresas_disponibles = '';
@@ -86,12 +87,20 @@ class Panelpaquetes extends Component
     public $paradas_filtradas = [];
     public $rutas_seleccionadas = [];
     public $mostrar_modal_paradas = false;
-    public $ruta_editando = [];
+    public $ruta_editando = [
+        'id' => null,
+        'nombre' => '',
+        'paradas' => []
+    ];
     public $indice_ruta_editando = null;
     
     public $mostrar_modal_rutas = false;
     public $mostrar_modal_paradas_lista = false;
     
+    public $modoEdicion = false;
+    public $paquete_editando_id = null;
+    public $paquete_a_eliminar = null;
+
     // Control de pestañas
     public $tab_activo = 'general';
 
@@ -109,6 +118,11 @@ class Panelpaquetes extends Component
         'servicios_seleccionados' => 'required|array|min:1',
         'equipos_seleccionados' => 'required|array|min:1',
         'disponibilidades' => 'required|array|min:1',
+        'itinerario_dia' => 'required|string',
+        'itinerario_hora_inicio' => 'required|date_format:H:i',
+        'itinerario_hora_fin' => 'nullable|date_format:H:i|after:itinerario_hora_inicio',
+        'rutas_seleccionadas' => 'sometimes|array',
+        'ruta_editando.paradas' => 'sometimes|array'
     ];
 
     protected $messages = [
@@ -123,7 +137,11 @@ class Panelpaquetes extends Component
 
     public function mount()
     {
-        $this->fk_idempresa = auth()->user()->empresa_id ?? 1; // Ajustar según tu lógica
+        $this->fk_idempresa = auth()->user()->empresa_id ?? 1;
+        $this->servicios_seleccionados = [];
+        $this->equipos_seleccionados = [];
+        $this->disponibilidades = [];
+        $this->rutas_seleccionadas = [];
         $this->cargarDatos();
         $this->cargarRutas();
         $this->cargarParadas();
@@ -154,7 +172,8 @@ class Panelpaquetes extends Component
     
     public function abrirModalCreacion()
     {
-        $this->resetearFormulario();
+        $this->resetearFormularioCompleto();
+        $this->modoEdicion = false;
         $this->mostrarModal = true;
     }
 
@@ -217,6 +236,39 @@ class Panelpaquetes extends Component
         ];
 
         $this->reset(['nueva_fecha_inicio', 'nueva_fecha_fin', 'nuevo_cupo']);
+    }
+
+    protected function resetearFormularioCompleto()
+    {
+        $this->reset([
+            'nombrepaquete',
+            'preciopaquete',
+            'cantidadpaquete',
+            'descripcion',
+            'imagen_principal',
+            'estado',
+            'descripciondetalle',
+            'fk_iddestino',
+            'fk_idpromociones',
+            'servicios_seleccionados',
+            'equipos_seleccionados',
+            'disponibilidades',
+            'imagenes_adicionales',
+            'itinerario_dia',
+            'itinerario_hora_inicio',
+            'itinerario_hora_fin',
+            'itinerario_descripcion',
+            'rutas_seleccionadas',
+            'paquete_editando_id',
+            'modoEdicion'
+        ]);
+        
+        $this->tab_activo = 'general';
+        $this->imagenes_adicionales = [];
+        $this->disponibilidades = [];
+        $this->servicios_seleccionados = [];
+        $this->equipos_seleccionados = [];
+        $this->rutas_seleccionadas = [];
     }
 
     public function eliminarDisponibilidad($index)
@@ -357,7 +409,7 @@ class Panelpaquetes extends Component
         $this->itinerarios = DB::table('itinerarios')
             ->leftJoin('itinerarios_ruta', 'itinerarios.id', '=', 'itinerarios_ruta.fk_iditinerario')
             ->leftJoin('rutas', 'itinerarios_ruta.fk_idruta', '=', 'rutas.id')
-            ->where('itinerarios.fk_idpaquete', '=','paquete.id') 
+            ->where('itinerarios.fk_idpaquete', $this->paquete_editando_id)
             ->select('itinerarios.*', 'rutas.namerutas')
             ->get()
             ->groupBy('id')
@@ -513,6 +565,8 @@ class Panelpaquetes extends Component
     
     public function guardarPaquete()
     {
+        $this->dispatch('disableSaveButton');
+        
         $userId = auth()->id();
         $empresa = DB::table('users')
             ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
@@ -531,6 +585,14 @@ class Panelpaquetes extends Component
 
         try {
             DB::beginTransaction();
+
+            $paqueteExistente = Paquetes::where('nombrepaquete', $this->nombrepaquete)
+            ->where('fk_idempresa', $empresa->id)
+            ->first();
+            
+            if ($paqueteExistente) {
+                throw new \Exception('Ya existe un paquete con este nombre');
+            }
 
             // Crear el paquete principal
             $imagen_principal_path = null;
@@ -597,69 +659,367 @@ class Panelpaquetes extends Component
                         'url' => $ruta,
                         'tipo' => 'secundaria',
                         'imageable_id' => $paquete->id,
-                        'imageable_type' => Paquete::class,
+                        'imageable_type' => Paquetes::class,
                     ]);
                 }
             }
 
             // Guardar itinerarios si existen datos
-            if ($this->itinerario_dia || !empty($this->rutas_seleccionadas)) {
+            if ($this->itinerario_dia && $this->itinerario_hora_inicio) {
                 $this->guardarItinerario($paquete->id);
             }
 
             DB::commit();
-
             session()->flash('mensaje', 'Paquete creado exitosamente con su itinerario.');
-            // return redirect()->route('paquetes.index');
-
+            $this->resetearFormularioCompleto(); // Nueva función para resetear todo
+            $this->mostrarModal = false;
+            
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error al crear el paquete: ' . $e->getMessage());
+        } finally {
+            $this->dispatch('enableSaveButton');
         }
     }
 
     // Función separada para manejar los itinerarios
     protected function guardarItinerario($paqueteId)
     {
+        $this->validate([
+            'itinerario_dia' => 'required|string',
+            'itinerario_hora_inicio' => 'required|date_format:H:i',
+            'itinerario_hora_fin' => 'nullable|date_format:H:i|after:itinerario_hora_inicio',
+            'rutas_seleccionadas' => 'required|array|min:1' // Cambiado de 'sometimes' a 'required'
+        ]);
+        
         $itinerario = Itinerarios::create([
             'dia' => $this->itinerario_dia,
             'hora_inicio' => $this->itinerario_hora_inicio,
             'hora_fin' => $this->itinerario_hora_fin,
             'descripcion' => $this->itinerario_descripcion,
-            'fk_idpaquete' => $paqueteId, // ✅ Ahora usa el ID correcto
+            'fk_idpaquete' => $paqueteId,
         ]);
 
-        foreach ($this->rutas_seleccionadas as $ruta) {
-            // Guardar relación itinerario-ruta
-            DB::table('itinerarios_ruta')->insert([
-                'fk_iditinerario' => $itinerario->id,
-                'fk_idruta' => $ruta['id'],
-            ]);
+        if (!empty($this->rutas_seleccionadas)) {
+            foreach ($this->rutas_seleccionadas as $ruta) {
+                // Verificar si la ruta existe
+                if (!isset($ruta['id'])) continue;
 
-            // Solo guardar paradas si no existen ya para esta ruta
-            // Esto evita duplicar paradas cada vez que se asocia una ruta
-            $paradasExistentes = DB::table('rutasparadas')
-                ->where('fk_idruta', $ruta['id'])
-                ->exists();
+                // Crear relación itinerario-ruta
+                itinerarioxruta::create([
+                    'fk_iditinerario' => $itinerario->id,
+                    'fk_idruta' => $ruta['id'],
+                ]);
 
-            if (!$paradasExistentes && isset($ruta['paradas'])) {
-                foreach ($ruta['paradas'] as $orden => $parada) {
-                    DB::table('rutasparadas')->insert([
-                        'fk_idruta' => $ruta['id'],
-                        'fk_idparada' => $parada['id'],
-                        'ordenparada' => $orden + 1,
-                    ]);
-                }
+                // Guardar paradas para la ruta si no existen
+                $this->guardarParadasParaRuta($ruta);
             }
         }
     }
 
-    public function editpaquete(){
-
+    protected function guardarParadasParaRuta($rutaData)
+    {
+        // Verificar si la ruta ya tiene paradas
+        $tieneParadas = ParadasxRutas::where('fk_idruta', $rutaData['id'])->exists();
+        
+        if (!$tieneParadas && !empty($rutaData['paradas'])) {
+            foreach ($rutaData['paradas'] as $orden => $parada) {
+                ParadasxRutas::create([
+                    'fk_idruta' => $rutaData['id'],
+                    'fk_idparada' => $parada['id'],
+                    'ordenparada' => $orden + 1,
+                ]);
+            }
+        }
     }
     
-    public function confirmDelete(){
+    public function agregarRuta($rutaId)
+    {
+        $ruta = Rutas::find($rutaId);
+        
+        if ($ruta && !collect($this->rutas_seleccionadas)->contains('id', $rutaId)) {
+            $this->rutas_seleccionadas[] = [
+                'id' => $ruta->id,
+                'nombre' => $ruta->namerutas,
+                'paradas' => []
+            ];
+        }
+    }
 
+    public function editarParadasRuta($index)
+    {
+        $this->ruta_editando = $this->rutas_seleccionadas[$index];
+        $this->indice_ruta_editando = $index;
+        $this->dispatch('abrirModalParadas');
+    }
+    
+    public function editarPaquete($paqueteId)
+    {
+        try {
+            $this->resetearFormularioCompleto();
+            // Cargar el paquete con TODAS las relaciones necesarias
+            $paquete = Paquetes::with([
+                'det_paquete',       // Relación de detalles
+                'dis_paquete',       // Disponibilidades
+                'ser_paquete',       // Servicios
+                'equi_paquete',      // Equipos
+                'imagenes',          // Imágenes polimórficas
+                'itinerarios.itinixrutas.ruta'  // Itinerarios con rutas
+            ])->findOrFail($paqueteId);
+
+            // Cargar datos básicos del paquete
+            $this->paquete_editando_id = $paquete->id;
+            $this->nombrepaquete = $paquete->nombrepaquete;
+            $this->preciopaquete = $paquete->preciopaquete;
+            $this->cantidadpaquete = $paquete->cantidadpaquete;
+            $this->descripcion = $paquete->descripcion;
+            $this->estado = $paquete->estado;
+
+            // Cargar detalle del paquete (con verificación segura)
+            if ($paquete->det_paquete && $paquete->det_paquete->count() > 0) {
+                $detalle = $paquete->det_paquete->first();
+                $this->descripciondetalle = $detalle->descripciondetalle ?? '';
+                $this->fk_iddestino = $detalle->fk_iddestino ?? null;
+                $this->fk_idpromociones = $detalle->fk_idpromociones ?? null;
+            } else {
+                $this->descripciondetalle = '';
+                $this->fk_iddestino = null;
+                $this->fk_idpromociones = null;
+            }
+
+            // Cargar servicios seleccionados (con verificación segura)
+            $this->servicios_seleccionados = $paquete->ser_paquete 
+                ? $paquete->ser_paquete->pluck('fk_idservicio')->toArray() 
+                : [];
+
+            // Cargar equipos seleccionados (con verificación segura)
+            $this->equipos_seleccionados = $paquete->equi_paquete 
+                ? $paquete->equi_paquete->pluck('fk_idequipo')->toArray() 
+                : [];
+
+            // Cargar disponibilidades (con verificación segura)
+            $this->disponibilidades = $paquete->dis_paquete 
+                ? $paquete->dis_paquete->map(function($item) {
+                    return [
+                        'fecha_inicio' => $item->fecha_inicio,
+                        'fecha_fin' => $item->fecha_fin,
+                        'cupo' => $item->cupo
+                    ];
+                })->toArray() 
+                : [];
+
+            // Cargar itinerarios (con verificación segura)
+            if ($paquete->iti_paquete && $paquete->iti_paquete->count() > 0) {
+                $itinerario = $paquete->iti_paquete->first();
+                $this->itinerario_dia = $itinerario->dia ?? '';
+                $this->itinerario_hora_inicio = $itinerario->hora_inicio ?? '';
+                $this->itinerario_hora_fin = $itinerario->hora_fin ?? '';
+                $this->itinerario_descripcion = $itinerario->descripcion ?? '';
+                
+                // Cargar rutas seleccionadas
+                $this->rutas_seleccionadas = $itinerario->itinixrutas 
+                    ? $itinerario->itinixrutas->map(function($item) {
+                        return [
+                            'id' => $item->ruta->id ?? null,
+                            'nombre' => $item->ruta->namerutas ?? '',
+                            'paradas' => $item->ruta->paradas 
+                                ? $item->ruta->paradas->map(function($parada) {
+                                    return [
+                                        'id' => $parada->id ?? null,
+                                        'nombre' => $parada->nameparadas ?? ''
+                                    ];
+                                })->toArray() 
+                                : []
+                        ];
+                    })->toArray() 
+                    : [];
+            } else {
+                $this->itinerario_dia = '';
+                $this->itinerario_hora_inicio = '';
+                $this->itinerario_hora_fin = '';
+                $this->itinerario_descripcion = '';
+                $this->rutas_seleccionadas = [];
+            }
+
+            $this->mostrarModal = true;
+            $this->modoEdicion = true;
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al cargar el paquete: ' . $e->getMessage());
+            // Opcional: logs para debugging
+            \Log::error('Error al editar paquete', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    public function actualizarPaquete()
+    {
+        $this->validate();
+
+        try {
+            DB::beginTransaction();
+
+            // Actualizar paquete principal
+            $paquete = Paquetes::findOrFail($this->paquete_editando_id);
+            
+            $dataPaquete = [
+                'nombrepaquete' => $this->nombrepaquete,
+                'preciopaquete' => $this->preciopaquete,
+                'cantidadpaquete' => $this->cantidadpaquete,
+                'descripcion' => $this->descripcion,
+                'estado' => $this->estado,
+            ];
+
+            if ($this->imagen_principal) {
+                // Eliminar imagen anterior si existe
+                if ($paquete->imagen_principal) {
+                    Storage::disk('public')->delete($paquete->imagen_principal);
+                }
+                $dataPaquete['imagen_principal'] = $this->imagen_principal->store('paquetes', 'public');
+            }
+
+            $paquete->update($dataPaquete);
+
+            // Actualizar detalle del paquete
+            $precio_total = $this->calcularPrecioTotal();
+            DetallePaquetes::updateOrCreate(
+                ['fk_idpaquete' => $paquete->id],
+                [
+                    'descripciondetalle' => $this->descripciondetalle,
+                    'precioequipo' => $this->calcularPrecioEquipos(),
+                    'precioservicio' => $this->calcularPrecioServicios(),
+                    'preciototal' => $precio_total,
+                    'fk_iddestino' => $this->fk_iddestino,
+                    'fk_idpromociones' => $this->fk_idpromociones ?: null,
+                ]
+            );
+
+            // Actualizar servicios (eliminar todos y volver a crear)
+            DB::table('paquete_servicio')->where('fk_idpaquete', $paquete->id)->delete();
+            foreach ($this->servicios_seleccionados as $servicio_id) {
+                DB::table('paquete_servicio')->insert([
+                    'fk_idpaquete' => $paquete->id,
+                    'fk_idservicio' => $servicio_id,
+                ]);
+            }
+
+            // Actualizar equipos (eliminar todos y volver a crear)
+            DB::table('paquete_equipo')->where('fk_idpaquete', $paquete->id)->delete();
+            foreach ($this->equipos_seleccionados as $equipo_id) {
+                DB::table('paquete_equipo')->insert([
+                    'fk_idpaquete' => $paquete->id,
+                    'fk_idequipo' => $equipo_id,
+                ]);
+            }
+
+            // Actualizar disponibilidades (eliminar todas y volver a crear)
+            DisponibilidadPaquete::where('fk_idpaquete', $paquete->id)->delete();
+            foreach ($this->disponibilidades as $disponibilidad) {
+                DisponibilidadPaquete::create([
+                    'fecha_inicio' => $disponibilidad['fecha_inicio'],
+                    'fecha_fin' => $disponibilidad['fecha_fin'],
+                    'cupo' => $disponibilidad['cupo'],
+                    'fk_idpaquete' => $paquete->id,
+                ]);
+            }
+            
+            // Actualizar imágenes adicionales
+            if ($this->imagenes_adicionales) {
+                foreach ($this->imagenes_adicionales as $imagen) {
+                    if ($imagen) {
+                        $ruta = $imagen->store('paquetes/adicionales', 'public');
+                        imagenes::create([
+                            'url' => $ruta,
+                            'tipo' => 'secundaria',
+                            'imageable_id' => $paquete->id,
+                            'imageable_type' => Paquetes::class,
+                        ]);
+                    }
+                }
+            }
+
+            // Actualizar itinerarios (eliminar existentes y crear nuevos)
+            if ($this->itinerario_dia && $this->itinerario_hora_inicio) {
+                // Eliminar itinerarios existentes
+                $itinerariosIds = $paquete->itinerarios->pluck('id');
+                itinerarioxruta::whereIn('fk_iditinerario', $itinerariosIds)->delete();
+                Itinerarios::where('fk_idpaquete', $paquete->id)->delete();
+                
+                // Crear nuevo itinerario
+                $this->guardarItinerario($paquete->id);
+            }
+
+            DB::commit();
+            session()->flash('mensaje', 'Paquete actualizado exitosamente.');
+            $this->resetearFormularioCompleto();
+            $this->mostrarModal = false;
+            $this->cargarDatos(); // Recargar la lista de paquetes
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error al actualizar el paquete: ' . $e->getMessage());
+        }
+    }
+    
+    public function confirmarEliminacion($paqueteId)
+    {
+        $this->paquete_a_eliminar = $paqueteId;
+        $this->dispatch('mostrarModalConfirmacion');
+    }
+
+    public function eliminarPaquete()
+    {
+        if (!$this->paquete_a_eliminar) {
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $paquete = Paquetes::with(['imagenes', 'itinerarios'])->findOrFail($this->paquete_a_eliminar);
+
+            // Eliminar imágenes adicionales (polimórficas)
+            foreach ($paquete->imagenes as $imagen) {
+                Storage::disk('public')->delete($imagen->url);
+                $imagen->delete();
+            }
+
+            // Eliminar imagen principal
+            if ($paquete->imagen_principal) {
+                Storage::disk('public')->delete($paquete->imagen_principal);
+            }
+
+            // Eliminar itinerarios y sus relaciones
+            $itinerariosIds = $paquete->itinerarios->pluck('id');
+            itinerarioxruta::whereIn('fk_iditinerario', $itinerariosIds)->delete();
+            $paquete->itinerarios()->delete();
+
+            // Eliminar relaciones muchos a muchos
+            DB::table('paquete_servicio')->where('fk_idpaquete', $paquete->id)->delete();
+            DB::table('paquete_equipo')->where('fk_idpaquete', $paquete->id)->delete();
+
+            // Eliminar disponibilidades
+            $paquete->dis_paquete()->delete();
+
+            // Eliminar detalle
+            $paquete->det_paquete()->delete();
+
+            // Finalmente eliminar el paquete
+            $paquete->delete();
+
+            DB::commit();
+            session()->flash('mensaje', 'Paquete eliminado exitosamente.');
+            $this->cargarDatos(); // Recargar la lista de paquetes
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Error al eliminar el paquete: ' . $e->getMessage());
+        } finally {
+            $this->paquete_a_eliminar = null;
+            $this->dispatch('ocultarModalConfirmacion');
+        }
     }
     
     public function render()

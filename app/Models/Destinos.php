@@ -21,6 +21,7 @@ class Destinos extends Model
     {
         return $this->belongsTo(Distritos::class ,'fk_iddistrito');
     }
+    
     public function tipoDestino()
     {
         return $this->belongsTo(TipoDestinos::class, 'fk_idtipodestino');
@@ -34,5 +35,10 @@ class Destinos extends Model
     public function imagenPrincipal()
     {
         return $this->morphOne(imagenes::class, 'imageable')->where('tipo', 'principal');
+    }
+
+    public function favoritos()
+    {
+        return $this->morphMany(favoritos::class, 'favoritable');
     }
 }

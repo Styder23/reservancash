@@ -35,4 +35,9 @@ class Detalle_Servicio extends Model
     {
         return $this->morphOne(imagenes::class, 'imageable')->where('tipo', 'principal');
     }
+    
+    public function favoritos()
+    {
+        return $this->morphMany(favoritos::class, 'favoritable');
+    }
 }

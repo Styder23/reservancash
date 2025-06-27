@@ -37,6 +37,7 @@ class DetalleServicios extends Component
 
     public function render()
     {
-        return view('livewire.servicios.detalle-servicios')->layout('layouts.guest');
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        return view('livewire.servicios.detalle-servicios')->layout($layout);
     }
 }

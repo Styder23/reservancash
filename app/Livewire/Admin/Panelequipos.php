@@ -13,6 +13,8 @@ use App\Models\TipoEquipo;
 use App\Models\Detalle_Equipo;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Validate;
 
 class Panelequipos extends Component
 {
@@ -41,6 +43,10 @@ class Panelequipos extends Component
     public $searchQuery1 = '';
     public $equipoAEliminar = null;
     public $modalConfirmacion = false;
+
+    //para las imagenes adicionales
+    public $imagenesAdicionales = [];
+    public $imagenesExistentes = [];
 
     public function mount()
     {
@@ -138,9 +144,11 @@ class Panelequipos extends Component
             'form.fk_idcategoria' => 'required',
             'form.fk_idtipoequipo' => 'required',
             'form.cantidadequipo' => 'required|integer|min:1',
-            'form.imagenes_equipo' => 'nullable|image|max:2048'
+            'form.imagenes_equipo' => 'nullable|image|max:2048',
+            'imagenesAdicionales.*' => 'image|max:2048',
         ]);
 
+        // MOVER ESTE BLOQUE ANTES DE CREAR EL EQUIPO
         $ruta = null;
         if ($this->form['imagenes_equipo']) {
             $ruta = $this->form['imagenes_equipo']->store('equipos', 'public');
@@ -150,13 +158,32 @@ class Panelequipos extends Component
             'name_equipo' => $this->form['name_equipo'],
             'descripcion_equipo' => $this->form['descripcion_equipo'],
             'precio_equipo' => $this->form['precio_equipo'],
-            'imagenes_equipo' => $ruta, // Cambiar 'imagen' por 'imagenes_equipo'
+            'imagenes_equipo' => $ruta, // Ahora $ruta ya está definida
             'fk_idcategoria' => $this->form['fk_idcategoria'],
             'fk_idserie' => $this->form['fk_idserie'],
             'fk_idmarca' => $this->form['fk_idmarca'],
             'fk_idmodelo' => $this->form['fk_idmodelo'],
             'fk_idtipoequipo' => $this->form['fk_idtipoequipo'],
         ]);
+        
+        if ($ruta) {
+            // Guardar también en la tabla imagenes
+            $equipo->imagenes()->create([
+                'url' => $ruta,
+                'tipo' => 'principal'
+            ]);
+        }
+
+        // Guardar imágenes adicionales
+        if ($this->imagenesAdicionales) {
+            foreach ($this->imagenesAdicionales as $imagen) {
+                $rutaAdicional = $imagen->store('equipos/adicionales', 'public');
+                $equipo->imagenes()->create([
+                    'url' => $rutaAdicional,
+                    'tipo' => 'adicional'
+                ]);
+            }
+        }
 
         Equipos::create([
             'fk_iddetalle_equipo' => $equipo->id, 
@@ -165,7 +192,7 @@ class Panelequipos extends Component
         ]);
 
         $this->cerrarModal();
-        $this->equipos = Equipos::with('Det_equipo', 'Det_equipo.categoria')->get(); // Cambiar relaciones
+        $this->equipos = Equipos::with('Det_equipo', 'Det_equipo.categoria')->get();
         session()->flash('message', 'Equipo creado correctamente.');
     }
 
@@ -189,6 +216,8 @@ class Panelequipos extends Component
             'fk_idtipoequipo' => $equipoDetalle->Det_equipo->fk_idtipoequipo,
             'cantidadequipo' => $equipoDetalle->cantidadequipo, // Directamente desde equipoDetalle
         ];
+        
+        $this->imagenesExistentes = $equipoDetalle->Det_equipo->imagenes->where('tipo', 'adicional');
     }
 
     public function actualizar()
@@ -197,7 +226,16 @@ class Panelequipos extends Component
 
         if ($this->form['imagenes_equipo']) {
             $ruta = $this->form['imagenes_equipo']->store('equipos', 'public');
-            $equipo->imagenes_equipo = $ruta; // Cambiar 'imagen' por 'imagenes_equipo'
+            $equipo->imagenes_equipo = $ruta;
+            
+            // Eliminar imagen principal anterior de la tabla imagenes si existe
+            $equipo->imagenes()->where('tipo', 'principal')->delete();
+            
+            // Guardar nueva imagen principal en tabla imagenes
+            $equipo->imagenes()->create([
+                'url' => $ruta,
+                'tipo' => 'principal'
+            ]);
         }
 
         $equipo->update([
@@ -211,6 +249,16 @@ class Panelequipos extends Component
             'fk_idtipoequipo' => $this->form['fk_idtipoequipo'],
         ]);
 
+        // Guardar imágenes adicionales nuevas
+        if ($this->imagenesAdicionales) {
+            foreach ($this->imagenesAdicionales as $imagen) {
+                $rutaAdicional = $imagen->store('equipos/adicionales', 'public');
+                $equipo->imagenes()->create([
+                    'url' => $rutaAdicional,
+                    'tipo' => 'adicional'
+                ]);
+            }
+        }
         // Actualizar o crear detalle
         Equipos::updateOrCreate(
             ['fk_iddetalle_equipo' => $equipo->id], // Cambiar 'fk_idequipo' por 'fk_iddetalle_equipo'
@@ -231,7 +279,20 @@ class Panelequipos extends Component
     public function confirmarEliminar()
     {
         $equipo = Equipos::findOrFail($this->equipoAEliminar);
-        $equipo->Det_equipo()->delete();
+        
+        // Eliminar imágenes asociadas
+        if ($equipo->Det_equipo) {
+            // Eliminar archivos físicos
+            foreach ($equipo->Det_equipo->imagenes as $imagen) {
+                Storage::disk('public')->delete($imagen->url);
+            }
+            // Eliminar registros de imágenes
+            $equipo->Det_equipo->imagenes()->delete();
+            
+            // Eliminar el detalle
+            $equipo->Det_equipo()->delete();
+        }
+        
         $equipo->delete();
 
         $this->modalConfirmacion = false;
@@ -244,4 +305,26 @@ class Panelequipos extends Component
         $this->modalConfirmacion = false;
         $this->equipoAEliminar = null;
     }
+    
+    // Método para eliminar imágenes adicionales
+    public function removeImagenAdicional($index)
+    {
+        unset($this->imagenesAdicionales[$index]);
+        $this->imagenesAdicionales = array_values($this->imagenesAdicionales);
+    }
+
+    // Método para eliminar imágenes existentes
+    public function eliminarImagen($id)
+    {
+        $imagen = imagenes::find($id);
+        if ($imagen) {
+            // Eliminar el archivo físico
+            Storage::disk('public')->delete($imagen->url);
+            // Eliminar el registro
+            $imagen->delete();
+            // Actualizar la lista de imágenes
+            $this->imagenesExistentes = $this->imagenesExistentes->filter(fn($img) => $img->id != $id);
+        }
+    }
+
 }

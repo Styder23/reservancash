@@ -16,6 +16,7 @@ class Promociones extends Component
 
     public function render()
     {
-        return view('livewire.promociones.promociones')->layout('layouts.guest');
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        return view('livewire.promociones.promociones')->layout($layout);
     }
 }

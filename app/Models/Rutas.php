@@ -19,4 +19,9 @@ class Rutas extends Model
     {
         return $this->hasMany('App\Models\itinerarioxruta', 'fk_idruta');
     }
+
+    public function paradas()
+    {
+        return $this->hasMany('App\Models\ParadasxRutas', 'fk_idruta');
+    }
 }

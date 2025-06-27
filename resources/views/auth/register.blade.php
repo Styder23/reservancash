@@ -370,6 +370,13 @@
 </head>
 
 <body>
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="auth-container">
         <div class="auth-card animate-fade-in">
             <div class="auth-card-header">
@@ -383,7 +390,7 @@
             </div>
 
             <div class="auth-card-body">
-                <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" id="registerForm">
                     @csrf
 
                     <!-- Tipo de Usuario -->
@@ -426,7 +433,7 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="document_number"
-                                        name="document_number" required>
+                                        name="document_number" maxlength="8" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -453,7 +460,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-phone"></i>
                                     </span>
-                                    <input class="form-control" type="tel" id="telefono" name="telefono" required>
+                                    <input class="form-control" type="tel" id="telefono" name="telefono"
+                                        maxlength="9" required>
                                 </div>
                             </div>
                         </div>
@@ -480,7 +488,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-hashtag"></i>
                                     </span>
-                                    <input class="form-control" type="text" id="ruc" name="ruc">
+                                    <input class="form-control" type="text" id="ruc" name="ruc"
+                                        maxlength="11">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -510,7 +519,7 @@
                                         <i class="fas fa-phone-alt"></i>
                                     </span>
                                     <input class="form-control" type="tel" id="telefono_empresa"
-                                        name="telefono_empresa">
+                                        name="telefono_empresa" maxlength="9">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -533,8 +542,8 @@
                                 <select class="form-control" id="doc_type_representante"
                                     name="doc_type_representante">
                                     <option value="dni">DNI</option>
-                                    <option value="ce">Carnet de Extranjería</option>
-                                    <option value="passport">Pasaporte</option>
+                                    {{-- <option value="ce">Carnet de Extranjería</option>
+                                    <option value="passport">Pasaporte</option> --}}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -544,7 +553,7 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="doc_number_representante"
-                                        name="doc_number_representante">
+                                        name="doc_number_representante" maxlength="8">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -611,7 +620,7 @@
                         <a class="auth-link" href="{{ route('login') }}">
                             <i class="fas fa-arrow-left"></i> ¿Ya tienes una cuenta? Inicia sesión
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="registerButton">
                             <i class="fas fa-paper-plane"></i> Registrarse
                         </button>
                     </div>
@@ -619,6 +628,21 @@
             </div>
         </div>
     </div>
+
+    {{-- modal de confirmación --}}
+    {{-- <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Registro exitoso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Usuario creado correctamente. Serás redirigido a la página de login.</p>
+                </div>
+            </div>
+        </div>
+    </div> --}}
 
     <script>
         // Cambiar entre tipo de usuario (Cliente/Empresa)
@@ -699,6 +723,43 @@
             }
         }
         document.addEventListener('DOMContentLoaded', updateRequiredFields);
+
+        // para el ajax del formulario
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const button = document.getElementById('registerButton');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+
+            fetch(form.action, {
+                    method: form.method,
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.redirect) {
+                        // Mostrar modal de éxito
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
+
+                        // Redirigir después de 3 segundos
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-paper-plane"></i> Registrarse';
+                });
+        });
     </script>
 </body>
 

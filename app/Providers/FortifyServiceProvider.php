@@ -18,9 +18,14 @@ class FortifyServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void
+    public function register()
     {
-        //
+        $this->app->singleton(
+            \Laravel\Fortify\Contracts\RegisterResponse::class,
+            function () {
+                return new RegisteredUserController();
+            }
+        );
     }
 
     /**

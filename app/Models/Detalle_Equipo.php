@@ -51,4 +51,9 @@ class Detalle_Equipo extends Model
     {
         return $this->morphMany(imagenes::class, 'imageable');
     }
+
+    public function favoritos()
+    {
+        return $this->morphMany(favoritos::class, 'favoritable');
+    }
 }

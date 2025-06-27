@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class itinerarioxruta extends Model
 {
     public $timestamps = false;
-    // protected $table = 'itinerarios';
+    protected $table = 'itinerarios_ruta';
 
     protected $fillable = [
         'fk_iditinerario','fk_idruta'

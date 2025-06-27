@@ -14,10 +14,18 @@
                         <p class="text-gray-600 text-sm mt-1">{{ Str::limit($paquete->descripcion, 100) }}</p>
                         <div class="mt-4 flex justify-between items-center">
                             <span class="text-teal-600 font-bold text-lg">S/{{ $paquete->preciopaquete }}</span>
-                            <button
-                                class="bg-purple-600 text-white text-sm px-4 py-2 rounded-full hover:bg-purple-700 transition">
-                                Reservar
-                            </button>
+                            <div class="flex space-x-3">
+                                <a href="{{ route('vistapaquete', $paquete->id) }}"
+                                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center group">
+                                    <span class="mr-1">Ver más</span>
+                                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+
                         </div>
                     </div>
                 </div>

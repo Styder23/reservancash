@@ -31,4 +31,8 @@ class DetallePaquetes extends Model
         return $this->belongsTo(Promociones::class ,'fk_idpromociones');
     }
 
+    public function favoritos()
+    {
+        return $this->morphMany(favoritos::class, 'favoritable');
+    }
 }

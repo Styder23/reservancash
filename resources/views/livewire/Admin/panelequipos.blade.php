@@ -441,33 +441,119 @@
                                                     </div>
                                                 </div>
                                             @endif
+                                            <!-- Input de archivo -->
+                                            <div class="relative mt-2">
+                                                <input type="file" wire:model="form.imagenes_equipo"
+                                                    id="imagen-upload"
+                                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                    accept="image/*">
+                                                <label for="imagen-upload"
+                                                    class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                    <svg class="w-5 h-5 mr-2 text-gray-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                        </path>
+                                                    </svg>
+                                                    <span class="text-sm text-gray-600">Seleccionar imagen</span>
+                                                </label>
+                                            </div>
+
+                                            <p class="text-xs text-gray-500 mt-2">
+                                                Formatos: JPG, PNG, GIF (máx. 2MB)
+                                            </p>
+                                            @error('form.imagenes_equipo')
+                                                <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                            @enderror
+                                            <div class="mt-6">
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Imágenes
+                                                    adicionales</label>
+
+                                                <!-- Vista previa de imágenes adicionales existentes -->
+                                                @if ($modoEditar && $imagenesExistentes->count())
+                                                    <div class="grid grid-cols-3 gap-2 mb-4">
+                                                        @foreach ($imagenesExistentes as $imagen)
+                                                            <div class="relative group">
+                                                                <img src="{{ asset('storage/' . $imagen->url) }}"
+                                                                    class="w-full h-24 object-cover rounded border border-gray-200">
+                                                                <button type="button"
+                                                                    wire:click="eliminarImagen({{ $imagen->id }})"
+                                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <svg class="w-3 h-3" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
+                                                                            d="M6 18L18 6M6 6l12 12"></path>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+
+                                                <!-- Vista previa de nuevas imágenes -->
+                                                @if ($imagenesAdicionales)
+                                                    <div class="grid grid-cols-3 gap-2 mb-4">
+                                                        @foreach ($imagenesAdicionales as $index => $imagen)
+                                                            <div class="relative">
+                                                                <img src="{{ $imagen->temporaryUrl() }}"
+                                                                    class="w-full h-24 object-cover rounded border border-gray-200">
+                                                                <button type="button"
+                                                                    wire:click="removeImagenAdicional({{ $index }})"
+                                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1">
+                                                                    <svg class="w-3 h-3" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
+                                                                            d="M6 18L18 6M6 6l12 12"></path>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+
+                                                <!-- Input para múltiples imágenes -->
+                                                <div x-data="{ isUploading: false, progress: 0 }"
+                                                    x-on:livewire-upload-start="isUploading = true"
+                                                    x-on:livewire-upload-finish="isUploading = false"
+                                                    x-on:livewire-upload-error="isUploading = false"
+                                                    x-on:livewire-upload-progress="progress = $event.detail.progress">
+                                                    <input type="file" wire:model="imagenesAdicionales" multiple
+                                                        accept="image/*" class="hidden" id="imagenesAdicionales">
+
+                                                    <label for="imagenesAdicionales"
+                                                        class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                        <svg class="w-5 h-5 mr-2 text-gray-400" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                                            </path>
+                                                        </svg>
+                                                        <span class="text-sm text-gray-600">Agregar imágenes
+                                                            adicionales</span>
+                                                    </label>
+
+                                                    <!-- Progress bar -->
+                                                    <div x-show="isUploading" class="mt-2">
+                                                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                                            <div class="bg-blue-600 h-2.5 rounded-full"
+                                                                x-bind:style="`width: ${progress}%`"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <p class="text-xs text-gray-500 mt-2">
+                                                        Puedes seleccionar múltiples imágenes (máx. 2MB cada una)
+                                                    </p>
+                                                    @error('imagenesAdicionales.*')
+                                                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <!-- Input de archivo -->
-                                        <div class="relative">
-                                            <input type="file" wire:model="form.imagenes_equipo"
-                                                id="imagen-upload"
-                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                accept="image/*">
-                                            <label for="imagen-upload"
-                                                class="flex items-center justify-center w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                                                <svg class="w-5 h-5 mr-2 text-gray-400" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                                    </path>
-                                                </svg>
-                                                <span class="text-sm text-gray-600">Seleccionar imagen</span>
-                                            </label>
-                                        </div>
 
-                                        <p class="text-xs text-gray-500 mt-2">
-                                            Formatos: JPG, PNG, GIF (máx. 2MB)
-                                        </p>
-                                        @error('form.imagenes_equipo')
-                                            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                                        @enderror
                                     </div>
                                 </div>
                             </div>
