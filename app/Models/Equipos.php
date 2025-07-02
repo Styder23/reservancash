@@ -31,8 +31,4 @@ class Equipos extends Model
         return $this->hasMany('App\Models\PaqueteEquipos', 'fk_idequipo');
     }
 
-    public function favoritos()
-    {
-        return $this->morphMany(favoritos::class, 'favoritable');
-    }
 }

@@ -106,6 +106,15 @@
                                             </path>
                                         </svg>
                                     </button>
+                                    <button wire:click="agregarItinerario({{ $paquete->id }})"
+                                        class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-md hover:bg-green-200 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        Itinerario
+                                    </button>
                                 </div>
                             </div>
 
@@ -248,10 +257,10 @@
                                         class="py-2 px-1 border-b-2 font-medium text-sm {{ $tab_activo === 'imagenes' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                                         Imágenes
                                     </button>
-                                    <button type="button" wire:click="cambiarTab('itinerario')"
+                                    {{-- <button type="button" wire:click="cambiarTab('itinerario')"
                                         class="py-2 px-1 border-b-2 font-medium text-sm {{ $tab_activo === 'itinerario' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                                         Itinerario
-                                    </button>
+                                    </button> --}}
                                 </nav>
                             </div>
 
@@ -855,359 +864,9 @@
                                     </div>
                                 @endif
 
-                                <!-- Pestaña: Itinerario -->
+                                {{-- <!-- Pestaña: Itinerario -->
                                 @if ($tab_activo === 'itinerario')
-                                    <div class="space-y-6">
-                                        <!-- Gestión de Rutas y Paradas -->
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <!-- Panel de Rutas -->
-                                            <div class="bg-gray-50 rounded-lg p-4">
-                                                <h3 class="text-sm font-medium text-gray-900 mb-3">Gestionar Rutas</h3>
-                                                <div class="space-y-3">
-                                                    <div class="flex gap-2">
-                                                        <input type="text" wire:model="nueva_ruta"
-                                                            placeholder="Nombre de la ruta"
-                                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                                        <button wire:click="crearRuta"
-                                                            class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
-                                                            Crear
-                                                        </button>
-                                                    </div>
-                                                    <button wire:click="abrirModalRutas"
-                                                        class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
-                                                        <svg class="w-4 h-4 mr-1" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Ver todas las rutas
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- Panel de Paradas -->
-                                            <div class="bg-gray-50 rounded-lg p-4">
-                                                <h3 class="text-sm font-medium text-gray-900 mb-3">Gestionar Paradas
-                                                </h3>
-                                                <div class="space-y-3">
-                                                    <div class="flex gap-2">
-                                                        <input type="text" wire:model="nueva_parada"
-                                                            placeholder="Nombre de la parada"
-                                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
-                                                        <button wire:click="crearParada"
-                                                            class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
-                                                            Crear
-                                                        </button>
-                                                    </div>
-                                                    <button wire:click="abrirModalParadas"
-                                                        class="text-sm text-green-600 hover:text-green-800 flex items-center">
-                                                        <svg class="w-4 h-4 mr-1" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        Ver todas las paradas
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {{-- modal para la lista de rutas --}}
-                                            @if ($mostrar_modal_rutas)
-                                                <div
-                                                    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                                    <div
-                                                        class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
-                                                        <h3 class="text-lg font-semibold mb-4">Todas las Rutas</h3>
-                                                        <div class="flex-1 overflow-y-auto space-y-2">
-                                                            @foreach ($rutas as $ruta)
-                                                                <div
-                                                                    class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                                                    <span>{{ $ruta->namerutas }}</span>
-                                                                    <div class="flex space-x-2">
-                                                                        <button
-                                                                            wire:click="seleccionarRuta({{ $ruta->id }})"
-                                                                            class="text-blue-600 text-sm hover:underline">
-                                                                            Seleccionar
-                                                                        </button>
-                                                                        <button
-                                                                            wire:click="eliminarRuta({{ $ruta->id }})"
-                                                                            class="text-red-500 hover:text-red-700">
-                                                                            ×
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                        <div class="mt-4 flex justify-end">
-                                                            <button wire:click="cerrarModalRutas"
-                                                                class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
-                                                                Cerrar
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-
-                                            {{-- modal para la lista de paradas --}}
-                                            @if ($mostrar_modal_paradas_lista)
-                                                <div
-                                                    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                                    <div
-                                                        class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
-                                                        <h3 class="text-lg font-semibold mb-4">Todas las Rutas</h3>
-                                                        <div class="flex-1 overflow-y-auto space-y-2">
-                                                            @foreach ($paradas as $parada)
-                                                                <div
-                                                                    class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                                                    <span>{{ $parada->nameparadas }}</span>
-                                                                    <div class="flex space-x-2">
-                                                                        <button
-                                                                            wire:click="seleccionarRuta({{ $parada->id }})"
-                                                                            class="text-blue-600 text-sm hover:underline">
-                                                                            Seleccionar
-                                                                        </button>
-                                                                        <button
-                                                                            wire:click="eliminarRuta({{ $parada->id }})"
-                                                                            class="text-red-500 hover:text-red-700">
-                                                                            ×
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                        <div class="mt-4 flex justify-end">
-                                                            <button wire:click="cerrarModalRutas"
-                                                                class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
-                                                                Cerrar
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-
-                                        </div>
-
-                                        <!-- Crear Itinerario -->
-                                        <div class="bg-white border border-gray-200 rounded-lg p-6">
-                                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Crear Día de
-                                                Itinerario
-                                            </h3>
-
-                                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                                <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-700 mb-1">Día</label>
-                                                    <input type="number" wire:model="itinerario_dia" min="1"
-                                                        placeholder="1"
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hora
-                                                        Inicio</label>
-                                                    <input type="time" wire:model="itinerario_hora_inicio"
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hora
-                                                        Fin</label>
-                                                    <input type="time" wire:model="itinerario_hora_fin"
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-4">
-                                                <label
-                                                    class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                                                <textarea wire:model="itinerario_descripcion" rows="3" placeholder="Descripción de las actividades del día"
-                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                                            </div>
-
-                                            <!-- Selección de Rutas con Búsqueda -->
-                                            <div class="mb-6">
-                                                <label class="block text-sm font-medium text-gray-700 mb-2">Rutas del
-                                                    Itinerario</label>
-
-                                                <!-- Buscador de rutas -->
-                                                <div class="relative mb-3">
-                                                    <input type="text" wire:model.live="buscar_ruta"
-                                                        placeholder="Buscar y seleccionar rutas..."
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-                                                    <!-- Dropdown de resultados -->
-                                                    @if ($buscar_ruta && count($rutas_filtradas) > 0)
-                                                        <div
-                                                            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
-                                                            @foreach ($rutas_filtradas as $ruta)
-                                                                <button type="button"
-                                                                    wire:click="seleccionarRuta({{ $ruta->id }})"
-                                                                    class="w-full text-left px-3 py-2 hover:bg-gray-50 focus:bg-gray-50 border-b last:border-b-0">
-                                                                    {{ $ruta->namerutas }}
-                                                                </button>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
-                                                </div>
-
-                                                <!-- Rutas seleccionadas -->
-                                                <div class="space-y-2">
-                                                    @foreach ($rutas_seleccionadas as $index => $ruta_sel)
-                                                        <div
-                                                            class="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-md">
-                                                            <div class="flex items-center space-x-3">
-                                                                <span
-                                                                    class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ $index + 1 }}</span>
-                                                                <span
-                                                                    class="font-medium">{{ $ruta_sel['nombre'] }}</span>
-
-                                                                <!-- Paradas de la ruta -->
-                                                                <div class="flex flex-wrap gap-1">
-                                                                    @foreach ($ruta_sel['paradas'] as $parada)
-                                                                        <span
-                                                                            class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
-                                                                            {{ $parada['nombre'] }}
-                                                                        </span>
-                                                                    @endforeach
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="flex items-center space-x-2">
-                                                                <button
-                                                                    wire:click="editarRutaParadas({{ $index }})"
-                                                                    class="text-blue-600 hover:text-blue-800 text-sm">
-                                                                    Editar paradas
-                                                                </button>
-                                                                <button
-                                                                    wire:click="removerRutaSeleccionada({{ $index }})"
-                                                                    class="text-red-500 hover:text-red-700">
-                                                                    ×
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-
-                                            {{-- <!-- Botón para guardar itinerario -->
-                                        <div class="flex justify-end">
-                                            <button wire:click="guardarItinerario"
-                                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                                Guardar Itinerario
-                                            </button>
-                                        </div> --}}
-                                            <div class="text-sm text-gray-500 italic">
-                                                El itinerario se guardará automáticamente al guardar el paquete.
-                                            </div>
-                                        </div>
-
-                                        <!-- Lista de Itinerarios Existentes -->
-                                        @if (count($itinerarios) > 0)
-                                            <div class="bg-white border border-gray-200 rounded-lg p-6">
-                                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Itinerarios
-                                                    Creados
-                                                </h3>
-                                                <div class="space-y-4">
-                                                    @foreach ($itinerarios as $itinerario)
-                                                        <div class="border border-gray-200 rounded-lg p-4">
-                                                            <div class="flex items-center justify-between mb-2">
-                                                                <h4 class="font-medium">Día {{ $itinerario->dia }}
-                                                                </h4>
-                                                                <div class="flex items-center space-x-2">
-                                                                    <span class="text-sm text-gray-500">
-                                                                        {{ $itinerario->hora_inicio }} -
-                                                                        {{ $itinerario->hora_fin }}
-                                                                    </span>
-                                                                    <button
-                                                                        wire:click="eliminarItinerario({{ $itinerario->id }})"
-                                                                        class="text-red-500 hover:text-red-700">
-                                                                        ×
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <p class="text-gray-600 text-sm mb-2">
-                                                                {{ $itinerario->descripcion }}</p>
-
-                                                            <!-- Mostrar rutas del itinerario -->
-                                                            <div class="flex flex-wrap gap-2">
-                                                                @foreach ($itinerario->rutas as $ruta)
-                                                                    <span
-                                                                        class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                                                        {{ $ruta->namerutas }}
-                                                                    </span>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    <!-- Modal para editar paradas de ruta -->
-                                    @if ($mostrar_modal_paradas)
-                                        <div
-                                            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                            <div class="bg-white rounded-lg p-6 w-full max-w-md">
-                                                <h3 class="text-lg font-semibold mb-4">Paradas para:
-                                                    {{ $ruta_editando['nombre'] ?? '' }}</h3>
-
-                                                <!-- Buscador de paradas -->
-                                                <div class="relative mb-4">
-                                                    <input type="text" wire:model.live="buscar_parada"
-                                                        placeholder="Buscar parada..."
-                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-                                                    @if ($buscar_parada && count($paradas_filtradas) > 0)
-                                                        <div
-                                                            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-32 overflow-y-auto">
-                                                            @foreach ($paradas_filtradas as $parada)
-                                                                <button type="button"
-                                                                    wire:click="agregarParadaARuta({{ $parada->id }})"
-                                                                    class="w-full text-left px-3 py-2 hover:bg-gray-50">
-                                                                    {{ $parada->nameparadas }}
-                                                                </button>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
-                                                </div>
-
-                                                <!-- Paradas seleccionadas con orden -->
-                                                <div class="space-y-2 mb-4 max-h-40 overflow-y-auto">
-                                                    @if (isset($ruta_editando['paradas']))
-                                                        @foreach ($ruta_editando['paradas'] as $index => $parada)
-                                                            <div
-                                                                class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                                                <div class="flex items-center space-x-2">
-                                                                    <span
-                                                                        class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">{{ $index + 1 }}</span>
-                                                                    <span
-                                                                        class="text-sm">{{ $parada['nombre'] }}</span>
-                                                                </div>
-                                                                <button
-                                                                    wire:click="removerParadaDeRuta({{ $index }})"
-                                                                    class="text-red-500 hover:text-red-700">
-                                                                    ×
-                                                                </button>
-                                                            </div>
-                                                        @endforeach
-                                                    @endif
-                                                </div>
-
-                                                <div class="flex justify-end space-x-2">
-                                                    <button wire:click="cerrarModalParadas"
-                                                        class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
-                                                        Cancelar
-                                                    </button>
-                                                    <button wire:click="guardarParadasRuta"
-                                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                                        Guardar
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endif
+                                @endif --}}
 
                                 <!-- Botones de acción -->
                                 <div class="mt-8 flex justify-between items-center">
@@ -1221,7 +880,7 @@
                                     @endif
 
                                     <div class="flex space-x-3">
-                                        @if ($tab_activo !== 'itinerario')
+                                        @if ($tab_activo !== 'imagenes')
                                             <button type="button" wire:click="siguienteTab"
                                                 class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                                                 Siguiente
@@ -1236,6 +895,365 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Modal de los itinerarios para Eliminar -->
+        @if ($mostrar_formulario_itinerario)
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Agregar Itinerario al Paquete</h3>
+                            <button wire:click="cerrarFormularioItinerario" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Gestión de Rutas y Paradas -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Panel de Rutas -->
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h3 class="text-sm font-medium text-gray-900 mb-3">Gestionar Rutas</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex gap-2">
+                                            <input type="text" wire:model="nueva_ruta"
+                                                placeholder="Nombre de la ruta"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                            <button wire:click="crearRuta"
+                                                class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
+                                                Crear
+                                            </button>
+                                        </div>
+                                        <button wire:click="abrirModalRutas"
+                                            class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Ver todas las rutas
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Panel de Paradas -->
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h3 class="text-sm font-medium text-gray-900 mb-3">Gestionar Paradas
+                                    </h3>
+                                    <div class="space-y-3">
+                                        <div class="flex gap-2">
+                                            <input type="text" wire:model="nueva_parada"
+                                                placeholder="Nombre de la parada"
+                                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                            <button wire:click="crearParada"
+                                                class="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700">
+                                                Crear
+                                            </button>
+                                        </div>
+                                        <button wire:click="abrirModalParadas"
+                                            class="text-sm text-green-600 hover:text-green-800 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Ver todas las paradas
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {{-- modal para la lista de rutas --}}
+                                @if ($mostrar_modal_rutas)
+                                    <div
+                                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div
+                                            class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
+                                            <h3 class="text-lg font-semibold mb-4">Todas las Rutas</h3>
+                                            <div class="flex-1 overflow-y-auto space-y-2">
+                                                @foreach ($rutas as $ruta)
+                                                    <div
+                                                        class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                                        <span>{{ $ruta->namerutas }}</span>
+                                                        <div class="flex space-x-2">
+                                                            <button wire:click="seleccionarRuta({{ $ruta->id }})"
+                                                                class="text-blue-600 text-sm hover:underline">
+                                                                Seleccionar
+                                                            </button>
+                                                            <button wire:click="eliminarRuta({{ $ruta->id }})"
+                                                                class="text-red-500 hover:text-red-700">
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            <div class="mt-4 flex justify-end">
+                                                <button wire:click="cerrarModalRutas"
+                                                    class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- modal para la lista de paradas --}}
+                                @if ($mostrar_modal_paradas_lista)
+                                    <div
+                                        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                        <div
+                                            class="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
+                                            <h3 class="text-lg font-semibold mb-4">Todas las Rutas</h3>
+                                            <div class="flex-1 overflow-y-auto space-y-2">
+                                                @foreach ($paradas as $parada)
+                                                    <div
+                                                        class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                                        <span>{{ $parada->nameparadas }}</span>
+                                                        <div class="flex space-x-2">
+                                                            <button wire:click="seleccionarRuta({{ $parada->id }})"
+                                                                class="text-blue-600 text-sm hover:underline">
+                                                                Seleccionar
+                                                            </button>
+                                                            <button wire:click="eliminarRuta({{ $parada->id }})"
+                                                                class="text-red-500 hover:text-red-700">
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            <div class="mt-4 flex justify-end">
+                                                <button wire:click="cerrarModalRutas"
+                                                    class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                            </div>
+
+                            <!-- Crear Itinerario -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Crear Día de
+                                    Itinerario
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Día</label>
+                                        <input type="number" wire:model="itinerario_dia" min="1"
+                                            placeholder="1"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Hora
+                                            Inicio</label>
+                                        <input type="time" wire:model="itinerario_hora_inicio"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Hora
+                                            Fin</label>
+                                        <input type="time" wire:model="itinerario_hora_fin"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                                    <textarea wire:model="itinerario_descripcion" rows="3" placeholder="Descripción de las actividades del día"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                </div>
+
+                                <!-- Selección de Rutas con Búsqueda -->
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Rutas del
+                                        Itinerario</label>
+
+                                    <!-- Buscador de rutas -->
+                                    <div class="relative mb-3">
+                                        <input type="text" wire:model.live="buscar_ruta"
+                                            placeholder="Buscar y seleccionar rutas..."
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                                        <!-- Dropdown de resultados -->
+                                        @if ($buscar_ruta && count($rutas_filtradas) > 0)
+                                            <div
+                                                class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                                @foreach ($rutas_filtradas as $ruta)
+                                                    <button type="button"
+                                                        wire:click="seleccionarRuta({{ $ruta->id }})"
+                                                        class="w-full text-left px-3 py-2 hover:bg-gray-50 focus:bg-gray-50 border-b last:border-b-0">
+                                                        {{ $ruta->namerutas }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Rutas seleccionadas -->
+                                    <div class="space-y-2">
+                                        @foreach ($rutas_seleccionadas as $index => $ruta_sel)
+                                            <div
+                                                class="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                                <div class="flex items-center space-x-3">
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ $index + 1 }}</span>
+                                                    <span class="font-medium">{{ $ruta_sel['nombre'] }}</span>
+
+                                                    <!-- Paradas de la ruta -->
+                                                    <div class="flex flex-wrap gap-1">
+                                                        @foreach ($ruta_sel['paradas'] as $parada)
+                                                            <span
+                                                                class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                                                                {{ $parada['nombre'] }}
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex items-center space-x-2">
+                                                    <button wire:click="editarRutaParadas({{ $index }})"
+                                                        class="text-blue-600 hover:text-blue-800 text-sm">
+                                                        Editar paradas
+                                                    </button>
+                                                    <button wire:click="removerRutaSeleccionada({{ $index }})"
+                                                        class="text-red-500 hover:text-red-700">
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- <!-- Botón para guardar itinerario -->
+                                        <div class="flex justify-end">
+                                            <button wire:click="guardarItinerario"
+                                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                Guardar Itinerario
+                                            </button>
+                                        </div> --}}
+                                <div class="text-sm text-gray-500 italic">
+                                    El itinerario se guardará automáticamente al guardar el paquete.
+                                </div>
+                            </div>
+
+                            <!-- Lista de Itinerarios Existentes -->
+                            @if (count($itinerarios) > 0)
+                                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Itinerarios
+                                        Creados
+                                    </h3>
+                                    <div class="space-y-4">
+                                        @foreach ($itinerarios as $itinerario)
+                                            <div class="border border-gray-200 rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <h4 class="font-medium">Día {{ $itinerario->dia }}
+                                                    </h4>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-sm text-gray-500">
+                                                            {{ $itinerario->hora_inicio }} -
+                                                            {{ $itinerario->hora_fin }}
+                                                        </span>
+                                                        <button wire:click="eliminarItinerario({{ $itinerario->id }})"
+                                                            class="text-red-500 hover:text-red-700">
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p class="text-gray-600 text-sm mb-2">
+                                                    {{ $itinerario->descripcion }}</p>
+
+                                                <!-- Mostrar rutas del itinerario -->
+                                                {{-- <div class="flex flex-wrap gap-2">
+                                                    @foreach ($itinerario->rutas as $ruta)
+                                                        <span
+                                                            class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                                            {{ $ruta->namerutas }}
+                                                        </span>
+                                                    @endforeach
+                                                </div> --}}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Modal para editar paradas de ruta -->
+                        @if ($mostrar_modal_paradas)
+                            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                                    <h3 class="text-lg font-semibold mb-4">Paradas para:
+                                        {{ $ruta_editando['nombre'] ?? '' }}</h3>
+
+                                    <!-- Buscador de paradas -->
+                                    <div class="relative mb-4">
+                                        <input type="text" wire:model.live="buscar_parada"
+                                            placeholder="Buscar parada..."
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                                        @if ($buscar_parada && count($paradas_filtradas) > 0)
+                                            <div
+                                                class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-32 overflow-y-auto">
+                                                @foreach ($paradas_filtradas as $parada)
+                                                    <button type="button"
+                                                        wire:click="agregarParadaARuta({{ $parada->id }})"
+                                                        class="w-full text-left px-3 py-2 hover:bg-gray-50">
+                                                        {{ $parada->nameparadas }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Paradas seleccionadas con orden -->
+                                    <div class="space-y-2 mb-4 max-h-40 overflow-y-auto">
+                                        @if (isset($ruta_editando['paradas']))
+                                            @foreach ($ruta_editando['paradas'] as $index => $parada)
+                                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span
+                                                            class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">{{ $index + 1 }}</span>
+                                                        <span class="text-sm">{{ $parada['nombre'] }}</span>
+                                                    </div>
+                                                    <button wire:click="removerParadaDeRuta({{ $index }})"
+                                                        class="text-red-500 hover:text-red-700">
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+
+                                    <div class="flex justify-end space-x-2">
+                                        <button wire:click="cerrarModalParadas"
+                                            class="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+                                            Cancelar
+                                        </button>
+                                        <button wire:click="guardarParadasRuta"
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                            Guardar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        <!-- Solo cambia el botón de guardar para que llame a guardarItinerario -->
+                        <button wire:click="guardarItinerario"
+                            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Guardar Itinerario
+                        </button>
                     </div>
                 </div>
             </div>

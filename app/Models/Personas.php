@@ -17,16 +17,16 @@ class Personas extends Model
 
     public function replegal()
     {
-        return $this->hasMany('App\Models\RepreLegal', 'fk_idpersona');
+        return $this->hasMany(RepreLegal::class, 'fk_idpersona');
     }
 
     public function empresa()
     {
-        return $this->hasMany('App\Models\RepreLegal', 'fk_idempresa');
+        return $this->hasMany(RepreLegal::class, 'fk_idpersona'); 
     }
 
     public function user()
     {
-        return $this->hasMany('App\Models\User', 'fk_idpersona');
+        return $this->hasMany(User::class, 'fk_idpersona'); 
     }
 }

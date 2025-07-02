@@ -21,6 +21,16 @@ export default {
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                // Cambiado de "color" a "colors"
+                purple: {
+                    700: "#6a0dad",
+                },
+                jade: {
+                    500: "#00a86b",
+                    600: "#007a4d",
+                },
+            },
         },
     },
 

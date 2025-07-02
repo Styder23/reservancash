@@ -17,6 +17,7 @@ class Equipos extends Component
     public $equipoId;
     public $esFavorito = false;
     public $favoritos = [];
+    
     public function mount(){
         $this->equipos=Detalle_Equipo::all();
         if (Auth::check()) {

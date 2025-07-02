@@ -34,8 +34,8 @@
                         <div
                             class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="relative">
-                                <img src="{{ $paquete->imagen_principal }}" alt="{{ $paquete->nombrepaquete }}"
-                                    class="w-full h-48 object-cover">
+                                <img src="{{ Storage::url($paquete->imagen_principal) }}"
+                                    alt="{{ $paquete->nombrepaquete }}" class="w-full h-48 object-cover">
                                 <button wire:click="removeFromFavorites('paquete', {{ $paquete->id }})"
                                     class="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-red-100 transition-colors duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 fill-current"

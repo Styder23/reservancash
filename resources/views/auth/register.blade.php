@@ -9,28 +9,36 @@
     <style>
         :root {
             --color-primary: #7e22ce;
+            /* Morado principal */
             --color-primary-light: #a855f7;
             --color-primary-dark: #581c87;
             --color-secondary: #9333ea;
             --color-accent: #e879f9;
+            --color-jade: #00a86b;
+            /* Verde jade */
+            --color-jade-light: #00c27a;
+            --color-jade-dark: #007a4d;
+            --color-white: #f8f8ff;
+            /* Blanco perlado */
+            --color-light: #e2e8f0;
             --color-dark: #1e1b4b;
             --color-darker: #0f172a;
-            --color-light: #cbd5e1;
-            --color-lighter: #f1f5f9;
-            --color-text: #e2e8f0;
-            --color-text-dark: #94a3b8;
+            --color-text: #1e1b4b;
+            --color-text-light: #64748b;
             --color-success: #10b981;
             --color-error: #ef4444;
+            --color-bg: #f9fafb;
+            /* Fondo claro */
         }
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--color-darker);
+            background-color: var(--color-bg);
             color: var(--color-text);
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .auth-container {
@@ -38,48 +46,71 @@
             min-height: 100vh;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-            background: radial-gradient(circle at 10% 20%, var(--color-primary-dark), var(--color-darker));
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--color-white) 0%, var(--color-light) 100%);
         }
 
         .auth-card {
             width: 100%;
             max-width: 900px;
-            background-color: rgba(30, 27, 75, 0.8);
-            backdrop-filter: blur(10px);
+            background-color: var(--color-white);
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             overflow: hidden;
-            border: 1px solid rgba(126, 34, 206, 0.3);
+            border: 1px solid rgba(126, 34, 206, 0.1);
+            display: flex;
+            transition: all 0.3s ease;
         }
 
-        .auth-card-header {
-            padding: 2rem;
-            text-align: center;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+        .auth-card:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        /* Panel izquierdo con imagen */
+        .auth-card-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             position: relative;
+            overflow: hidden;
         }
 
-        .auth-card-header::after {
+        .auth-card-left::before {
             content: '';
             position: absolute;
-            bottom: -20px;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-            transform: skewY(-2deg);
-            z-index: 1;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-card-left::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .logo-container {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            z-index: 1;
         }
 
         .logo-icon {
             font-size: 3rem;
             color: white;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             width: 80px;
             height: 80px;
             border-radius: 50%;
@@ -87,8 +118,8 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.25);
         }
 
         .auth-title {
@@ -97,94 +128,117 @@
             margin: 0.5rem 0;
             color: white;
             position: relative;
-            z-index: 2;
+            z-index: 1;
+            text-align: center;
         }
 
         .auth-subtitle {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
             font-size: 1rem;
             margin-top: 0.5rem;
             position: relative;
-            z-index: 2;
+            z-index: 1;
+            text-align: center;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .auth-card-body {
-            padding: 2.5rem;
-            position: relative;
-            z-index: 2;
+        .auth-features {
+            margin-top: 2rem;
+            z-index: 1;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* Panel derecho con formulario */
+        .auth-card-right {
+            flex: 1.5;
+            padding: 3rem 2.5rem;
         }
 
         .form-section {
-            margin-bottom: 2rem;
-            border-bottom: 1px solid rgba(126, 34, 206, 0.2);
-            padding-bottom: 1.5rem;
-        }
-
-        .form-section:last-child {
-            border-bottom: none;
+            margin-bottom: 1.5rem;
         }
 
         .section-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--color-accent);
+            margin-bottom: 1rem;
+            color: var(--color-primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .section-title i {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
         }
 
         .user-type-selector {
             display: flex;
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .user-type-option {
             flex: 1;
-            padding: 1.5rem 1rem;
+            padding: 1.2rem 0.8rem;
             text-align: center;
-            background-color: rgba(126, 34, 206, 0.1);
-            border: 2px solid rgba(126, 34, 206, 0.3);
-            border-radius: 10px;
+            background-color: rgba(126, 34, 206, 0.05);
+            border: 1px solid rgba(126, 34, 206, 0.15);
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .user-type-option:hover {
-            background-color: rgba(126, 34, 206, 0.2);
+            background-color: rgba(126, 34, 206, 0.1);
             border-color: var(--color-primary-light);
         }
 
         .user-type-option.active {
-            background-color: rgba(126, 34, 206, 0.3);
+            background-color: rgba(126, 34, 206, 0.15);
             border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
         }
 
         .user-type-icon {
-            font-size: 2rem;
+            font-size: 1.5rem;
             margin-bottom: 0.5rem;
-            color: var(--color-accent);
+            color: var(--color-primary);
         }
 
         .user-type-label {
             font-weight: 500;
             color: var(--color-text);
+            font-size: 0.9rem;
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .form-label {
@@ -192,15 +246,16 @@
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: var(--color-text);
+            font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            background-color: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(126, 34, 206, 0.3);
-            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
+            background-color: var(--color-white);
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
             color: var(--color-text);
             transition: all 0.3s;
             box-sizing: border-box;
@@ -209,23 +264,23 @@
         .form-control:focus {
             outline: none;
             border-color: var(--color-primary-light);
-            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
-            background-color: rgba(15, 23, 42, 0.7);
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
         }
 
         .input-group {
             display: flex;
             align-items: center;
-            background-color: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(126, 34, 206, 0.3);
-            border-radius: 8px;
+            background-color: var(--color-white);
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
             overflow: hidden;
         }
 
         .input-group-prepend {
-            padding: 0.75rem 1rem;
-            background-color: rgba(126, 34, 206, 0.3);
-            color: var(--color-accent);
+            padding: 0.65rem 0.8rem;
+            background-color: rgba(126, 34, 206, 0.05);
+            color: var(--color-primary);
+            font-size: 0.9rem;
         }
 
         .input-group .form-control {
@@ -255,37 +310,38 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1rem;
-            background-color: rgba(15, 23, 42, 0.5);
-            border: 1px dashed rgba(126, 34, 206, 0.5);
-            border-radius: 8px;
-            color: var(--color-text-dark);
+            padding: 0.65rem 1rem;
+            background-color: var(--color-white);
+            border: 1px dashed #e2e8f0;
+            border-radius: 6px;
+            color: var(--color-text-light);
             transition: all 0.3s;
+            font-size: 0.9rem;
         }
 
         .form-file-label:hover {
-            background-color: rgba(15, 23, 42, 0.7);
             border-color: var(--color-primary-light);
             color: var(--color-text);
         }
 
         .form-file-label i {
             margin-right: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .auth-card-footer {
-            padding: 1.5rem 2.5rem;
+            padding: 1.5rem 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: rgba(15, 23, 42, 0.5);
-            border-top: 1px solid rgba(126, 34, 206, 0.2);
+            border-top: 1px solid #e2e8f0;
+            margin-top: 1.5rem;
         }
 
         .auth-link {
-            color: var(--color-accent);
+            color: var(--color-primary);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: color 0.3s;
             display: flex;
             align-items: center;
@@ -293,18 +349,17 @@
         }
 
         .auth-link:hover {
-            color: var(--color-primary-light);
-            text-decoration: underline;
+            color: var(--color-primary-dark);
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s;
             border: none;
             cursor: pointer;
@@ -312,21 +367,87 @@
         }
 
         .btn-primary {
-            background-color: var(--color-primary);
+            background-color: var(--color-jade);
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: var(--color-primary-light);
-            box-shadow: 0 4px 15px rgba(126, 34, 206, 0.4);
-            transform: translateY(-2px);
+            background-color: var(--color-jade-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 168, 107, 0.2);
+        }
+
+        /* Alertas */
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #059669;
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-content i {
+            font-size: 1rem;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            margin-left: auto;
+            padding: 0;
+            line-height: 1;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .auth-card {
+                flex-direction: column;
                 max-width: 100%;
-                border-radius: 0;
+            }
+
+            .auth-card-left {
+                padding: 2rem 1.5rem;
+            }
+
+            .auth-card-right {
+                padding: 2rem 1.5rem;
             }
 
             .form-grid {
@@ -338,33 +459,10 @@
             }
         }
 
-        /* Animaciones */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+        @media (max-width: 480px) {
+            .auth-card-left {
+                display: none;
             }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        .delay-100 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-200 {
-            animation-delay: 0.2s;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
         }
     </style>
 </head>
@@ -379,22 +477,48 @@
 
     <div class="auth-container">
         <div class="auth-card animate-fade-in">
-            <div class="auth-card-header">
+            <!-- Panel izquierdo con información -->
+            <div class="auth-card-left">
                 <div class="logo-container">
                     <div class="logo-icon">
                         <i class="fas fa-mountain"></i>
                     </div>
                 </div>
                 <h1 class="auth-title">Turismo Natural</h1>
-                <p class="auth-subtitle">Regístrate y empieza a explorar</p>
+                <p class="auth-subtitle">Descubre los mejores destinos con nosotros</p>
+
+                <div class="auth-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <span>Destinos exclusivos</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span>Reservas seguras</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <span>Soporte 24/7</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="auth-card-body">
+            <!-- Panel derecho con formulario -->
+            <div class="auth-card-right">
+                <h2 class="auth-title" style="color: var(--color-primary); margin-bottom: 1.5rem; text-align: left;">
+                    Crear Cuenta</h2>
+
                 <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data" id="registerForm">
                     @csrf
 
                     <!-- Tipo de Usuario -->
-                    <div class="form-section delay-100">
+                    <div class="form-section">
                         <h3 class="section-title"><i class="fas fa-user-tag"></i> Tipo de Usuario</h3>
                         <div class="user-type-selector">
                             <div class="user-type-option active" data-target="client-section">
@@ -415,15 +539,13 @@
                     </div>
 
                     <!-- Sección para Cliente -->
-                    <div id="client-section" class="form-section delay-200">
+                    <div id="client-section" class="form-section">
                         <h3 class="section-title"><i class="fas fa-id-card"></i> Información Personal</h3>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label" for="document_type">Tipo de Documento</label>
                                 <select class="form-control" id="document_type" name="document_type" required>
                                     <option value="dni">DNI</option>
-                                    {{-- <option value="ce">Carnet de Extranjería</option>
-                                    <option value="passport">Pasaporte</option> --}}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -451,7 +573,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-user"></i>
                                     </span>
-                                    <input class="form-control" type="text" id="apellidos" name="apellidos" required>
+                                    <input class="form-control" type="text" id="apellidos" name="apellidos"
+                                        required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -469,7 +592,6 @@
 
                     <!-- Sección para Empresa (oculta inicialmente) -->
                     <div id="company-section" class="form-section" style="display: none;">
-                        <!-- Información de la Empresa -->
                         <h3 class="section-title"><i class="fas fa-building"></i> Información de la Empresa</h3>
                         <div class="form-grid">
                             <div class="form-group">
@@ -534,7 +656,6 @@
                             </div>
                         </div>
 
-                        <!-- Representante Legal -->
                         <h3 class="section-title"><i class="fas fa-user-tie"></i> Representante Legal</h3>
                         <div class="form-grid">
                             <div class="form-group">
@@ -542,8 +663,6 @@
                                 <select class="form-control" id="doc_type_representante"
                                     name="doc_type_representante">
                                     <option value="dni">DNI</option>
-                                    {{-- <option value="ce">Carnet de Extranjería</option>
-                                    <option value="passport">Pasaporte</option> --}}
                                 </select>
                             </div>
                             <div class="form-group">
@@ -579,8 +698,8 @@
                         </div>
                     </div>
 
-                    <!-- Datos de la Cuenta (comunes para ambos) -->
-                    <div class="form-section delay-200">
+                    <!-- Datos de la Cuenta -->
+                    <div class="form-section">
                         <h3 class="section-title"><i class="fas fa-key"></i> Datos de Acceso</h3>
                         <div class="form-grid">
                             <div class="form-group">
@@ -618,13 +737,40 @@
 
                     <div class="auth-card-footer">
                         <a class="auth-link" href="{{ route('login') }}">
-                            <i class="fas fa-arrow-left"></i> ¿Ya tienes una cuenta? Inicia sesión
+                            <i class="fas fa-arrow-left"></i> ¿Ya tienes cuenta? Inicia sesión
                         </a>
                         <button type="submit" class="btn btn-primary" id="registerButton">
-                            <i class="fas fa-paper-plane"></i> Registrarse
+                            <i class="fas fa-user-plus"></i> Registrarse
                         </button>
                     </div>
                 </form>
+
+                @if (session('error'))
+                    <div id="errorAlert" class="alert alert-error">
+                        <div class="alert-content">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>{{ session('error') }}</span>
+                            <button onclick="closeAlert('errorAlert')" class="alert-close">&times;</button>
+                        </div>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div id="validationAlert" class="alert alert-error">
+                        <div class="alert-content">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Errores en el formulario:</strong>
+                                <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            <button onclick="closeAlert('validationAlert')" class="alert-close">&times;</button>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -645,47 +791,69 @@
     </div> --}}
 
     <script>
-        // Cambiar entre tipo de usuario (Cliente/Empresa)
-        document.querySelectorAll('.user-type-option').forEach(option => {
-            option.addEventListener('click', function() {
-                // Actualizar selección visual
-                document.querySelectorAll('.user-type-option').forEach(opt => {
-                    opt.classList.remove('active');
-                });
-                this.classList.add('active');
-
-                // Mostrar sección correspondiente
-                const targetId = this.getAttribute('data-target');
-                document.getElementById('client-section').style.display = 'none';
-                document.getElementById('company-section').style.display = 'none';
-                document.getElementById(targetId).style.display = 'block';
-
-                // Actualizar el valor del tipo de usuario
-                document.querySelectorAll('input[name="user_type"]').forEach(input => {
-                    input.disabled = true;
-                });
-                this.querySelector('input').disabled = false;
-                updateRequiredFields();
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar cuando el DOM esté listo
+            initializeUserTypeToggle();
+            initializeFileUpload();
+            initializeFormSubmission();
+            initializeAlerts();
+            updateRequiredFields();
         });
+
+        // Cambiar entre tipo de usuario (Cliente/Empresa)
+        function initializeUserTypeToggle() {
+            document.querySelectorAll('.user-type-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Actualizar selección visual
+                    document.querySelectorAll('.user-type-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+
+                    // Mostrar sección correspondiente
+                    const targetId = this.getAttribute('data-target');
+                    const clientSection = document.getElementById('client-section');
+                    const companySection = document.getElementById('company-section');
+
+                    if (clientSection) clientSection.style.display = 'none';
+                    if (companySection) companySection.style.display = 'none';
+
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) targetSection.style.display = 'block';
+
+                    // Actualizar el valor del tipo de usuario
+                    document.querySelectorAll('input[name="user_type"]').forEach(input => {
+                        input.disabled = true;
+                    });
+
+                    const selectedInput = this.querySelector('input');
+                    if (selectedInput) selectedInput.disabled = false;
+
+                    updateRequiredFields();
+                });
+            });
+        }
 
         // Actualizar texto del input file cuando se selecciona un archivo
-        document.getElementById('logo_empresa').addEventListener('change', function() {
-            const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
-            this.nextElementSibling.innerHTML = `<i class="fas fa-file-image"></i> ${fileName}`;
-        });
-
-        // Animación de carga
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.animate-fade-in').forEach(el => {
-                el.style.opacity = '0';
-            });
-        });
+        function initializeFileUpload() {
+            const logoInput = document.getElementById('logo_empresa');
+            if (logoInput) {
+                logoInput.addEventListener('change', function() {
+                    const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
+                    const nextElement = this.nextElementSibling;
+                    if (nextElement) {
+                        nextElement.innerHTML = `<i class="fas fa-file-image"></i> ${fileName}`;
+                    }
+                });
+            }
+        }
 
         // Función para manejar campos requeridos según el tipo de usuario
         function updateRequiredFields() {
-            const isCompany = document.querySelector('.user-type-option.active').getAttribute('data-target') ===
-                'company-section';
+            const activeOption = document.querySelector('.user-type-option.active');
+            if (!activeOption) return;
+
+            const isCompany = activeOption.getAttribute('data-target') === 'company-section';
 
             // Campos de cliente
             const clientFields = ['document_type', 'document_number', 'nombres', 'apellidos', 'telefono'];
@@ -722,44 +890,188 @@
                 });
             }
         }
-        document.addEventListener('DOMContentLoaded', updateRequiredFields);
 
-        // para el ajax del formulario
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Manejar el envío del formulario con AJAX
+        function initializeFormSubmission() {
+            const registerForm = document.getElementById('registerForm');
+            if (!registerForm) return;
 
-            const form = e.target;
-            const button = document.getElementById('registerButton');
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            fetch(form.action, {
-                    method: form.method,
-                    body: new FormData(form),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+                const form = e.target;
+                const button = document.getElementById('registerButton');
+
+                if (!button) return;
+
+                // Cambiar estado del botón
+                setButtonLoading(button, true);
+
+                fetch(form.action, {
+                        method: form.method,
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success && data.redirect) {
+                            // Mostrar modal de éxito o mensaje
+                            const successModal = document.getElementById('successModal');
+                            if (successModal && typeof bootstrap !== 'undefined') {
+                                const modal = new bootstrap.Modal(successModal);
+                                modal.show();
+                            } else {
+                                // Mostrar mensaje de éxito si no hay modal
+                                showSuccessMessage(data.message);
+                            }
+
+                            // Redirigir después de 3 segundos
+                            setTimeout(() => {
+                                window.location.href = data.redirect;
+                            }, 3000);
+                        } else if (!data.success && data.errors) {
+                            // Manejar errores de validación
+                            displayErrors(data.errors);
+                            setButtonLoading(button, false);
+                        } else if (!data.success) {
+                            // Error general
+                            showErrorMessage(data.message || 'Ha ocurrido un error');
+                            setButtonLoading(button, false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setButtonLoading(button, false);
+
+                        // Mostrar mensaje de error al usuario
+                        showErrorMessage('Ha ocurrido un error. Por favor, inténtelo de nuevo.');
+                    });
+            });
+        }
+
+        // Función para cambiar el estado del botón
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.disabled = true;
+                button.classList.add('btn-loading');
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+            } else {
+                button.disabled = false;
+                button.classList.remove('btn-loading');
+                button.innerHTML = '<i class="fas fa-paper-plane"></i> Registrarse';
+            }
+        }
+
+        // Función para mostrar errores
+        function displayErrors(errors) {
+            // Limpiar errores anteriores
+            document.querySelectorAll('.error-message').forEach(error => {
+                error.remove();
+            });
+
+            // Mostrar nuevos errores
+            Object.keys(errors).forEach(field => {
+                const input = document.getElementById(field);
+                if (input) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error-message text-danger small mt-1';
+                    errorDiv.textContent = errors[field][0]; // Primer error del campo
+                    input.parentNode.appendChild(errorDiv);
+                }
+            });
+        }
+
+        // Función para mostrar mensaje de éxito
+        function showSuccessMessage(message) {
+            let successAlert = document.getElementById('dynamic-success-alert');
+            if (!successAlert) {
+                successAlert = document.createElement('div');
+                successAlert.id = 'dynamic-success-alert';
+                successAlert.className = 'alert alert-success';
+                successAlert.innerHTML = `
+            <div class="alert-content">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+                <button onclick="closeAlert('dynamic-success-alert')" class="alert-close">&times;</button>
+            </div>
+        `;
+
+                const form = document.getElementById('registerForm');
+                if (form) {
+                    form.parentNode.insertBefore(successAlert, form);
+                }
+            } else {
+                successAlert.querySelector('span').textContent = message;
+                successAlert.style.display = 'block';
+                successAlert.style.opacity = '1';
+            }
+        }
+
+        // Función para mostrar mensaje de error general
+        function showErrorMessage(message) {
+            // Crear o actualizar alerta de error
+            let errorAlert = document.getElementById('dynamic-error-alert');
+            if (!errorAlert) {
+                errorAlert = document.createElement('div');
+                errorAlert.id = 'dynamic-error-alert';
+                errorAlert.className = 'alert alert-error';
+                errorAlert.innerHTML = `
+            <div class="alert-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${message}</span>
+                <button onclick="closeAlert('dynamic-error-alert')" class="alert-close">&times;</button>
+            </div>
+        `;
+
+                const form = document.getElementById('registerForm');
+                if (form) {
+                    form.parentNode.insertBefore(errorAlert, form);
+                }
+            } else {
+                errorAlert.querySelector('span').textContent = message;
+                errorAlert.style.display = 'block';
+                errorAlert.style.opacity = '1';
+            }
+        }
+
+        // Función para cerrar alertas
+        function closeAlert(alertId) {
+            const alert = document.getElementById(alertId);
+            if (alert) {
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Inicializar manejo de alertas
+        function initializeAlerts() {
+            // Auto-cerrar alerts después de 5 segundos (excepto los dinámicos de error)
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    // No auto-cerrar alertas de error específicas
+                    if (!alert.id.includes('error') && !alert.id.includes('Error')) {
+                        alert.style.opacity = '0';
+                        setTimeout(function() {
+                            alert.style.display = 'none';
+                        }, 300);
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.redirect) {
-                        // Mostrar modal de éxito
-                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                        successModal.show();
-
-                        // Redirigir después de 3 segundos
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 3000);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-paper-plane"></i> Registrarse';
                 });
-        });
+            }, 5000);
+        }
+
+        // Exponer funciones globales necesarias
+        window.closeAlert = closeAlert;
     </script>
 </body>
 

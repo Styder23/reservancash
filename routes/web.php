@@ -5,6 +5,7 @@ use App\Livewire\Admin;
 
 // login
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\CustomRegisterController;
 use App\Livewire\Dashcliente;
 use App\Livewire\Dashempresa;
 
@@ -42,6 +43,10 @@ use App\Livewire\Admin\Panelservicios;
 use App\Livewire\Admin\Panelpaquetes;
 use App\Livewire\Admin\Panelpromociones;
 
+// para el admin
+use App\Livewire\Root\Usuarios;
+use App\Livewire\Root\DatosGenerales;
+
 Route::get('/', function () {
     return redirect('/inicio');
 });
@@ -74,6 +79,9 @@ Route::get('/dividida', Dividida::class)->name('dividida');
 Route::get('/login', [LoginController::class, 'create'])->name('login');
 Route::post('/login', [LoginController::class, 'store']);
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+Route::get('/register', [CustomRegisterController::class, 'create'])->name('register');
+Route::post('/register', [CustomRegisterController::class, 'store']);
 
 Route::middleware([
     'auth:sanctum',
@@ -116,3 +124,7 @@ Route::middleware('cliente')->group(function () {
     Route::get('/reservacliente', ReservaCliente::class)->name('reservacli');
     Route::get('/vista_detallereservacli/{id}', DetalleReservacli::class)->name('vistareservacli'); 
 });
+
+// para el administrador:
+Route::get('/usuarios',Usuarios::class)->name('usuarios');
+Route::get('/generales',DatosGenerales::class)->name('generales');

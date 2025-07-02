@@ -1,0 +1,20 @@
+- Login: la redirección (hecho)
+- Vista para agregar categorias, modelos, marcas, cambiar la serie a text (hecho)
+- Mostrar solo por empresas en el panel empresas (servicios, equipos, paquetes, promociones) hecho
+- PONER los corazones para favoritos (servicios, equipos, paquetes) hecho
+- PanelAdmin (hecho)
+- MEJORAR EL DISEÑO DE REGISTRO (hecho)
+- detalle de paquetes, mover las fotos o mostrarlas, saber el total de personas del combo(hecho 80%)
+- Poner las consultas para los Dashbords (hecho)
+- Perfil del usuario (hecho 60%)
+- La comparación Importante (proceso)
+- CREAR EL DESTINO EN EL PAQUETE Y NO JALAR POR EL COMBO(suponemos el tipo de paquete)
+- Reservas empresas y clientes
+- Reportes (para la empresa y admin)
+- Mejorar las reservas de los clientes (Importante) clonar paquete
+- Comentarios de los paquetes
+- Busqueda de los paquetes el filtro
+- Subir videos en empresas
+- SEPARAR EL ITINERARIO DEL PAQUETE
+- BLOQUEAR TODA LA INFO DE UNA EMPRESA MEDIANTE EL ADMIN
+- Servicio: agregar mensajes de error para otro tipo de imagen

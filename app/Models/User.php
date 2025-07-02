@@ -46,10 +46,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(favoritos::class, 'fk_iduser');
     }
-    // public function persona()
-    // {
-    //     return $this->belongsTo(Personas::class ,'fk_idtipousu');
-    // }
+    
+    public function tipousu()
+    {
+        return $this->belongsTo(TipoUsuarios::class, 'fk_idtipousu');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

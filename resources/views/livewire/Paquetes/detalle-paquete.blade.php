@@ -20,35 +20,38 @@
             <!-- Contenido Principal -->
             <div class="lg:col-span-2">
                 <!-- Galería de Imágenes -->
-                <div class="mb-8">
-                    <div class="grid grid-cols-4 gap-2 h-96">
+                <div class="mb-8" x-data="lightbox()">
+                    <!-- Grid de miniaturas -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 h-96">
                         <!-- Imagen principal -->
                         @if ($paquete->imagen_principal)
-                            <div class="col-span-2 row-span-2">
+                            <div class="col-span-2 row-span-2 relative group">
                                 <img src="{{ asset('storage/' . $paquete->imagen_principal) }}"
                                     alt="Imagen principal del paquete"
-                                    class="w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                    class="w-full h-full object-cover rounded-lg cursor-pointer transition-opacity duration-300 group-hover:opacity-90"
                                     @click="openLightbox(0)">
+                                <div
+                                    class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                                </div>
                             </div>
                         @endif
 
                         <!-- Imágenes secundarias -->
                         @foreach ($paquete->imagenes as $key => $imagen)
                             @php
-                                // Calculamos el índice real considerando si hay imagen principal
                                 $realIndex = $paquete->imagen_principal ? $key + 1 : $key;
                                 $maxVisibleImages = $paquete->imagen_principal ? 3 : 4;
                             @endphp
 
                             @if ($key < $maxVisibleImages)
-                                <div class="relative">
+                                <div class="relative group">
                                     <img src="{{ asset('storage/' . $imagen->url) }}" alt="Imagen del paquete"
-                                        class="w-full h-full object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                        class="w-full h-full object-cover rounded-lg cursor-pointer transition-opacity duration-300 group-hover:opacity-90"
                                         @click="openLightbox({{ $realIndex }})">
 
                                     <!-- Overlay para mostrar cantidad de imágenes restantes -->
                                     @if ($key === $maxVisibleImages - 1 && $paquete->imagenes->count() > $maxVisibleImages)
-                                        <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg flex items-center justify-center cursor-pointer"
+                                        <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-300 group-hover:bg-opacity-70"
                                             @click="openLightbox({{ $realIndex }})">
                                             <span class="text-white font-semibold text-lg">
                                                 +{{ $paquete->imagenes->count() - $maxVisibleImages }} fotos
@@ -60,37 +63,79 @@
                         @endforeach
                     </div>
 
-                    <!-- Lightbox -->
-                    <div x-show="lightboxOpen"
-                        class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" x-cloak
+                    <!-- Lightbox mejorado -->
+                    <div x-show="lightboxOpen" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4" x-cloak
                         @click.away="lightboxOpen = false" @keydown.escape.window="lightboxOpen = false">
 
-                        <div class="relative w-full max-w-6xl h-full max-h-screen">
-                            <!-- Botón cerrar -->
-                            <button @click="lightboxOpen = false"
-                                class="absolute top-4 right-4 text-white text-4xl z-50 hover:text-gray-300">
-                                &times;
-                            </button>
+                        <div class="relative w-full max-w-6xl h-full max-h-screen flex flex-col">
+                            <!-- Controles superiores -->
+                            <div class="flex justify-between items-center mb-4">
+                                <!-- Contador de imágenes -->
+                                <div class="text-white text-lg">
+                                    <span x-text="lightboxIndex + 1"></span> / <span
+                                        x-text="lightboxImages.length"></span>
+                                </div>
 
-                            <!-- Imagen actual -->
-                            <img :src="lightboxImages[lightboxIndex]" class="w-full h-full object-contain" @click.stop>
+                                <!-- Botón cerrar -->
+                                <button @click="lightboxOpen = false"
+                                    class="text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
 
-                            <!-- Navegación anterior -->
-                            <button x-show="lightboxIndex > 0" @click="lightboxIndex--"
-                                class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70">
-                                &#8249;
-                            </button>
+                            <!-- Contenedor principal de imagen -->
+                            <div class="relative flex-1 flex items-center">
+                                <!-- Imagen actual con transición -->
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <img :src="lightboxImages[lightboxIndex]"
+                                        class="max-w-full max-h-full object-contain transition-opacity duration-300"
+                                        :class="{ 'opacity-100': currentImageLoaded, 'opacity-0': !currentImageLoaded }"
+                                        @load="currentImageLoaded = true">
+                                </div>
 
-                            <!-- Navegación siguiente -->
-                            <button x-show="lightboxIndex < lightboxImages.length - 1" @click="lightboxIndex++"
-                                class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70">
-                                &#8250;
-                            </button>
+                                <!-- Navegación anterior -->
+                                <button x-show="lightboxIndex > 0" @click="prevImage()"
+                                    class="absolute left-0 md:-left-12 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all duration-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
 
-                            <!-- Contador de imágenes -->
-                            <div
-                                class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded">
-                                <span x-text="lightboxIndex + 1"></span> / <span x-text="lightboxImages.length"></span>
+                                <!-- Navegación siguiente -->
+                                <button x-show="lightboxIndex < lightboxImages.length - 1" @click="nextImage()"
+                                    class="absolute right-0 md:-right-12 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all duration-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Miniaturas de navegación -->
+                            <div class="mt-4 flex overflow-x-auto py-2 space-x-2" x-show="lightboxImages.length > 1">
+                                <template x-for="(image, index) in lightboxImages" :key="index">
+                                    <button @click="lightboxIndex = index"
+                                        class="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200"
+                                        :class="{
+                                            'border-purple-500': lightboxIndex ===
+                                                index,
+                                            'border-transparent': lightboxIndex !== index
+                                        }">
+                                        <img :src="image" class="w-full h-full object-cover"
+                                            :alt="'Miniatura ' + (index + 1)">
+                                    </button>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -132,7 +177,8 @@
 
                         @if ($paquete->det_paquete->first()->promos)
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                <div
+                                    class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
                                     <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -481,6 +527,7 @@
             return {
                 lightboxOpen: false,
                 lightboxIndex: 0,
+                currentImageLoaded: false,
                 lightboxImages: [
                     @if ($paquete->imagen_principal)
                         "{{ asset('storage/' . $paquete->imagen_principal) }}",
@@ -493,6 +540,29 @@
                 openLightbox(index) {
                     this.lightboxIndex = index;
                     this.lightboxOpen = true;
+                    this.currentImageLoaded = false;
+                    // Deshabilitar scroll del body
+                    document.body.style.overflow = 'hidden';
+                },
+
+                nextImage() {
+                    if (this.lightboxIndex < this.lightboxImages.length - 1) {
+                        this.currentImageLoaded = false;
+                        this.lightboxIndex++;
+                    }
+                },
+
+                prevImage() {
+                    if (this.lightboxIndex > 0) {
+                        this.currentImageLoaded = false;
+                        this.lightboxIndex--;
+                    }
+                },
+
+                // Restaurar scroll al cerrar
+                closeLightbox() {
+                    this.lightboxOpen = false;
+                    document.body.style.overflow = '';
                 }
             }
         }

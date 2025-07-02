@@ -31,8 +31,8 @@ class Servicios extends Model
         return $this->hasMany('App\Models\PaqueteServicios', 'fk_idservicio');
     }
 
-    public function favoritos()
-    {
-        return $this->morphMany(favoritos::class, 'favoritable');
-    }
+    // public function favoritos()
+    // {
+    //     return $this->morphMany(favoritos::class, 'favoritable');
+    // }
 }

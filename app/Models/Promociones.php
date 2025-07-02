@@ -16,7 +16,7 @@ class Promociones extends Model
     ];
 
     public function empresa(){
-        return $this->belongsTo(Empresa::class, 'fk_idempresa');
+        return $this->belongsTo(Empresas::class, 'fk_idempresa');
     }
 
     public function imagenes()

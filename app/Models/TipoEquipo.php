@@ -1,10 +1,4 @@
 <?php
-
-
-
-
-
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,8 +9,10 @@ class TipoEquipo extends Model
     use HasFactory;
 
     protected $table='tipoequipos';
+    public $timestamps = false;
+    
     protected $fillable = [
-        'nametipoequipo',
+        'nametipoequipos',
     ];
 
     public function det_equipos()

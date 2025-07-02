@@ -17,26 +17,36 @@ class Empresas extends Model
 
     public function paquete()
     {
-        return $this->hasMany('App\Models\Paquetes', 'fk_idempresa');
+        return $this->hasMany(Paquetes::class, 'fk_idempresa');
     }
 
     public function promos()
     {
-        return $this->hasMany('App\Models\Promociones', 'fk_idempresa');
+        return $this->hasMany(Promociones::class, 'fk_idempresa');
     }
 
     public function replegal()
     {
-        return $this->hasMany('App\Models\RepreLegal', 'fk_idempresa');
+        return $this->hasMany(RepreLegal::class, 'fk_idempresa');
     }
 
     public function servicio()
     {
-        return $this->hasMany('App\Models\Servicios', 'fk_idempresa');
+        return $this->hasMany(Servicios::class, 'fk_idempresa');
     }
 
     public function equipo()
     {
-        return $this->hasMany('App\Models\Equipos', 'fk_idempresa');
+        return $this->hasMany(Equipos::class, 'fk_idempresa');
+    }
+
+    public function videos()
+    {
+        return $this->morphMany(Videos::class, 'videoable');
+    }
+    
+    public function getVideoPrincipalAttribute()
+    {
+        return $this->videos()->where('tipo', 'principal')->first();
     }
 }

@@ -11,6 +11,7 @@ use App\Models\imagenes;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
+use Illuminate\Support\Facades\DB;
 
 class PanelDestino extends Component
 {
@@ -70,6 +71,8 @@ class PanelDestino extends Component
 
     public function render()
     {
+        $user = User::with();
+        
         $destinos = Destinos::with(['distrito', 'tipoDestino'])
             ->when($this->searchQuery, function ($query) {
                 $query->where('namedestino', 'like', '%' . $this->searchQuery . '%')

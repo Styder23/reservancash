@@ -20,12 +20,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(
-            \Laravel\Fortify\Contracts\RegisterResponse::class,
-            function () {
-                return new RegisteredUserController();
-            }
-        );
+        //
     }
 
     /**
@@ -33,10 +28,12 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Fortify::createUsersUsing(CreateNewUser::class);
+        // Fortify::createUsersUsing(CreateNewUser::class); // <- YA ESTÁ COMENTADO ✅
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+
+        // ELIMINAR TODO EL BLOQUE DE registerResponse - NO EXISTE EN TU VERSIÓN
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());

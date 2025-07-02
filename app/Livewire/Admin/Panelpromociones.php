@@ -6,12 +6,14 @@ use Livewire\Component;
 use App\Models\Promociones;
 use App\Models\imagenes;
 use App\Models\Videos;
+use App\Models\Empresas;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class Panelpromociones extends Component
 {
@@ -46,20 +48,53 @@ class Panelpromociones extends Component
     public $imagenesAEliminar = [];
     public $videosAEliminar = [];
 
+    public $empresaId;
     // Inicialización
+    
     public function mount()
     {
+        // Obtener la empresa del usuario autenticado
+        $this->obtenerEmpresaUsuario();
         $this->cargarPromociones();
+    }
+
+    public function obtenerEmpresaUsuario()
+    {
+        $userId = auth()->id();
+        $empresa = DB::table('users')
+            ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
+            ->join('representante_legal', 'representante_legal.fk_idpersona', '=', 'personas.id')
+            ->join('empresas', 'empresas.id', '=', 'representante_legal.fk_idempresa')
+            ->where('users.id', $userId)
+            ->select('empresas.id', 'empresas.nameempresa')
+            ->first();
+
+        if (!$empresa) {
+            session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            $this->empresaId = null;
+            return;
+        }
+
+        $this->empresaId = $empresa->id;
     }
 
     // Cargar promociones con búsqueda
     public function cargarPromociones()
     {
-        $query = Promociones::with(['imagenes', 'videos']); // Cargar relaciones
+        // Si no hay empresa asociada, no cargar promociones
+        if (!$this->empresaId) {
+            $this->promociones = collect();
+            return;
+        }
+
+        $query = Promociones::with(['imagenes', 'videos', 'empresa'])
+            ->where('fk_idempresa', $this->empresaId); // Filtrar por empresa
         
         if (!empty($this->searchQuery)) {
-            $query->where('namepromocion', 'like', '%'.$this->searchQuery.'%')
-                  ->orWhere('descripcion', 'like', '%'.$this->searchQuery.'%');
+            $query->where(function($q) {
+                $q->where('namepromocion', 'like', '%'.$this->searchQuery.'%')
+                ->orWhere('descripcion', 'like', '%'.$this->searchQuery.'%');
+            });
         }
         
         $this->promociones = $query->orderBy('id', 'desc')->get();

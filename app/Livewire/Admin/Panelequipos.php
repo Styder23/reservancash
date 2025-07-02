@@ -25,7 +25,8 @@ class Panelequipos extends Component
     public $modal = false;
     public $modoEditar = false;
     public $imagenTemporal;
-
+    public $empresaId;
+    
     public $form = [
         'id' => null,
         'name_equipo' => '',
@@ -50,7 +51,9 @@ class Panelequipos extends Component
 
     public function mount()
     {
-        $this->equipos = Equipos::with('Det_equipo', 'Det_equipo.categoria')->get(); // Cambiar 'detalle' por 'Det_equipo'
+        // Obtener la empresa del usuario autenticado
+        $this->obtenerEmpresaUsuario();
+        $this->cargarEquipos();
         $this->categorias = Categoria::all();
         $this->marcas = Marca::all();
         $this->modelos = Modelo::all();
@@ -58,9 +61,36 @@ class Panelequipos extends Component
         $this->tipos = TipoEquipo::all();
     }
     
-    public function render()
+    public function obtenerEmpresaUsuario()
     {
-        $equipos = Equipos::with(['Det_equipo.categoria', 'Det_equipo.marca', 'Det_equipo.modelo', 'Det_equipo.serie', 'Det_equipo.tipoequipo'])
+        $userId = auth()->id();
+        $empresa = DB::table('users')
+            ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
+            ->join('representante_legal', 'representante_legal.fk_idpersona', '=', 'personas.id')
+            ->join('empresas', 'empresas.id', '=', 'representante_legal.fk_idempresa')
+            ->where('users.id', $userId)
+            ->select('empresas.id', 'empresas.nameempresa')
+            ->first();
+
+        if (!$empresa) {
+            session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            $this->empresaId = null;
+            return;
+        }
+
+        $this->empresaId = $empresa->id;
+    }
+
+    public function cargarEquipos()
+    {
+        // Si no hay empresa asociada, no cargar equipos
+        if (!$this->empresaId) {
+            $this->equipos = collect();
+            return;
+        }
+
+        $this->equipos = Equipos::with(['Det_equipo.categoria', 'Det_equipo.marca', 'Det_equipo.modelo', 'Det_equipo.serie', 'Det_equipo.tipoequipo', 'empresa'])
+            ->where('fk_idempresa', $this->empresaId) // Filtrar por empresa
             ->when($this->searchQuery1, function ($query) {
                 $query->whereHas('Det_equipo', function($q) {
                     $q->where('name_equipo', 'like', '%' . $this->searchQuery1 . '%')
@@ -84,9 +114,12 @@ class Panelequipos extends Component
             })
             ->orderBy('id', 'desc')
             ->get();
+    }
 
+    public function render()
+    {
         return view('livewire.admin.panelequipos', [
-            'equipos' => $equipos
+            'equipos' => $this->equipos
         ])->layout('layouts.prueba');
     }
 

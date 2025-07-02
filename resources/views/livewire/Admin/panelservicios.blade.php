@@ -208,7 +208,7 @@
         </main>
     </div>
 
-    <!-- Modal Crear/Editar Equipo -->
+    <!-- Modal Crear/Editar Servicio -->
     @if ($modal)
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -221,7 +221,7 @@
                     <!-- Modal Header -->
                     <div class="gradient-bg px-6 py-4 flex justify-between items-center">
                         <h2 class="text-xl font-bold text-white">
-                            {{ $modoEditar ? 'Editar Equipo' : 'Crear Nuevo Equipo' }}
+                            {{ $modoEditar ? 'Editar Servicio' : 'Crear Nuevo Servicio' }}
                         </h2>
                         <button wire:click="cerrarModal" class="text-white hover:text-gray-200 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

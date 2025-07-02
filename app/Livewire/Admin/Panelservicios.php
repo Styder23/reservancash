@@ -19,6 +19,7 @@ class Panelservicios extends Component
     public $modoEditar = false;
     public $modalConfirmacion = false;
     public $servicioAEliminar = null;
+    public $empresaId;
     
     public $searchQuery1 = '';
     
@@ -41,20 +42,48 @@ class Panelservicios extends Component
 
     public function mount()
     {
+        $this->obtenerEmpresaUsuario();
         $this->cargarServicios();
         $this->tipos = TipoServicios::all();
     }
 
+    public function obtenerEmpresaUsuario()
+    {
+        $userId = auth()->id();
+        $empresa = DB::table('users')
+            ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
+            ->join('representante_legal', 'representante_legal.fk_idpersona', '=', 'personas.id')
+            ->join('empresas', 'empresas.id', '=', 'representante_legal.fk_idempresa')
+            ->where('users.id', $userId)
+            ->select('empresas.id', 'empresas.nameempresa')
+            ->first();
+
+        if (!$empresa) {
+            session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            $this->empresaId = null;
+            return;
+        }
+
+        $this->empresaId = $empresa->id;
+    }
+    
     public function cargarServicios()
     {
+        // Si no hay empresa asociada, no cargar servicios
+        if (!$this->empresaId) {
+            $this->servicios = collect();
+            return;
+        }
+
         $this->servicios = Servicios::with('Det_servicio.tiposervicio')
+            ->where('fk_idempresa', $this->empresaId) // Filtrar por empresa
             ->when($this->searchQuery1, function($query) {
                 $query->whereHas('Det_servicio', function($q) {
                     $q->where('nombreservicio', 'like', '%'.$this->searchQuery1.'%')
-                      ->orWhere('descripcionservicio', 'like', '%'.$this->searchQuery1.'%')
-                      ->orWhereHas('tiposervicio', function($subQ) {
-                          $subQ->where('nametipo_servicios', 'like', '%'.$this->searchQuery1.'%');
-                      });
+                    ->orWhere('descripcionservicio', 'like', '%'.$this->searchQuery1.'%')
+                    ->orWhereHas('tiposervicio', function($subQ) {
+                        $subQ->where('nametipo_servicios', 'like', '%'.$this->searchQuery1.'%');
+                    });
                 });
             })
             ->orderBy('id', 'desc')

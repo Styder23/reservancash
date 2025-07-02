@@ -14,7 +14,7 @@ class Destinos extends Model
     ];
 
     protected $casts = [
-        'ubicacion' => 'array'
+        'ubicacion' => 'array' 
     ];
 
     public function distrito()

@@ -73,5 +73,100 @@
                 </div>
             </form>
         </div>
+        <!-- Modal de confirmación -->
+        <!-- Modal de confirmación de registro exitoso -->
+        @if (session('success'))
+            <div id="successModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-check-circle"></i> ¡Registro Exitoso!</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ session('success') }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="closeModal()" class="btn btn-primary">Continuar</button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                }
+
+                .modal-content {
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 8px;
+                    max-width: 400px;
+                    width: 90%;
+                    text-align: center;
+                    animation: modalSlide 0.3s ease-out;
+                }
+
+                .modal-header h3 {
+                    margin: 0 0 1rem 0;
+                    color: #059669;
+                }
+
+                .modal-header i {
+                    font-size: 2rem;
+                    margin-right: 0.5rem;
+                }
+
+                .modal-body {
+                    margin-bottom: 1.5rem;
+                }
+
+                .modal-footer .btn {
+                    padding: 0.75rem 2rem;
+                    background: #3b82f6;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                }
+
+                .modal-footer .btn:hover {
+                    background: #2563eb;
+                }
+
+                @keyframes modalSlide {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.8);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+            </style>
+
+            <script>
+                function closeModal() {
+                    document.getElementById('successModal').style.display = 'none';
+                }
+
+                // Cerrar modal con Escape
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                    }
+                });
+            </script>
+        @endif
     </div>
 </x-guest-layout>

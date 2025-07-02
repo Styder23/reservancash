@@ -124,6 +124,7 @@ class CreateNewUser implements CreatesNewUsers
             ]);
         }
 
+        $user->should_auto_login = false;
         return $user;
     }
 }

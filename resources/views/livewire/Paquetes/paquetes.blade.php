@@ -6,7 +6,22 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($paquetes as $paquete)
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition">
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition relative">
+                    <!-- Añadido relative aquí -->
+                    <!-- Favorite/Heart Icon - Posicionado correctamente -->
+                    <div class="absolute top-4 right-4 z-10">
+                        <button wire:click="toggleFavorito({{ $paquete->id }})"
+                            class="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors">
+                            <svg class="w-5 h-5 {{ in_array($paquete->id, $favoritos) ? 'text-red-500 fill-current' : 'text-gray-600' }}"
+                                fill="{{ in_array($paquete->id, $favoritos) ? 'currentColor' : 'none' }}"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+
                     <img src="{{ Storage::url($paquete->imagen_principal) }}" alt="{{ $paquete->nombrepaquete }}"
                         class="w-full h-48 object-cover">
                     <div class="p-4">
@@ -25,7 +40,6 @@
                                     </svg>
                                 </a>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -35,10 +49,16 @@
                 </div>
             @endforelse
         </div>
-
-        <!-- Paginación -->
-        {{-- <div class="mt-8">
-            {{ $equipos->links() }}
-        </div> --}}
     </div>
+    <script>
+        // Script para ocultar las notificaciones después de 3 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const notifications = document.querySelectorAll('.fixed.top-4.right-4');
+                notifications.forEach(function(notification) {
+                    notification.style.display = 'none';
+                });
+            }, 3000);
+        });
+    </script>
 </div>

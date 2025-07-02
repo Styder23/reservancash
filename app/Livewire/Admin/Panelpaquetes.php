@@ -93,6 +93,9 @@ class Panelpaquetes extends Component
         'paradas' => []
     ];
     public $indice_ruta_editando = null;
+
+    public $mostrar_formulario_itinerario = false;
+    public $paquete_para_itinerario = null;
     
     public $mostrar_modal_rutas = false;
     public $mostrar_modal_paradas_lista = false;
@@ -106,6 +109,7 @@ class Panelpaquetes extends Component
 
     public $mostrarModal = false;
     public $search = '';
+    public $empresaId;
 
     // Validaciones
     protected $rules = [
@@ -115,8 +119,8 @@ class Panelpaquetes extends Component
         'descripcion' => 'nullable|string',
         'descripciondetalle' => 'required|string|max:255',
         'fk_iddestino' => 'required|exists:destinos,id',
-        'servicios_seleccionados' => 'required|array|min:1',
-        'equipos_seleccionados' => 'required|array|min:1',
+        // 'servicios_seleccionados' => 'required|array|min:1',
+        // 'equipos_seleccionados' => 'required|array|min:1',
         'disponibilidades' => 'required|array|min:1',
         'itinerario_dia' => 'required|string',
         'itinerario_hora_inicio' => 'required|date_format:H:i',
@@ -130,44 +134,99 @@ class Panelpaquetes extends Component
         'preciopaquete.required' => 'El precio del paquete es obligatorio',
         'cantidadpaquete.required' => 'La cantidad del paquete es obligatoria',
         'fk_iddestino.required' => 'Debe seleccionar un destino',
-        'servicios_seleccionados.required' => 'Debe seleccionar al menos un servicio',
-        'equipos_seleccionados.required' => 'Debe seleccionar al menos un equipo',
+        // 'servicios_seleccionados.required' => 'Debe seleccionar al menos un servicio',
+        // 'equipos_seleccionados.required' => 'Debe seleccionar al menos un equipo',
         'disponibilidades.required' => 'Debe agregar al menos una fecha de disponibilidad',
     ];
 
     public function mount()
     {
-        $this->fk_idempresa = auth()->user()->empresa_id ?? 1;
+        // Obtener la empresa del usuario autenticado
+        $this->obtenerEmpresaUsuario();
+        
         $this->servicios_seleccionados = [];
         $this->equipos_seleccionados = [];
         $this->disponibilidades = [];
         $this->rutas_seleccionadas = [];
+        
         $this->cargarDatos();
         $this->cargarRutas();
         $this->cargarParadas();
         $this->cargarItinerarios();
     }
 
+    public function obtenerEmpresaUsuario()
+    {
+        $userId = auth()->id();
+        $empresa = DB::table('users')
+            ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
+            ->join('representante_legal', 'representante_legal.fk_idpersona', '=', 'personas.id')
+            ->join('empresas', 'empresas.id', '=', 'representante_legal.fk_idempresa')
+            ->where('users.id', $userId)
+            ->select('empresas.id', 'empresas.nameempresa')
+            ->first();
+
+        if (!$empresa) {
+            session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            $this->empresaId = null;
+            // Fallback a empresa por defecto o del usuario si tienes ese campo
+            $this->fk_idempresa = auth()->user()->empresa_id ?? 1;
+            return;
+        }
+
+        $this->empresaId = $empresa->id;
+        $this->fk_idempresa = $empresa->id; // Mantener compatibilidad con tu código existente
+    }
+
     public function cargarDatos()
     {
-        // Cargar datos de relaciones
-        $this->servicios_disponibles = Servicios::with('Det_servicio')->get();
-        $this->equipos_disponibles = Equipos::with('Det_equipo')->get();
-        $this->destinos_disponibles = Destinos::all();
-        $this->promociones_disponibles = Promociones::all();
-        $this->empresas_disponibles = Empresas::all();
+        // Si no hay empresa asociada, no cargar datos
+        if (!$this->empresaId) {
+            $this->paquetes = collect();
+            $this->servicios_disponibles = collect();
+            $this->equipos_disponibles = collect();
+            $this->destinos_disponibles = collect();
+            $this->promociones_disponibles = collect();
+            return;
+        }
+
+        // Cargar solo servicios y equipos de la misma empresa
+        $this->servicios_disponibles = Servicios::with('Det_servicio')
+            ->where('fk_idempresa', $this->empresaId)
+            ->get();
+            
+        $this->equipos_disponibles = Equipos::with('Det_equipo')
+            ->where('fk_idempresa', $this->empresaId)
+            ->get();
+        
+        // Cargar solo promociones de la misma empresa
+        $this->promociones_disponibles = Promociones::where('fk_idempresa', $this->empresaId)->get();
+        
+        // Destinos - si pertenecen a empresas, filtrar; si no, cargar todos
+        $this->destinos_disponibles = Destinos::all(); // O filtrar si tienen fk_idempresa
+        
+        // Empresas - solo la empresa actual
+        $this->empresas_disponibles = Empresas::where('id', $this->empresaId)->get();
         
         // Cargar paquetes de la empresa del usuario
         $this->paquetes = Paquetes::with([
             'det_paquete.destino',
+            'det_paquete.promos',
             'dis_paquete',
-            'ser_paquete.servicio',
-            'equi_paquete.equipo',
-            'empresa' // Agregué esta relación que ya tienes en el modelo
+            'ser_paquete.servicio' ?? null,
+            'equi_paquete.equipo' ?? null,
+            'empresa',
+            'itinerarios'
         ])
-        ->where('fk_idempresa', $this->fk_idempresa)
+        ->where('fk_idempresa', $this->empresaId)
         ->orderBy('id', 'desc')
         ->get();
+    }
+
+    // Método para recargar datos (útil si necesitas refrescar)
+    public function recargarDatos()
+    {
+        $this->cargarDatos();
     }
     
     public function abrirModalCreacion()
@@ -320,6 +379,25 @@ class Panelpaquetes extends Component
     }
 
     // funciones para el apartado de itinerarios
+    
+    public function agregarItinerario($paqueteId)
+    {
+        $this->paquete_para_itinerario = $paqueteId;
+        $this->mostrar_formulario_itinerario = true;
+        $this->limpiarFormularioItinerario();
+        
+        // Si ya hay itinerarios para este paquete, cargarlos
+        $this->itinerarios = Itinerarios::where('fk_idpaquete', $paqueteId)->get();
+    }
+
+    public function cerrarFormularioItinerario(){
+        
+        $this->mostrar_formulario_itinerario = false;
+        $this->paquete_para_itinerario = null;
+        $this->limpiarFormularioItinerario();
+        
+    }
+
     public function updated($propertyName)
     {
         if ($propertyName === 'buscar_ruta') {
@@ -627,7 +705,7 @@ class Panelpaquetes extends Component
             foreach ($this->servicios_seleccionados as $servicio_id) {
                 DB::table('paquete_servicio')->insert([
                     'fk_idpaquete' => $paquete->id,
-                    'fk_idservicio' => $servicio_id,
+                    'fk_idservicio' => $servicio_id ?? null,
                 ]);
             }
 
@@ -635,7 +713,7 @@ class Panelpaquetes extends Component
             foreach ($this->equipos_seleccionados as $equipo_id) {
                 DB::table('paquete_equipo')->insert([
                     'fk_idpaquete' => $paquete->id,
-                    'fk_idequipo' => $equipo_id,
+                    'fk_idequipo' => $equipo_id ?? null,
                 ]);
             }
 
@@ -664,15 +742,15 @@ class Panelpaquetes extends Component
                 }
             }
 
-            // Guardar itinerarios si existen datos
-            if ($this->itinerario_dia && $this->itinerario_hora_inicio) {
-                $this->guardarItinerario($paquete->id);
-            }
+            // // Guardar itinerarios si existen datos
+            // if ($this->itinerario_dia && $this->itinerario_hora_inicio) {
+            //     $this->guardarItinerario($paquete->id);
+            // }
 
             DB::commit();
-            session()->flash('mensaje', 'Paquete creado exitosamente con su itinerario.');
-            $this->resetearFormularioCompleto(); // Nueva función para resetear todo
             $this->mostrarModal = false;
+            session()->flash('mensaje', 'Paquete creado exitosamente con su itinerario.');
+            $this->resetearFormularioCompleto(); // Nueva función para resetear todo            
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -715,6 +793,20 @@ class Panelpaquetes extends Component
                 $this->guardarParadasParaRuta($ruta);
             }
         }
+    }
+
+    // para jalar toda la info solo de paquetes nada mas
+    protected function soloDatosPaquete()
+    {
+        return [
+            'nombrepaquete' => $this->nombrepaquete,
+            'preciopaquete' => $this->preciopaquete,
+            'cantidadpaquete' => $this->cantidadpaquete,
+            'descripcion' => $this->descripcion,
+            'descripciondetalle' => $this->descripciondetalle,
+            'fk_iddestino' => $this->fk_iddestino,
+            'estado' => $this->estado,
+        ];
     }
 
     protected function guardarParadasParaRuta($rutaData)
@@ -1025,11 +1117,10 @@ class Panelpaquetes extends Component
     public function render()
     {
         return view('livewire.admin.panelpaquetes', [
-            'destinosFiltro' => $this->destinos_disponibles // Opcional, si lo usas para filtros
+            'destinosFiltro' => $this->destinos_disponibles 
         ])->layout('layouts.prueba');
     }
 
-    
     public function getNextTab($currentTab)
     {
         $tabs = ['general', 'servicios', 'disponibilidad', 'imagenes', 'itinerario'];

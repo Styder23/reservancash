@@ -1,395 +1,235 @@
-<div class="min-h-screen bg-gray-50 p-4">
-    <div class="max-w-8xl mx-auto">
-        <h1 class="text-2xl font-bold text-center text-green-700 mb-6">Compara Paquetes Turísticos</h1>
+<div class="container mx-auto px-4 py-10">
+    <div class="text-center mb-12">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Comparador de Paquetes Turísticos</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">Selecciona dos paquetes para comparar características, precios y
+            servicios incluidos</p>
+    </div>
 
-        <!-- Contenedor principal de dos columnas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-            <!-- Columna Izquierda -->
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <!-- Buscador -->
-                <div class="relative mb-4">
-                    <input type="text"
-                        class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Buscar destino...">
-                    <div class="absolute left-3 top-3.5 text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
+    <!-- Selectores de paquetes -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Primer paquete</label>
+            <div class="relative">
+                <select wire:model="paqueteAId" class="w-full border-gray-300 rounded-lg shadow-sm pr-10">
+                    <option value="">-- Selecciona un paquete --</option>
+                    @foreach ($paquetes as $paq)
+                        <option value="{{ $paq->id }}">{{ $paq->nombrepaquete }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
                 </div>
-
-                <!-- Filtros -->
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Precio</option>
-                        <option>Menor a mayor</option>
-                        <option>Mayor a menor</option>
-                    </select>
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Duración</option>
-                        <option>1 día</option>
-                        <option>2 días</option>
-                    </select>
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Fecha</option>
-                        <option>Próxima semana</option>
-                        <option>Próximo mes</option>
-                    </select>
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Servicios</option>
-                        <option>Con alimentación</option>
-                        <option>Con guía</option>
-                    </select>
-                </div>
-
-                <!-- Lista de Cards -->
-                <div class="space-y-4">
-                    <!-- Card 1 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Recomendado</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna 69</h3>
-                                    <p class="text-sm text-gray-500">Empresa Aventura Total</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 120</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">12 horas</span>
-                            </div>
-                            <div class="mt-2 text-right">
-                                <label class="text-sm text-gray-500">
-                                    <input type="checkbox" class="compare-checkbox"
-                                        value="Laguna 69 - S/120 - 12h">Comparar
-                                </label>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Card 2 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna 69</h3>
-                                    <p class="text-sm text-gray-500">Empresa Trekking Perú</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 150</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">10 horas</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Card 3 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna 69</h3>
-                                    <p class="text-sm text-gray-500">Empresa Trekking Perú</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 150</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">10 horas</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Card 4 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna 69</h3>
-                                    <p class="text-sm text-gray-500">Empresa Trekking Perú</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 150</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">10 horas</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="text-center mt-6">
-                    <button onclick="compareSelected()"
-                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                        Comparar Seleccionados
-                    </button>
-                </div>
-
-
-
-                <div id="comparison-result" class="mt-6 bg-yellow-100 p-4 rounded-lg hidden">
-                    <h2 class="font-bold text-lg text-yellow-800 mb-2">Comparación:</h2>
-                    <ul id="comparison-list" class="list-disc pl-5 text-sm text-gray-700"></ul>
-                </div>
-
             </div>
+        </div>
 
-
-
-
-
-            <!-- Columna Derecha -->
-            <div class="bg-white p-4 rounded-xl shadow-sm">
-                <!-- Buscador -->
-                <div class="relative mb-4">
-                    <input type="text"
-                        class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Buscar destino...">
-                    <div class="absolute left-3 top-3.5 text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Filtros -->
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Precio</option>
-                        <option>Menor a mayor</option>
-                        <option>Mayor a menor</option>
-                    </select>
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Duración</option>
-                        <option>1 día</option>
-                        <option>2 días</option>
-                    </select>
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Fecha</option>
-                        <option>Próxima semana</option>
-                        <option>Próximo mes</option>
-                    </select>
-                    <select class="p-2 border rounded-lg text-sm">
-                        <option>Servicios</option>
-                        <option>Con alimentación</option>
-                        <option>Con guía</option>
-                    </select>
-                </div>
-
-                <!-- Lista de Cards -->
-                <div class="space-y-4">
-                    <!-- Card 3 con imagen referencial -->
-                    <a href="destino-detalle""
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna Churup" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">Nuevo</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna Churup</h3>
-                                    <p class="text-sm text-gray-500">Empresa Andes Travel</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 90</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">8 horas</span>
-                            </div>
-                            <div class="mt-2 text-right">
-                                <label class="text-sm text-gray-500">
-                                    <input type="checkbox" class="compare-checkbox"
-                                        value="Laguna 69 - S/120 - 12h">Comparar
-                                </label>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Card 4 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna Parón" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium">Últimos
-                                cupos</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna Parón</h3>
-                                    <p class="text-sm text-gray-500">Empresa Nature Tours</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 180</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">14 horas</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Card 3 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna 69</h3>
-                                    <p class="text-sm text-gray-500">Empresa Trekking Perú</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 150</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">10 horas</span>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Card 4 con imagen referencial -->
-                    <a href="destino-detalle"
-                        class="block border rounded-lg hover:border-green-400 transition-colors overflow-hidden">
-                        <div class="relative h-40">
-                            <img src="inicioarriba.jpg" alt="Laguna 69" class="w-full h-full object-cover">
-                            <button onclick="toggleLike(event)"
-                                class="absolute top-2 left-2 bg-white hover:bg-red-500 p-1 rounded-full shadow-md transition-colors like-btn">
-                                <img src="me-gusta.png" alt="Me gusta" class="h-5 w-5">
-                            </button>
-                            <span
-                                class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">Oferta</span>
-                        </div>
-                        <div class="p-4">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-lg">Laguna 69</h3>
-                                    <p class="text-sm text-gray-500">Empresa Trekking Perú</p>
-                                </div>
-                                <img src="logo-Principal.png" alt="Logo empresa" class="h-12">
-                            </div>
-                            <div class="mt-3 flex justify-between items-center">
-                                <span class="text-2xl font-bold text-green-600">S/ 150</span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">10 horas</span>
-                            </div>
-                        </div>
-                    </a>
-
-                </div>
-                <div class="text-center mt-6">
-                    <button onclick="compareSelected()"
-                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                        Comparar Seleccionados
-                    </button>
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Segundo paquete</label>
+            <div class="relative">
+                <select wire:model="paqueteBId" class="w-full border-gray-300 rounded-lg shadow-sm pr-10">
+                    <option value="">-- Selecciona un paquete --</option>
+                    @foreach ($paquetes as $paq)
+                        <option value="{{ $paq->id }}">{{ $paq->nombrepaquete }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Mostrar comparación solo cuando hay dos paquetes seleccionados -->
+    @if ($paqueteA && $paqueteB)
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <!-- Resumen comparativo -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 border-b">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Precio</h3>
+                    <div class="flex justify-center items-baseline">
+                        @php
+                            $precioA = $paqueteA->det_paquete->first()->promos
+                                ? $paqueteA->preciopaquete *
+                                    (1 - $paqueteA->det_paquete->first()->promos->descuento / 100)
+                                : $paqueteA->preciopaquete;
+
+                            $precioB = $paqueteB->det_paquete->first()->promos
+                                ? $paqueteB->preciopaquete *
+                                    (1 - $paqueteB->det_paquete->first()->promos->descuento / 100)
+                                : $paqueteB->preciopaquete;
+                        @endphp
+
+                        @if ($precioA < $precioB)
+                            <span class="text-2xl font-bold text-green-600">S/.{{ number_format($precioA, 2) }}</span>
+                            <span class="text-lg text-gray-500 ml-2">vs S/.{{ number_format($precioB, 2) }}</span>
+                        @elseif($precioA > $precioB)
+                            <span class="text-lg text-gray-500 mr-2">S/.{{ number_format($precioA, 2) }} vs</span>
+                            <span class="text-2xl font-bold text-green-600">S/.{{ number_format($precioB, 2) }}</span>
+                        @else
+                            <span class="text-xl font-bold text-blue-600">S/.{{ number_format($precioA, 2) }}</span>
+                            <span class="mx-2 text-gray-400">=</span>
+                            <span class="text-xl font-bold text-blue-600">S/.{{ number_format($precioB, 2) }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Duración</h3>
+                    <div class="flex justify-center items-baseline">
+                        @if ($paqueteA->itinerarios->count() > $paqueteB->itinerarios->count())
+                            <span class="text-xl font-bold text-blue-600">{{ $paqueteA->itinerarios->count() }}
+                                días</span>
+                            <span class="mx-2 text-gray-400">></span>
+                            <span class="text-lg text-gray-600">{{ $paqueteB->itinerarios->count() }} días</span>
+                        @elseif($paqueteA->itinerarios->count() < $paqueteB->itinerarios->count())
+                            <span class="text-lg text-gray-600">{{ $paqueteA->itinerarios->count() }} días</span>
+                            <span class="mx-2 text-gray-400">
+                                << /span>
+                                    <span class="text-xl font-bold text-blue-600">{{ $paqueteB->itinerarios->count() }}
+                                        días</span>
+                                @else
+                                    <span class="text-xl font-bold text-blue-600">{{ $paqueteA->itinerarios->count() }}
+                                        días</span>
+                                    <span class="mx-2 text-gray-400">=</span>
+                                    <span class="text-xl font-bold text-blue-600">{{ $paqueteB->itinerarios->count() }}
+                                        días</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Servicios incluidos</h3>
+                    <div class="flex justify-center items-baseline">
+                        @if ($paqueteA->ser_paquete->count() > $paqueteB->ser_paquete->count())
+                            <span class="text-xl font-bold text-blue-600">{{ $paqueteA->ser_paquete->count() }}</span>
+                            <span class="mx-2 text-gray-400">></span>
+                            <span class="text-lg text-gray-600">{{ $paqueteB->ser_paquete->count() }}</span>
+                        @elseif($paqueteA->ser_paquete->count() < $paqueteB->ser_paquete->count())
+                            <span class="text-lg text-gray-600">{{ $paqueteA->ser_paquete->count() }}</span>
+                            <span class="mx-2 text-gray-400">
+                                << /span>
+                                    <span
+                                        class="text-xl font-bold text-blue-600">{{ $paqueteB->ser_paquete->count() }}</span>
+                                @else
+                                    <span
+                                        class="text-xl font-bold text-blue-600">{{ $paqueteA->ser_paquete->count() }}</span>
+                                    <span class="mx-2 text-gray-400">=</span>
+                                    <span
+                                        class="text-xl font-bold text-blue-600">{{ $paqueteB->ser_paquete->count() }}</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparación detallada -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
+                <!-- Encabezados -->
+                <div class="bg-gray-50 p-4 border-r">
+                    <h3 class="font-bold text-gray-800">Características</h3>
+                </div>
+                <div class="bg-gray-50 p-4 border-r">
+                    <h3 class="font-bold text-center text-gray-800">{{ $paqueteA->nombrepaquete }}</h3>
+                </div>
+                <div class="bg-gray-50 p-4">
+                    <h3 class="font-bold text-center text-gray-800">{{ $paqueteB->nombrepaquete }}</h3>
+                </div>
+
+                <!-- Filas de comparación -->
+                @foreach ($comparisonAttributes as $attribute => $label)
+                    <div class="p-4 border-t border-r">
+                        <span class="font-medium text-gray-700">{{ $label }}</span>
+                    </div>
+                    <div class="p-4 border-t border-r">
+                        <span class="block text-center">
+                            @if ($attribute === 'destino')
+                                {{ $paqueteA->det_paquete->first()->destino->namedestino }}
+                            @elseif($attribute === 'duracion')
+                                {{ $paqueteA->itinerarios->count() }} días
+                            @elseif($attribute === 'precio')
+                                @if ($paqueteA->det_paquete->first()->promos)
+                                    <span
+                                        class="text-sm line-through text-gray-500">S/.{{ number_format($paqueteA->preciopaquete, 2) }}</span><br>
+                                    <span
+                                        class="font-bold text-blue-600">S/.{{ number_format($paqueteA->preciopaquete * (1 - $paqueteA->det_paquete->first()->promos->descuento / 100), 2) }}</span>
+                                @else
+                                    S/.{{ number_format($paqueteA->preciopaquete, 2) }}
+                                @endif
+                            @elseif($attribute === 'empresa')
+                                {{ $paqueteA->empresa->nameempresa }}
+                            @elseif($attribute === 'servicios')
+                                <ul class="space-y-1 text-left">
+                                    @foreach ($paqueteA->ser_paquete->take(3) as $servicio)
+                                        <li class="flex items-center">
+                                            <svg class="w-3 h-3 text-green-500 mr-1" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span
+                                                class="text-sm">{{ $servicio->servicio->Det_servicio->nombreservicio }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </span>
+                    </div>
+                    <div class="p-4 border-t">
+                        <span class="block text-center">
+                            @if ($attribute === 'destino')
+                                {{ $paqueteB->det_paquete->first()->destino->namedestino }}
+                            @elseif($attribute === 'duracion')
+                                {{ $paqueteB->itinerarios->count() }} días
+                            @elseif($attribute === 'precio')
+                                @if ($paqueteB->det_paquete->first()->promos)
+                                    <span
+                                        class="text-sm line-through text-gray-500">S/.{{ number_format($paqueteB->preciopaquete, 2) }}</span><br>
+                                    <span
+                                        class="font-bold text-blue-600">S/.{{ number_format($paqueteB->preciopaquete * (1 - $paqueteB->det_paquete->first()->promos->descuento / 100), 2) }}</span>
+                                @else
+                                    S/.{{ number_format($paqueteB->preciopaquete, 2) }}
+                                @endif
+                            @elseif($attribute === 'empresa')
+                                {{ $paqueteB->empresa->nameempresa }}
+                            @elseif($attribute === 'servicios')
+                                <ul class="space-y-1 text-left">
+                                    @foreach ($paqueteB->ser_paquete->take(3) as $servicio)
+                                        <li class="flex items-center">
+                                            <svg class="w-3 h-3 text-green-500 mr-1" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span
+                                                class="text-sm">{{ $servicio->servicio->Det_servicio->nombreservicio }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Tarjetas de paquetes para referencia -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @include('components.card-paquete', ['paquete' => $paqueteA])
+            @include('components.card-paquete', ['paquete' => $paqueteB])
+        </div>
+    @else
+        <div class="bg-white rounded-xl shadow-md p-8 text-center">
+            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-xl font-medium text-gray-700 mb-2">Selecciona dos paquetes para comparar</h3>
+            <p class="text-gray-500">Elige dos opciones de la lista desplegable para ver una comparación detallada.</p>
+        </div>
+    @endif
 </div>
-
-
-<script>
-    function toggleLike(event) {
-        event.preventDefault(); // Evita que se active el enlace
-        event.stopPropagation(); // Evita que se propague el evento
-
-        const button = event.currentTarget;
-
-        if (button.classList.contains('bg-red-500')) {
-            button.classList.remove('bg-red-500');
-            button.classList.add('bg-white');
-        } else {
-            button.classList.remove('bg-white');
-            button.classList.add('bg-red-500');
-        }
-    }
-</script>
-
-<script>
-    function compareSelected() {
-        const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
-        const comparisonList = document.getElementById('comparison-list');
-        const resultBox = document.getElementById('comparison-result');
-
-        comparisonList.innerHTML = '';
-
-        if (checkboxes.length !== 2) {
-            alert('Por favor selecciona exactamente 2 paquetes para comparar.');
-            resultBox.classList.add('hidden');
-            return;
-        }
-
-        checkboxes.forEach(cb => {
-            const li = document.createElement('li');
-            li.textContent = cb.value;
-            comparisonList.appendChild(li);
-        });
-
-        resultBox.classList.remove('hidden');
-        resultBox.scrollIntoView({ behavior: 'smooth' });
-    }
-</script>
-

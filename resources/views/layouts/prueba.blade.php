@@ -145,12 +145,19 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('profile.show') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('dashboard.empresa') ? 'bg-purple-600' : '' }}">
+                                <i class="fas fa-tachometer-alt w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Mi Perfil</span>
+                            </a>
+                        </li>
+                        {{-- <li>
                             <a href="{{ route('det_destinos') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
                                 <i class="fas fa-tools w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Mis Destinos</span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li>
                             <a href="{{ route('det_servicios') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
@@ -200,6 +207,48 @@
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('dashboard') ? 'bg-purple-600' : '' }}">
                                 <i class="fas fa-home w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('dashboard') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-home w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Perfile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('usuarios') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-clipboard-list w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Usuarios</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('generales') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-clipboard-list w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Datos Generales</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-clipboard-list w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Empresas</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-clipboard-list w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Paquetes</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-clipboard-list w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Reportes</span>
                             </a>
                         </li>
                     @endif
@@ -324,7 +373,7 @@
 
             <!-- Contenido de la Página -->
             <main class="flex-1 overflow-y-auto bg-gray-50">
-                <div class="p-6">
+                <div class="p-6 bg-purple-200">
                     {{ $slot }}
                 </div>
             </main>
