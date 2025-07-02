@@ -54,7 +54,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-3xl font-bold text-white">Panel Administrativo</h1>
-                        <p class="text-blue-100 mt-1">Gestión de Equipos</p>
+                        <p class="text-blue-100 mt-1">Gestión de Servicios</p>
                     </div>
                     <div class="flex items-center space-x-4">
                         <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">

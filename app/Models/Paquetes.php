@@ -65,4 +65,16 @@ class Paquetes extends Model
     {
         return $this->morphMany(favoritos::class, 'favoritable');
     }
+
+
+
+
+
+    // Funcion para buscar paquetes por nombre
+    public function detalles()
+    {
+        return $this->hasMany(\App\Models\DetallePaquetes::class, 'fk_idpaquete');
+    }
+
+
 }

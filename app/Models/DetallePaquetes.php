@@ -12,27 +12,42 @@ class DetallePaquetes extends Model
     protected $table = 'detalle_paquetes';
 
     protected $fillable = [
-        'descripciondetalle','precioequipo','precioservicio','preciototal','fk_idpaquete',
-        'fk_iddestino','fk_idpromociones'
+        'descripciondetalle',
+        'precioequipo',
+        'precioservicio',
+        'preciototal',
+        'fk_idpaquete',
+        'fk_iddestino',
+        'fk_idpromociones'
     ];
 
     public function paquete()
     {
-        return $this->belongsTo(Paquetes::class ,'fk_idpaquete');
+        return $this->belongsTo(Paquetes::class, 'fk_idpaquete');
     }
 
     public function destino()
     {
-        return $this->belongsTo(Destinos::class ,'fk_iddestino');
+        return $this->belongsTo(Destinos::class, 'fk_iddestino');
     }
 
     public function promos()
     {
-        return $this->belongsTo(Promociones::class ,'fk_idpromociones');
+        return $this->belongsTo(Promociones::class, 'fk_idpromociones');
     }
 
     public function favoritos()
     {
         return $this->morphMany(favoritos::class, 'favoritable');
+    }
+
+
+
+
+
+
+    public function promocion()
+    {
+        return $this->belongsTo(\App\Models\Promociones::class, 'fk_idpromociones');
     }
 }

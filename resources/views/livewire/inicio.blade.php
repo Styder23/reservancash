@@ -33,35 +33,57 @@
                     </select>
                 </div>
                 <!-- Option Precio-->
+                <?php
+                // Ejemplo en tu componente Livewire o Controller
+                $precioMin = \App\Models\Paquetes::min('preciopaquete');
+                $precioMax = \App\Models\Paquetes::max('preciopaquete');
+                
+                // Redondea hacia abajo y arriba para que los rangos sean claros
+                $precioMin = floor($precioMin);
+                $precioMax = ceil($precioMax);
+                
+                // Genera los rangos de 20 en 20 soles
+                $rangosPrecio = [];
+                $inicio = $precioMin;
+                while ($inicio < $precioMax) {
+                    $fin = $inicio + 10;
+                    $rangosPrecio[] = [
+                        'min' => $inicio,
+                        'max' => $fin,
+                        'label' => "S/ {$inicio} - S/ {$fin}",
+                    ];
+                    $inicio = $fin;
+                }
+                ?>
                 <div class="flex-1">
                     <label for="precio" class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                    <select id="servicio"
+                    <select id="precio"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2">
                         <option value="">Todos los precios...</option>
-                        @foreach ($servicios as $servicio)
-                            <option value="{{ $servicio->id }}">{{ $servicio->nombre }}</option>
+                        @foreach ($rangosPrecio as $rango)
+                            <option value="{{ $rango['min'] }}-{{ $rango['max'] }}">{{ $rango['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
                 <!-- Option Duración-->
                 <div class="flex-1">
-                    <label for="servicio" class="block text-sm font-medium text-gray-700 mb-2">Duración</label>
-                    <select id="servicio"
+                    <label for="duracion" class="block text-sm font-medium text-gray-700 mb-2">Duración</label>
+                    <select id="duracion"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2">
                         <option value="">Duración...</option>
-                        @foreach ($servicios as $servicio)
-                            <option value="{{ $servicio->id }}">{{ $servicio->nombre }}</option>
+                        @foreach ($rangosDuracion as $rango)
+                            <option value="{{ $rango['min'] }}-{{ $rango['max'] }}">{{ $rango['label'] }}</option>
                         @endforeach
                     </select>
                 </div>
                 <!-- Option Horario-->
                 <div class="flex-1">
-                    <label for="horario" class="block text-sm font-medium text-gray-700 mb-2">Horario</label>
-                    <select id="horario"
+                    <label for="distrito" class="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
+                    <select id="distrito"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2">
-                        <option value="">Horario...</option>
-                        @foreach ($servicios as $servicio)
-                            <option value="{{ $servicio->id }}">{{ $servicio->nombre }}</option>
+                        <option value="">Distrito...</option>
+                        @foreach ($distritos as $distrito)
+                            <option value="{{ $distrito->id }}">{{ $distrito->namedistrito }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -71,54 +93,51 @@
                     <input type="date" id="fecha"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
                 </div>
-                <!-- Boton buscar-->
-                <div class="flex items-end">
-                    <button type="submit"
-                        class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
-                        Buscar
-                    </button>
-                </div>
             </form>
         </div>
     </div>
 
-    <!-- Sección de servicios destacados -->
+    <!-- Sección de paquetes destacados -->
     <div id="servicios" class="py-16 bg-gray-50">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Paquetes destacados</h2>
-
+            <!-- Contenedor de los N paquetes -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Servicio 1 -->
-                @foreach ($detalle_paquetes as $detalle_paquete)
+                <!-- Paquetes Nº # -->
+                @foreach ($paquetes->take(3) as $paquete)
                     <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
                         <div class="relative">
-                            <img src="{{ asset('images.jfif') }}" alt="Imagen Paquete" class="w-full h-48 object-cover">
+                            <img src="{{ asset('storage/' . ($paquete->imagen_principal ?? 'images.jfif')) }}"
+                                alt="{{ $paquete->nombrepaquete }}" class="w-full h-48 object-cover">
                             <div
                                 class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                Disponible
+                                {{ $paquete->estado ?? 'Disponible' }}
                             </div>
                         </div>
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-bold text-gray-800">Paquete #{{ $detalle_paquete->id }}</h3>
-                                <span
-                                    class="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded">Nuevo</span>
+                                <h3 class="text-xl font-bold text-gray-800">{{ $paquete->nombrepaquete }}</h3>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded">
+                                    Nuevo
+                                </span>
                             </div>
-                            <p class="text-gray-600 mb-4">{{ $detalle_paquetee->descripciondetalle }}</p>
+                            <p class="text-gray-600 mb-4">{{ $paquete->descripcion }}</p>
 
                             <div class="flex items-center mb-4">
                                 <span class="text-sm text-gray-500 ml-2">
-                                    Precio equipo: S/ {{ $detalle_paquete->precioequipo }}<br>
-                                    Precio servicio: S/ {{ $detalle_paquete->precioservicio }}
+                                    {{-- Aquí podrías mostrar la cantidad de detalles o viajeros si tienes ese dato --}}
+                                    Incluye {{ $paquete->det_paquete->count() }} servicios/equipos
                                 </span>
                             </div>
 
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <span class="text-lg font-bold text-blue-600">S/ {{ $detalle_paquete->preciototal }}</span>
+                                    <span class="text-lg font-bold text-blue-600">
+                                        S/ {{ number_format($paquete->preciopaquete, 2) }}
+                                    </span>
                                     <span class="text-sm text-gray-500">/por persona</span>
                                 </div>
-                                <a href="{{ route('destino_detalle', ['id' => $detalle_paquete->id]) }}"
+                                <a href="{{ route('vistapaquete', ['id' => $paquete->id]) }}"
                                     class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                                     Ver detalles
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none"
@@ -133,76 +152,133 @@
                 @endforeach
             </div>
             <div class="text-center mt-8">
-                <a href="#"
+                <a href="paquetes"
                     class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Ver
-                    todos los servicios</a>
+                    todos los paquetes</a>
             </div>
         </div>
     </div>
 
-    <!-- Sección de equipos de turismo -->
-    <div class="py-16 bg-white">
+    <!-- Sección de promociones destacados -->
+    <div id="servicios" class="py-16 bg-gray-50">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-8">Equipos para tu aventura</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Equipo 1 -->
-                <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition duration-300">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+            <h2 class="text-3xl font-bold text-center mb-8">Promociones destacados</h2>
+            <!-- Contenedor de las N promociones -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Promociones Nº # -->
+                @foreach ($paquetesConPromocion->take(3) as $paquete)
+                    @php
+                        $detallePromo = $paquete->detalles->first(function ($d) {
+                            return $d->promocion && $d->promocion->descuento > 0;
+                        });
+                        $descuento = $detallePromo ? $detallePromo->promocion->descuento : 0;
+                        $precioOriginal = $paquete->preciopaquete;
+                        $precioDescuento =
+                            $descuento > 0 ? $precioOriginal - ($precioOriginal * $descuento) / 100 : $precioOriginal;
+                    @endphp
+                    <div
+                        class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 relative flex flex-col h-full">
+                        @if ($descuento > 0)
+                            <div
+                                class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+                                -{{ $descuento }}%
+                            </div>
+                        @endif
+                        <div class="relative">
+                            <img src="{{ asset('storage/' . ($paquete->imagen_principal ?? 'images.jfif')) }}"
+                                alt="{{ $paquete->nombrepaquete }}" class="w-full h-48 object-cover">
+                            <div
+                                class="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                {{ $paquete->estado ?? 'Disponible' }}
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-1">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-xl font-bold text-gray-800">{{ $paquete->nombrepaquete }}</h3>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-2.5 py-0.5 rounded">
+                                    Promoción
+                                </span>
+                            </div>
+                            <p class="text-gray-600 mb-4">{{ $paquete->descripcion }}</p>
+                            <div class="flex items-center mb-4">
+                                <span class="text-sm text-gray-500 ml-2">
+                                    Incluye {{ $paquete->detalles->count() }} servicios/equipos
+                                </span>
+                            </div>
+                            <div>
+                                @if ($descuento > 0)
+                                    <span class="text-sm text-gray-400 line-through">
+                                        S/ {{ number_format($precioOriginal, 2) }}
+                                    </span><br>
+                                    <span class="text-lg font-bold text-red-600">
+                                        S/ {{ number_format($precioDescuento, 2) }}
+                                    </span>
+                                    <span class="text-sm text-gray-500">/por persona</span>
+                                @else
+                                    <span class="text-lg font-bold text-blue-600">
+                                        S/ {{ number_format($precioOriginal, 2) }}
+                                    </span>
+                                    <span class="text-sm text-gray-500">/por persona</span>
+                                @endif
+                            </div>
+                            <div class="flex-1"></div>
+                            <div class="w-full flex justify-end mt-4">
+                                <a href="{{ route('vistapaquete', ['id' => $paquete->id]) }}"
+                                    class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                    Ver detalles
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold mb-2">Equipos de camping</h3>
-                    <p class="text-gray-600">Carpas, sacos de dormir y utensilios para acampar.</p>
-                </div>
-
-                <!-- Equipo 2 -->
-                <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition duration-300">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 22V12h6v10" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2">Equipos de buceo</h3>
-                    <p class="text-gray-600">Trajes, tanques y accesorios para exploración submarina.</p>
-                </div>
-
-                <!-- Equipo 3 -->
-                <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition duration-300">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2">Equipos de escalada</h3>
-                    <p class="text-gray-600">Cuerdas, arneses y equipamiento para montañismo.</p>
-                </div>
-
-                <!-- Equipo 4 -->
-                <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition duration-300">
-                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2">Vehículos todo terreno</h3>
-                    <p class="text-gray-600">Jeeps, cuatrimotos y vehículos para terrenos difíciles.</p>
-                </div>
+                @endforeach
             </div>
             <div class="text-center mt-8">
-                <a href="#"
+                <a href="promociones"
                     class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Ver
-                    todos los equipos</a>
+                    todos las promociones</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de emopresas de turismo -->
+    <div class="py-16 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8">Nuestras Empresas</h2>
+            <!-- Contenedor de las empresas disponibles -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Empresa Nº # -->
+                @foreach ($empresas as $empresa)
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition duration-300">
+                        <div
+                            class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                            @if ($empresa->logoempresa)
+                                <img src="{{ asset('storage/' . $empresa->logoempresa) }}"
+                                    alt="{{ $empresa->nameempresa }}" class="w-16 h-16 object-cover rounded-full">
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            @endif
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">{{ $empresa->nameempresa }}</h3>
+                        <p class="text-gray-600 mb-1">{{ $empresa->rucempresa }}</p>
+                        <p class="text-gray-600 mb-1">{{ $empresa->razonsocial }}</p>
+                        <p class="text-gray-500 text-sm">{{ $empresa->direccionempresa }}</p>
+                        <p class="text-gray-500 text-sm">Tel: {{ $empresa->telefonoempresa }}</p>
+                    </div>
+                @endforeach
+            </div>
+            <div class="text-center mt-8">
+                <a href="empresas"
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Ver
+                    todas los empresas</a>
             </div>
         </div>
     </div>
@@ -212,122 +288,51 @@
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Itinerarios populares</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Itinerario 1 -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Ruta del Sol - 7 días</h3>
-                        <p class="text-gray-700 mb-4">Recorrido por las mejores playas con actividades acuáticas y
-                            experiencias culturales.</p>
-                        <ul class="space-y-2 mb-4">
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 1-2: Playa principal
-                            </li>
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 3-4: Islas cercanas
-                            </li>
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 5-7: Pueblo costero
-                            </li>
-                        </ul>
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Ver itinerario
-                            completo →</a>
+                @forelse($itinerarios as $itinerario)
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">
+                                {{ $itinerario->paquete->nombrepaquete ?? 'Itinerario' }} - Día {{ $itinerario->dia }}
+                            </h3>
+                            <p class="text-gray-700 mb-4">
+                                {{ $itinerario->descripcion }}
+                            </p>
+                            <ul class="space-y-2 mb-4">
+                                @foreach ($itinerario->itinerariosRutas as $itRuta)
+                                    <li class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Ruta: {{ $itRuta->ruta->namerutas ?? 'Sin ruta' }}
+                                        @if ($itRuta->ruta && $itRuta->ruta->rutasParadas->count())
+                                            <ul class="ml-4 list-disc">
+                                                @foreach ($itRuta->ruta->rutasParadas as $parada)
+                                                    <li>
+                                                        Parada: {{ $parada->parada->nombre ?? 'Sin nombre' }}
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Ver itinerario
+                                completo →</a>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Itinerario 2 -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Aventura en los Andes - 5 días</h3>
-                        <p class="text-gray-700 mb-4">Expedición por las montañas con caminatas, cascadas y
-                            paisajes impresionantes.</p>
-                        <ul class="space-y-2 mb-4">
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 1: Llegada y aclimatación
-                            </li>
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 2-3: Trekking y lagos
-                            </li>
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 4-5: Cima y descenso
-                            </li>
-                        </ul>
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Ver itinerario
-                            completo →</a>
+                @empty
+                    <div class="col-span-full text-center text-gray-500">
+                        No hay itinerarios disponibles por ahora.
                     </div>
-                </div>
-
-                <!-- Itinerario 3 -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Tour Urbano Cultural - 3 días</h3>
-                        <p class="text-gray-700 mb-4">Recorrido por los puntos históricos y culturales más
-                            importantes de la ciudad.</p>
-                        <ul class="space-y-2 mb-4">
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 1: Centro histórico
-                            </li>
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 2: Museos y galerías
-                            </li>
-                            <li class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Día 3: Gastronomía local
-                            </li>
-                        </ul>
-                        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Ver itinerario
-                            completo →</a>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </div>
 
     <!-- Sección de promociones -->
-    <div class="py-16 bg-blue-50">
+    <!--div class="py-16 bg-blue-50">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Promociones especiales</h2>
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -355,7 +360,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div-->
 
     <!-- Sección de contacto -->
     <div id="contacto" class="py-16 bg-gray-100">
@@ -378,7 +383,9 @@
                             </div>
                             <div class="ml-4">
                                 <h3 class="text-lg font-medium text-gray-900">Teléfono</h3>
-                                <p class="text-gray-600">+123 456 7890</p>
+                                <p class="text-gray-600">+51 928 671 412</p>
+                                <p class="text-gray-600">+51 983 470 161</p>
+                                <p class="text-gray-600">+51 946 849 348</p>
                             </div>
                         </div>
 
@@ -393,7 +400,7 @@
                             </div>
                             <div class="ml-4">
                                 <h3 class="text-lg font-medium text-gray-900">Email</h3>
-                                <p class="text-gray-600">info@turismo-aventura.com</p>
+                                <p class="text-gray-600">reservancash@gmail.com</p>
                             </div>
                         </div>
 
