@@ -5,6 +5,9 @@
     @livewireStyles
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    [x-cloak] { display: none !important; }
+</style>
 </head>
 
 <body class="bg-gray-100">
@@ -26,7 +29,7 @@
 
         <!-- AQUÍ VA EL COMPONENTE LIVEWIRE -->
         <div id="chatbot-body" class="p-4 h-[250px] overflow-y-auto">
-            @livewire('destinos')
+            @livewire('promociones')
         </div>
 
         <div id="chatbot-input" class="flex border-t border-gray-300">
@@ -49,6 +52,22 @@
         }
     </script>
 
+<script src="//unpkg.com/alpinejs" defer></script>
 </body>
 
 </html>
+@push('scripts')
+<script>
+window.lightbox = function() {
+    return {
+        lightboxOpen: false,
+        lightboxIndex: 0,
+        lightboxImages: [],
+        openLightbox(index) {
+            this.lightboxIndex = index;
+            this.lightboxOpen = true;
+        }
+    }
+}
+</script>
+@endpush

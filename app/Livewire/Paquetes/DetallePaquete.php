@@ -155,7 +155,7 @@ class DetallePaquete extends Component
         $servicios = $this->paquete->ser_paquete
             ->whereIn('servicio.id', $this->serviciosSeleccionados)
             ->pluck('servicio');
-        
+
         foreach ($servicios as $servicio) {
             $precioBase += $servicio->Det_servicio->precio_servicio ?? 0;
         }
@@ -164,7 +164,7 @@ class DetallePaquete extends Component
         $equipos = $this->paquete->equi_paquete
             ->whereIn('equipo.id', $this->equiposSeleccionados)
             ->pluck('equipo');
-        
+
         foreach ($equipos as $equipo) {
             $precioBase += $equipo->Det_equipo->precio_equipo ?? 0;
         }
@@ -177,5 +177,27 @@ class DetallePaquete extends Component
         return view('livewire.paquetes.detalle-paquete')
             ->layout(auth()->check() ? 'layouts.prueba' : 'layouts.guest')
             ->title($this->paquete->nombrepaquete ?? 'Detalle del Paquete');
+    }
+
+
+
+
+
+
+
+
+
+    public $whatsappActivo = false;
+
+    public function contactarWhatsApp($paqueteId)
+    {
+        $this->whatsappActivo = true;
+
+        // Guardar el paquete como "contactado" en sesión
+        $contactados = session()->get('paquetesContactados', []);
+        if (!in_array($paqueteId, $contactados)) {
+            $contactados[] = $paqueteId;
+            session(['paquetesContactados' => $contactados]);
+        }
     }
 }

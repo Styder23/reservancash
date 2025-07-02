@@ -16,13 +16,13 @@ use Illuminate\Support\Facades\DB;
 class PanelDestino extends Component
 {
     use WithFileUploads;
-    
+
     #[Validate('required|string|max:255')]
     public $namedestino = '';
-    
+
     #[Validate('required|string')]
     public $descripciondestino = '';
-    
+
     #[Validate('nullable|image|max:2048')]
     public $imagenPrincipal;
 
@@ -31,16 +31,16 @@ class PanelDestino extends Component
 
     public $imagenPrincipalActual = null;
     public $imagenesAdicionalesActuales = [];
-    
+
     #[Validate('required|string')]
     public $ubicaciondestino = '';
-    
+
     #[Validate('required|exists:distritos,id')]
     public $fk_iddistrito = '';
-    
+
     #[Validate('required|exists:tipo_destinos,id')]
     public $fk_idtipodestino = '';
-    
+
     // Propiedades de control
     public $distritos = [];
     public $tiposDestino = [];
@@ -76,12 +76,12 @@ class PanelDestino extends Component
         $destinos = Destinos::with(['distrito', 'tipoDestino'])
             ->when($this->searchQuery, function ($query) {
                 $query->where('namedestino', 'like', '%' . $this->searchQuery . '%')
-                      ->orWhereHas('distrito', function($q) {
-                          $q->where('namedistrito', 'like', '%' . $this->searchQuery . '%');
-                      })
-                      ->orWhereHas('tipoDestino', function($q) {
-                          $q->where('nametipo_destinos', 'like', '%' . $this->searchQuery . '%');
-                      });
+                    ->orWhereHas('distrito', function ($q) {
+                        $q->where('namedistrito', 'like', '%' . $this->searchQuery . '%');
+                    })
+                    ->orWhereHas('tipoDestino', function ($q) {
+                        $q->where('nametipo_destinos', 'like', '%' . $this->searchQuery . '%');
+                    });
             })
             ->orderBy('id', 'desc')
             ->get();
@@ -121,25 +121,25 @@ class PanelDestino extends Component
     public function editDestino($destinoId)
     {
         $destino = Destinos::with('imagenes')->findOrFail($destinoId);
-        
+
         $this->editingId = $destino->id;
         $this->namedestino = $destino->namedestino;
         $this->descripciondestino = $destino->descripciondestino;
         $this->ubicaciondestino = $destino->ubicaciondestino;
         $this->fk_iddistrito = $destino->fk_iddistrito;
         $this->fk_idtipodestino = $destino->fk_idtipodestino;
-        
+
         // Cargar imagen principal desde el campo 'imagenes'
         $this->imagenPrincipalActual = $destino->imagenes;
-        
+
         // Cargar imágenes adicionales desde la relación polimórfica
         $this->imagenesAdicionalesActuales = $destino->imagenes()
             ->where('tipo', 'adicional')
             ->get()
-            ->map(function($img) {
+            ->map(function ($img) {
                 return ['id' => $img->id, 'url' => $img->url];
             })->toArray();
-        
+
         $this->showModal = true;
     }
 
@@ -163,12 +163,12 @@ class PanelDestino extends Component
 
         if ($this->editingId) {
             $destino = Destinos::findOrFail($this->editingId);
-            
+
             // Si hay nueva imagen principal, eliminar la anterior
             if ($this->imagenPrincipal && $destino->imagenes) {
                 Storage::disk('public')->delete($destino->imagenes);
             }
-            
+
             $destino->update($data);
         } else {
             $destino = Destinos::create($data);
@@ -195,21 +195,21 @@ class PanelDestino extends Component
     {
         if (isset($this->imagenesAdicionalesActuales[$index])) {
             $imagen = $this->imagenesAdicionalesActuales[$index];
-            
+
             // Eliminar del storage
             Storage::disk('public')->delete($imagen['url']);
-            
+
             // Eliminar de la base de datos
             imagenes::find($imagen['id'])->delete();
-            
+
             // Eliminar del array
             unset($this->imagenesAdicionalesActuales[$index]);
             $this->imagenesAdicionalesActuales = array_values($this->imagenesAdicionalesActuales);
-            
+
             session()->flash('message', 'Imagen eliminada correctamente.');
         }
     }
-    
+
     public function confirmDelete($destinoId)
     {
         $this->destinoToDelete = $destinoId;
@@ -225,20 +225,20 @@ class PanelDestino extends Component
     {
         if ($this->destinoToDelete) {
             $destino = Destinos::findOrFail($this->destinoToDelete);
-            
+
             // Eliminar imagen principal del campo 'imagenes'
             if ($destino->imagenes) {
                 Storage::disk('public')->delete($destino->imagenes);
             }
-            
+
             // Eliminar imágenes adicionales de la relación polimórfica
             foreach ($destino->imagenes()->get() as $imagen) {
                 Storage::disk('public')->delete($imagen->url);
                 $imagen->delete();
             }
-            
+
             $destino->delete();
-            
+
             session()->flash('message', 'Destino eliminado exitosamente.');
             $this->destinoToDelete = null;
         }
@@ -247,7 +247,7 @@ class PanelDestino extends Component
     public function getImageUrl($imagePath)
     {
         if (!$imagePath) return null;
-        
+
         return Storage::disk('public')->url($imagePath);
     }
 }

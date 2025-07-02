@@ -46,13 +46,13 @@
                         <span x-show="sidebarOpen">Destinos</span>
                     </a>
                 </li>
-                <!-- Vista Dividida -->
-                <li class="p-4 hover:bg-gray-700">
-                    <a href="{{ route('pantalladividida') }}" class="flex items-center">
-                        <i class="fas fa-columns mr-2"></i>
-                        <span x-show="sidebarOpen">Vista Dividida</span>
-                    </a>
-                </li>
+                    <!-- Vista Dividida -->
+                    <li class="p-4 hover:bg-gray-700">
+                        <a href="{{ route('pantalladividida') }}" class="flex items-center">
+                            <i class="fas fa-columns mr-2"></i>
+                            <span x-show="sidebarOpen">Vista Dividida</span>
+                        </a>
+                    </li>
                 <!-- Iniciar Sesión -->
                 <li x-data="{ open: false }" @mouseleave="open = false" class="p-4 hover:bg-gray-700 relative">
                     <!-- Botón principal -->

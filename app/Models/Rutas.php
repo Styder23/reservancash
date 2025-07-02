@@ -12,7 +12,7 @@ class Rutas extends Model
     protected $table = 'rutas';
 
     protected $fillable = [
-        'namerutas'	
+        'namerutas'
     ];
 
     public function itinixrutas()
@@ -24,4 +24,14 @@ class Rutas extends Model
     {
         return $this->hasMany('App\Models\ParadasxRutas', 'fk_idruta');
     }
+
+    public function rutasParadas()
+    { 
+        return $this->hasMany(\App\Models\ParadasxRutas::class, 'fk_idruta');
+    }
+
+
+
+
+    
 }

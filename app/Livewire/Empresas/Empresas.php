@@ -7,10 +7,7 @@ use App\Models\Empresas as Modelempresa;
 
 class Empresas extends Component
 {
-    public $empresas;
-    public function mount(){
-        $this->empresas=Modelempresa::all();
-    }
+    public $empresas = [];
 
     public function render()
     {
@@ -18,5 +15,10 @@ class Empresas extends Component
         
         $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
         return view('livewire.empresas.empresas')->layout($layout);
+    }
+
+    public function mount()
+    {
+        $this->empresas = \App\Models\Empresas::all();
     }
 }

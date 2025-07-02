@@ -1,3 +1,23 @@
+<script>
+    window.lightbox = function() {
+        return {
+            lightboxOpen: false,
+            lightboxIndex: 0,
+            lightboxImages: [
+                @if ($paquete->imagen_principal)
+                    "{{ asset('storage/' . $paquete->imagen_principal) }}",
+                @endif
+                @foreach ($paquete->imagenes as $imagen)
+                    "{{ asset('storage/' . $imagen->url) }}",
+                @endforeach
+            ],
+            openLightbox(index) {
+                this.lightboxIndex = index;
+                this.lightboxOpen = true;
+            }
+        }
+    }
+</script>
 <div>
     <!-- Header del Paquete -->
     <div class="relative h-48 bg-gradient-to-r from-blue-900 to-blue-700">
@@ -19,6 +39,9 @@
         <div class="grid lg:grid-cols-3 gap-8">
             <!-- Contenido Principal -->
             <div class="lg:col-span-2">
+
+
+
                 <!-- Galería de Imágenes -->
                 <div class="mb-8" x-data="lightbox()">
                     <!-- Grid de miniaturas -->
@@ -421,10 +444,15 @@
                         Reservar ahora
                     </button>
 
-                    <button wire:click="contactarWhatsApp"
+                    @php
+                        $telefono = $paquete->empresa->telefonoempresa ?? '51999999999'; // Ajusta según tu relación
+                        $urlWhatsapp = "https://wa.me/{$telefono}";
+                    @endphp
+
+                    <a href="{{ $urlWhatsapp }}" target="_blank"
                         class="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition duration-200 mb-4 flex items-center justify-center">
                         <i class="fab fa-whatsapp mr-2 text-xl"></i> Contactar por WhatsApp
-                    </button>
+                    </a>
 
                     <button wire:click="personalizarPaquete"
                         class="w-full bg-yellow-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 mb-4">
@@ -522,7 +550,7 @@
         </div>
     @endif
 
-    <script>
+    <<<<<<< HEAD <script>
         function lightbox() {
             return {
                 lightboxOpen: false,
@@ -567,4 +595,6 @@
             }
         }
     </script>
+    =======
+    >>>>>>> 89e6056bf8f45acaa836daa6fb4f2aeca641c31f
 </div>

@@ -12,7 +12,13 @@ class Promociones extends Model
     protected $table = 'promociones';
 
     protected $fillable = [
-        'namepromocion','descripcion','descuento','fechainicio','fechafin','estado','fk_idempresa'	
+        'namepromocion',
+        'descripcion',
+        'descuento',
+        'fechainicio',
+        'fechafin',
+        'estado',
+        'fk_idempresa'
     ];
 
     public function empresa(){
@@ -28,4 +34,12 @@ class Promociones extends Model
     {
         return $this->morphMany(Videos::class, 'videoable');
     }
+
+
+
+
+    public function promocion()
+    {
+        return $this->belongsTo(\App\Models\Promociones::class, 'fk_idpromociones');
+    }   
 }

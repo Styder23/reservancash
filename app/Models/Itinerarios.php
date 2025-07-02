@@ -12,16 +12,29 @@ class Itinerarios extends Model
     protected $table = 'itinerarios';
 
     protected $fillable = [
-        'dia','hora_inicio','hora_fin','descripcion','fk_idpaquete'
+        'dia',
+        'hora_inicio',
+        'hora_fin',
+        'descripcion',
+        'fk_idpaquete'
     ];
 
     public function paquete()
     {
-        return $this->belongsTo(Paquetes::class ,'fk_idpaquete');
+        return $this->belongsTo(Paquetes::class, 'fk_idpaquete');
     }
 
     public function itinixrutas()
     {
         return $this->hasMany('App\Models\itinerarioxruta', 'fk_iditinerario');
     }
+
+    public function itinerariosRutas()
+    {
+        return $this->hasMany(\App\Models\itinerarioxruta::class, 'fk_iditinerario');
+    }
+
+
+
+    
 }
