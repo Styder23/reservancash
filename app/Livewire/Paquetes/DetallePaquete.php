@@ -12,6 +12,8 @@ use App\Models\Paquetes;
 use App\Models\Reservas;
 use App\Models\Pagos;
 use App\Models\premios;
+use App\Models\UserItinerario;
+use App\Models\RespuestasComentarios;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -33,6 +35,13 @@ class DetallePaquete extends Component
     public $equiposSeleccionados = [];
     public $destinosSeleccionados = [];
 
+    //para los comentarios
+    public $nuevoComentario = '';
+    public $nuevaRespuesta = '';
+    public $mostrarRespuesta = null;
+    public $valoracion = 0; // Nueva propiedad para la valoración
+    public $valoracionHover = 0;
+    
     protected $rules = [
         'fechaSeleccionada' => 'required|date',
         'personas' => 'required|numeric|min:1|max:10',
@@ -41,7 +50,10 @@ class DetallePaquete extends Component
         'destinosSeleccionados' => 'array',
         'metodoPago' => 'required|in:transferencia,yape,plin',
         'comprobantePago' => 'required_if:metodoPago,yape,plin|image|max:2048',
-        'notasReserva' => 'nullable|string|max:500'
+        'notasReserva' => 'nullable|string|max:500',
+        'nuevoComentario' => 'required|min:5|max:500',
+        'nuevaRespuesta' => 'required|min:3|max:300',
+        'valoracion' => 'required|numeric|min:1|max:5',
     ];
 
     protected $messages = [
@@ -52,6 +64,15 @@ class DetallePaquete extends Component
         'comprobantePago.required_if' => 'Debes subir el comprobante de pago para Yape o Plin.',
         'comprobantePago.image' => 'El comprobante debe ser una imagen.',
         'comprobantePago.max' => 'El comprobante no debe superar los 2MB.',
+        'nuevoComentario.required' => 'El comentario es obligatorio.',
+        'nuevoComentario.min' => 'El comentario debe tener al menos 5 caracteres.',
+        'nuevoComentario.max' => 'El comentario no puede superar los 500 caracteres.',
+        'nuevaRespuesta.required' => 'La respuesta es obligatoria.',
+        'nuevaRespuesta.min' => 'La respuesta debe tener al menos 3 caracteres.',
+        'nuevaRespuesta.max' => 'La respuesta no puede superar los 300 caracteres.',
+        'valoracion.required' => 'Debes seleccionar una valoración.',
+        'valoracion.min' => 'La valoración mínima es 1 estrella.',
+        'valoracion.max' => 'La valoración máxima es 5 estrellas.',
     ];
 
     public function mount($id)
@@ -59,6 +80,95 @@ class DetallePaquete extends Component
         $this->cargarPaquete($id);
     }
   
+    // Función para establecer la valoración
+    public function setValoracion($valor)
+    {
+        $this->valoracion = $valor;
+    }
+
+    // Función para el efecto hover
+    public function setValoracionHover($valor)
+    {
+        $this->valoracionHover = $valor;
+    }
+
+    // Función para limpiar el hover
+    public function clearHover()
+    {
+        $this->valoracionHover = 0;
+    }
+
+    //funciones para los comentarios
+        public function agregarComentario()
+        {
+            $this->validate([
+                'nuevoComentario' => 'required|min:5|max:500',
+                'valoracion' => 'required|numeric|min:1|max:5'
+            ]);
+            
+            UserItinerario::create([
+                'comentario' => $this->nuevoComentario,
+                'fecha' => now(),
+                'fk_idusers' => auth()->id(),
+                'fk_idpaquete' => $this->paquete->id,
+                'estrellas' => $this->valoracion, // Guardar la valoración
+            ]);
+            
+            $this->nuevoComentario = '';
+            $this->valoracion = 0; // Resetear la valoración
+            $this->cargarPaquete($this->paquete->id); // Recargar con las relaciones
+            
+            // Mensaje de éxito
+            session()->flash('message', 'Comentario y valoración agregados exitosamente');
+        }
+
+
+    public function toggleRespuesta($comentarioId)
+    {
+        $this->mostrarRespuesta = $this->mostrarRespuesta === $comentarioId ? null : $comentarioId;
+        $this->nuevaRespuesta = '';
+    }
+
+    public function cancelarRespuesta()
+    {
+        $this->mostrarRespuesta = null;
+        $this->nuevaRespuesta = '';
+    }
+
+    public function agregarRespuesta($comentarioId)
+    {
+        $this->validateOnly('nuevaRespuesta');
+        
+        RespuestasComentarios::create([
+            'fk_idcomentario' => $comentarioId,
+            'fk_idusers' => auth()->id(),
+            'respuesta' => $this->nuevaRespuesta,
+            'fecha_respuesta' => now(),
+        ]);
+        
+        $this->nuevaRespuesta = '';
+        $this->mostrarRespuesta = null;
+        $this->cargarPaquete($this->paquete->id); // Recargar con las relaciones
+        
+        // Mensaje de éxito
+        session()->flash('message', 'Respuesta agregada exitosamente');
+    }
+
+    public function getPromedioValoracion()
+    {
+        $comentarios = $this->paquete->comentarios()->whereNotNull('estrellas')->get();
+        if ($comentarios->count() > 0) {
+            return round($comentarios->avg('estrellas'), 1);
+        }
+        return 0;
+    }
+
+    // Función para obtener el número total de valoraciones
+    public function getTotalValoraciones()
+    {
+        return $this->paquete->comentarios()->whereNotNull('estrellas')->count();
+    }
+    
     public function updatedFechaSeleccionada($value)
     {
         $this->validate([
@@ -91,7 +201,9 @@ class DetallePaquete extends Component
             'ser_paquete.servicio.Det_servicio',
             'equi_paquete.equipo.Det_equipo',
             'dis_paquete',
-            'reservas'
+            'reservas',
+            'comentarios.users',
+            'comentarios.respuestas.usuario',
         ])->findOrFail($id);
 
         if ($this->paquete->dis_paquete->isNotEmpty()) {

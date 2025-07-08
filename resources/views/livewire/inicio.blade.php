@@ -17,12 +17,12 @@
     </div>
 
     <!-- Buscador de servicios turísticos -->
-    <div class="bg-white py-8 shadow-md">
+    <div class="bg-purple-300 py-6 shadow-md">
         <div class="container mx-auto px-6">
             <form class="flex flex-col md:flex-row gap-4">
                 <!-- Option Destinos -->
                 <div class="flex-1">
-                    <label for="destino" class="block text-sm font-medium text-gray-700 mb-2">Destinos</label>
+                    <label for="destino" class="block text-sm font-bold text-gray-800 mb-2">Destinos</label>
                     <select id="destino"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2"
                         onchange="updatePlaceholder(this)">
@@ -56,7 +56,7 @@
                 }
                 ?>
                 <div class="flex-1">
-                    <label for="precio" class="block text-sm font-medium text-gray-700 mb-2">Precio</label>
+                    <label for="precio" class="block text-sm font-bold text-gray-900 mb-2">Precio</label>
                     <select id="precio"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2">
                         <option value="">Todos los precios...</option>
@@ -67,7 +67,7 @@
                 </div>
                 <!-- Option Duración-->
                 <div class="flex-1">
-                    <label for="duracion" class="block text-sm font-medium text-gray-700 mb-2">Duración</label>
+                    <label for="duracion" class="block text-sm font-bold text-gray-900 mb-2">Duración</label>
                     <select id="duracion"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2">
                         <option value="">Duración...</option>
@@ -78,7 +78,7 @@
                 </div>
                 <!-- Option Horario-->
                 <div class="flex-1">
-                    <label for="distrito" class="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
+                    <label for="distrito" class="block text-sm font-bold text-gray-900 mb-2">Distrito</label>
                     <select id="distrito"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 p-2">
                         <option value="">Distrito...</option>
@@ -89,7 +89,7 @@
                 </div>
                 <!-- Opcion Fecha-->
                 <div class="flex-1">
-                    <label for="fecha" class="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+                    <label for="fecha" class="block text-sm font-bold text-gray-900 mb-2">Fecha</label>
                     <input type="date" id="fecha"
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200">
                 </div>
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Sección de paquetes destacados -->
-    <div id="servicios" class="py-16 bg-gray-50">
+    <div id="servicios" class="py-10 bg-purple-200">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Paquetes destacados</h2>
             <!-- Contenedor de los N paquetes -->
@@ -160,7 +160,7 @@
     </div>
 
     <!-- Sección de promociones destacados -->
-    <div id="servicios" class="py-16 bg-gray-50">
+    <div id="servicios" class="py-10 bg-purple-200">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Promociones destacados</h2>
             <!-- Contenedor de las N promociones -->
@@ -246,7 +246,7 @@
     </div>
 
     <!-- Sección de emopresas de turismo -->
-    <div class="py-16 bg-white">
+    <div class="py-10 bg-purple-200 mb-16">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Nuestras Empresas</h2>
             <!-- Contenedor de las empresas disponibles -->
@@ -284,7 +284,7 @@
     </div>
 
     <!-- Sección de itinerarios populares -->
-    <div class="py-16 bg-gray-50">
+    <div class="py-10 bg-gray-50">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Itinerarios populares</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">

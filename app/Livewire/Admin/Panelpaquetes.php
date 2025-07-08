@@ -922,7 +922,7 @@ class Panelpaquetes extends Component
         }
 
         session()->flash('success', 'Itinerario guardado exitosamente');
-        
+        $this->cerrarFormularioItinerario();
     }
 
     // para jalar toda la info solo de paquetes nada mas

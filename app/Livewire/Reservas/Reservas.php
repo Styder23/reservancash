@@ -143,15 +143,31 @@ class Reservas extends Component
             }
 
             $reserva = ModelReservas::findOrFail($this->reservaSeleccionada);
+            
+            // Si la reserva estaba confirmada, decrementar el contador
+            if ($reserva->estado == 'confirmada') {
+                $this->decrementarPremiosUsuario($reserva->fk_idusers);
+            }
+            
             $reserva->update([
                 'estado' => 'cancelada',
-                'notas' => $this->motivoCancelacion // Usamos el campo notas para guardar el motivo
+                'notas' => $this->motivoCancelacion
             ]);
             
             $this->cerrarModales();
             session()->flash('success', 'Reserva cancelada exitosamente.');
         } catch (\Exception $e) {
             session()->flash('error', 'Error al cancelar la reserva: ' . $e->getMessage());
+        }
+    }
+
+    // Agregar este método privado
+    private function decrementarPremiosUsuario($userId)
+    {
+        try {
+            premios::decrementarReservaConfirmada($userId);
+        } catch (\Exception $e) {
+            \Log::error('Error al decrementar premios del usuario: ' . $e->getMessage());
         }
     }
 

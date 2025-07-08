@@ -8,13 +8,13 @@
 - Poner las consultas para los Dashbords (hecho)
 - Perfil del usuario (hecho 60%)
 - La comparación Importante (proceso)
-- CREAR EL DESTINO EN EL PAQUETE Y NO JALAR POR EL COMBO(suponemos el tipo de paquete)
-- Reservas empresas y clientes
-- Reportes (para la empresa y admin)
-- Mejorar las reservas de los clientes (Importante) clonar paquete
-- Comentarios de los paquetes
+- CREAR EL DESTINO EN EL PAQUETE Y NO JALAR POR EL COMBO(suponemos el tipo de paquete) (hecho)
+- Reservas empresas y clientes (hecho)
+- Reportes (para la empresa y admin) //
+- Mejorar las reservas de los clientes (Importante) clonar paquete //
+- Comentarios de los paquetes (vamos con esto )
 - Busqueda de los paquetes el filtro
 - Subir videos en empresas
-- SEPARAR EL ITINERARIO DEL PAQUETE
+- SEPARAR EL ITINERARIO DEL PAQUETE (hecho)
 - BLOQUEAR TODA LA INFO DE UNA EMPRESA MEDIANTE EL ADMIN
 - Servicio: agregar mensajes de error para otro tipo de imagen

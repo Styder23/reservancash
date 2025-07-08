@@ -60,13 +60,6 @@ class ReservaCliente extends Component
 
     public function solicitarCancelacion()
     {
-        // Agregar logs para depurar
-        \Log::info('Datos de cancelación', [
-            'reservaACancelar' => $this->reservaACancelar,
-            'motivoCliente' => $this->motivoCliente,
-            'user_id' => Auth::id()
-        ]);
-
         $this->validate([
             'motivoCliente' => 'required|string|min:10',
         ], [
@@ -75,52 +68,34 @@ class ReservaCliente extends Component
         ]);
 
         try {
-            // Verificar que la reserva existe y pertenece al usuario
             $reserva = Reservas::where('id', $this->reservaACancelar)
                             ->where('fk_idusers', Auth::id())
                             ->first();
             
             if (!$reserva) {
-                \Log::error('Reserva no encontrada o no pertenece al usuario', [
-                    'reservaACancelar' => $this->reservaACancelar,
-                    'user_id' => Auth::id()
-                ]);
                 session()->flash('error', 'Reserva no encontrada o no tienes permisos para cancelarla.');
                 return;
             }
-
-            \Log::info('Reserva encontrada', [
-                'reserva_id' => $reserva->id,
-                'estado_actual' => $reserva->estado
-            ]);
             
-            // Solo permitir si está pendiente o confirmado
-            if (in_array($reserva->estado, ['pendiente', 'confirmado'])) {
+            if (in_array($reserva->estado, ['pendiente', 'confirmada'])) {
+                // Si la reserva estaba confirmada, decrementar el contador
+                if ($reserva->estado == 'confirmada') {
+                    \App\Models\premios::decrementarReservaConfirmada(Auth::id());
+                }
+                
                 $reserva->update([
                     'estado' => 'cancelada',
                     'motivo_cliente' => $this->motivoCliente,
                     'fecha_solicitud_cancelacion' => now()
                 ]);
                 
-                \Log::info('Reserva actualizada correctamente', ['reserva_id' => $reserva->id]);
-                
                 $this->cerrarModal();
                 session()->flash('message', 'Solicitud de cancelación enviada. La empresa se pondrá en contacto contigo para el proceso de reembolso.');
                 
             } else {
-                \Log::warning('Estado de reserva no válido para cancelación', [
-                    'reserva_id' => $reserva->id,
-                    'estado' => $reserva->estado
-                ]);
                 session()->flash('error', 'Esta reserva no puede ser cancelada.');
             }
         } catch (\Exception $e) {
-            \Log::error('Error en cancelación', [
-                'mensaje' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
             session()->flash('error', 'Error al enviar la solicitud: ' . $e->getMessage());
         }
     }
