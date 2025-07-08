@@ -81,4 +81,9 @@ class Paquetes extends Model
     {
         return $this->hasMany(\App\Models\DetallePaquetes::class, 'fk_idpaquete');
     }
+
+    public function comentarios()
+    {
+        return $this->hasMany(UserItinerario::class, 'fk_idpaquete')->orderBy('fecha', 'desc');
+    }
 }

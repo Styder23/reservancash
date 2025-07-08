@@ -367,7 +367,8 @@
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Sobre la empresa</h2>
 
                     <div class="flex items-start">
-                        <img src="{{ $paquete->empresa->logo }}" alt="Logo {{ $paquete->empresa->nameempresa }}"
+                        <img src="{{ asset('storage/' . $paquete->empresa->logoempresa) }}"
+                            alt="Logo {{ $paquete->empresa->nameempresa }}"
                             class="w-20 h-20 object-cover rounded-lg mr-4">
                         <div>
                             <h3 class="text-xl font-semibold text-gray-800">{{ $paquete->empresa->nameempresa }}
@@ -480,6 +481,237 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Sección de Comentarios -->
+    <!-- Sección de Comentarios y Valoraciones -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Comentarios y valoraciones</h2>
+
+            <!-- Resumen de valoraciones -->
+            @if ($this->getTotalValoraciones() > 0)
+                <div class="flex items-center space-x-2">
+                    <div class="flex items-center">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <svg class="w-5 h-5 {{ $i <= $this->getPromedioValoracion() ? 'text-yellow-400' : 'text-gray-300' }}"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        @endfor
+                    </div>
+                    <span class="text-sm text-gray-600">{{ $this->getPromedioValoracion() }}
+                        ({{ $this->getTotalValoraciones() }} valoraciones)</span>
+                </div>
+            @endif
+        </div>
+
+        <!-- Mensaje de éxito -->
+        @if (session()->has('message'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                {{ session('message') }}
+            </div>
+        @endif
+
+        <!-- Formulario para nuevo comentario (solo si está autenticado) -->
+        @auth
+            <div class="mb-8 border-b pb-6">
+                <form wire:submit.prevent="agregarComentario">
+                    <div class="flex items-start space-x-4">
+                        <img src="{{ auth()->user()->profile_photo_path
+                            ? asset('storage/' . auth()->user()->profile_photo_path)
+                            : asset('images/default-user.png') }}"
+                            alt="Foto de perfil" class="w-10 h-10 rounded-full object-cover">
+                        <div class="flex-1">
+                            <!-- Sistema de valoración con estrellas -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tu valoración</label>
+                                <div class="flex items-center space-x-1">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <button type="button" wire:click="setValoracion({{ $i }})"
+                                            wire:mouseenter="setValoracionHover({{ $i }})"
+                                            wire:mouseleave="clearHover"
+                                            class="focus:outline-none transition-colors duration-200">
+                                            <svg class="w-8 h-8 {{ ($valoracionHover > 0 && $i <= $valoracionHover) || ($valoracionHover === 0 && $i <= $valoracion)
+                                                ? 'text-yellow-400 hover:text-yellow-500'
+                                                : 'text-gray-300 hover:text-yellow-400' }}"
+                                                fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        </button>
+                                    @endfor
+                                    <span class="ml-2 text-sm text-gray-600">
+                                        @if ($valoracion > 0)
+                                            {{ $valoracion }} {{ $valoracion == 1 ? 'estrella' : 'estrellas' }}
+                                        @endif
+                                    </span>
+                                </div>
+                                @error('valoracion')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <!-- Área de texto para el comentario -->
+                            <textarea wire:model="nuevoComentario"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('nuevoComentario') border-red-500 @enderror"
+                                rows="3" placeholder="Escribe tu comentario sobre este paquete..."></textarea>
+                            @error('nuevoComentario')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                            <div class="mt-2 flex justify-between items-center">
+                                <span class="text-xs text-gray-500">{{ strlen($nuevoComentario) }}/500 caracteres</span>
+                                <button type="submit"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-gray-400"
+                                    wire:loading.attr="disabled">
+                                    <span wire:loading.remove>Publicar comentario</span>
+                                    <span wire:loading>Publicando...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        @else
+            <div class="mb-8 border-b pb-6">
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <p class="text-gray-600">
+                        <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-800 font-medium">Inicia
+                            sesión</a>
+                        para dejar tu comentario y valoración sobre este paquete.
+                    </p>
+                </div>
+            </div>
+        @endauth
+
+        <!-- Lista de comentarios -->
+        <div class="space-y-6">
+            @forelse ($paquete->comentarios as $comentario)
+                <div class="border-b pb-6 last:border-b-0 last:pb-0">
+                    <div class="flex items-start space-x-4 mb-4">
+                        <img src="{{ $comentario->users->profile_photo_path
+                            ? asset('storage/' . $comentario->users->profile_photo_path)
+                            : asset('images/default-user.png') }}"
+                            alt="Foto de {{ $comentario->users->name }}" class="w-10 h-10 rounded-full object-cover">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-semibold text-gray-800">{{ $comentario->users->name }}</h4>
+                                <span class="text-sm text-gray-500">
+                                    {{ $comentario->fecha ? $comentario->fecha->format('d M Y') : 'Hace poco' }}
+                                </span>
+                            </div>
+
+                            <!-- Mostrar valoración si existe -->
+                            @if ($comentario->valoracion)
+                                <div class="flex items-center mb-2">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <svg class="w-4 h-4 {{ $i <= $comentario->valoracion ? 'text-yellow-400' : 'text-gray-300' }}"
+                                            fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    @endfor
+                                    <span class="ml-2 text-sm text-gray-600">{{ $comentario->valoracion }}/5</span>
+                                </div>
+                            @endif
+
+                            <p class="text-gray-700 mt-1">{{ $comentario->comentario }}</p>
+
+                            <!-- Botón para responder (solo si está autenticado) -->
+                            @auth
+                                <button wire:click="toggleRespuesta({{ $comentario->id }})"
+                                    class="mt-2 text-sm text-blue-600 hover:text-blue-800 transition duration-200">
+                                    {{ $mostrarRespuesta === $comentario->id ? 'Cancelar' : 'Responder' }}
+                                </button>
+                            @endauth
+
+                            <!-- Formulario de respuesta (se muestra solo para el comentario seleccionado) -->
+                            @if ($mostrarRespuesta === $comentario->id)
+                                <div class="mt-4 pl-6">
+                                    <form wire:submit.prevent="agregarRespuesta({{ $comentario->id }})">
+                                        <div class="flex items-start space-x-4">
+                                            <img src="{{ auth()->user()->profile_photo_path
+                                                ? asset('storage/' . auth()->user()->profile_photo_path)
+                                                : asset('images/default-user.png') }}"
+                                                alt="Tu foto" class="w-8 h-8 rounded-full object-cover">
+                                            <div class="flex-1">
+                                                <textarea wire:model="nuevaRespuesta"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 @error('nuevaRespuesta') border-red-500 @enderror"
+                                                    rows="2" placeholder="Escribe tu respuesta..."></textarea>
+                                                @error('nuevaRespuesta')
+                                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                @enderror
+                                                <div class="mt-2 flex justify-between items-center">
+                                                    <span
+                                                        class="text-xs text-gray-500">{{ strlen($nuevaRespuesta) }}/300
+                                                        caracteres</span>
+                                                    <div class="flex space-x-2">
+                                                        <button type="button" wire:click="cancelarRespuesta"
+                                                            class="px-3 py-1 text-gray-600 hover:text-gray-800 transition duration-200">
+                                                            Cancelar
+                                                        </button>
+                                                        <button type="submit"
+                                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200 disabled:bg-gray-400"
+                                                            wire:loading.attr="disabled">
+                                                            <span wire:loading.remove>Enviar respuesta</span>
+                                                            <span wire:loading>Enviando...</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Respuestas al comentario -->
+                    @if ($comentario->respuestas && $comentario->respuestas->count() > 0)
+                        <div class="ml-14 pl-4 border-l-2 border-gray-200 space-y-4">
+                            @foreach ($comentario->respuestas as $respuesta)
+                                <div class="flex items-start space-x-3">
+                                    <img src="{{ $respuesta->usuario->profile_photo_url ?? asset('images/default-user.png') }}"
+                                        alt="Foto de {{ $respuesta->usuario->name }}"
+                                        class="w-8 h-8 rounded-full object-cover">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2">
+                                            <span
+                                                class="text-sm font-medium text-gray-800">{{ $respuesta->usuario->name }}</span>
+                                            <span class="text-xs text-gray-500">
+                                                {{ $respuesta->fecha_respuesta ? $respuesta->fecha_respuesta->format('d M Y') : 'Hace poco' }}
+                                            </span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mt-1">{{ $respuesta->respuesta }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            @empty
+                <div class="text-center py-8 text-gray-500">
+                    <div class="mb-4">
+                        <svg class="mx-auto w-16 h-16 text-gray-300" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <p class="text-lg font-medium text-gray-600">No hay comentarios aún</p>
+                    <p class="text-sm text-gray-500 mt-1">¡Sé el primero en comentar y valorar este paquete!</p>
+                    @guest
+                        <p class="text-sm text-gray-500 mt-2">
+                            <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-800 font-medium">Inicia
+                                sesión</a>
+                            para dejar tu comentario y valoración.
+                        </p>
+                    @endguest
+                </div>
+            @endforelse
         </div>
     </div>
 

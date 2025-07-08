@@ -40,6 +40,19 @@ class premios extends Model
         return $premio;
     }
 
+    // Método para decrementar si se cansela la reserva
+    public static function decrementarReservaConfirmada($userId)
+    {
+        $premio = self::where('fk_iduser', $userId)->first();
+        
+        if ($premio && $premio->cantidad_reservas > 0) {
+            $premio->decrement('cantidad_reservas');
+            return $premio;
+        }
+        
+        return null;
+    }
+
     // Método para canjear un premio - CORREGIDO
     public function canjearPremio()
     {
