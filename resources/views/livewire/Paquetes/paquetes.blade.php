@@ -114,11 +114,11 @@
                 </div>
             @endforelse
         </div>
-        <<<<<<< HEAD=======<!-- Paginación -->
-            {{-- <div class="mt-8">
+        <!-- Paginación -->
+        {{-- <div class="mt-8">
             {{ $equipos->links() }}
         </div> --}}
-            >>>>>>> 89e6056bf8f45acaa836daa6fb4f2aeca641c31f
+
     </div>
     <script>
         // Script para ocultar las notificaciones después de 3 segundos

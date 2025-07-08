@@ -32,14 +32,15 @@
         <!-- Page Heading -->
         @if (isset($header))
             <header class="bg-white shadow">
-                <div class="max-w-8xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <!-- Cambiar de max-w-8xl a max-w-full para ocupar todo el espacio -->
+                <div class="max-w-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
             </header>
         @endif
 
         <!-- Page Content -->
-        <main>
+        <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {{ $slot }}
         </main>
     </div>
@@ -51,9 +52,7 @@
     @wireUiScripts
 
     <script src="//unpkg.com/alpinejs" defer></script>
-
-    {{-- @wireUiScripts(['nonce': 'csp-token'])
-    @wireUiScripts(['nonce': 'csp-token', 'foo' => true]) --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>

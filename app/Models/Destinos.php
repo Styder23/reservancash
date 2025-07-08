@@ -10,7 +10,8 @@ class Destinos extends Model
     use HasFactory;
     public $timestamps = false;
     protected $fillable = [
-        'namedestino','descripciondestino','imagenes','ubicaciondestino','fk_iddistrito','fk_idtipodestino'	
+        'namedestino','descripciondestino','imagenes','ubicaciondestino','fk_iddistrito','fk_idtipodestino',
+        'fk_idempresa'	
     ];
 
     protected $casts = [
@@ -40,5 +41,10 @@ class Destinos extends Model
     public function favoritos()
     {
         return $this->morphMany(favoritos::class, 'favoritable');
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresas::class ,'fk_idempresa');
     }
 }

@@ -8,6 +8,7 @@ class DetalleReservacli extends Component
 {
     public function render()
     {
-        return view('livewire.reservas.detalle-reservacli');
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+        return view('livewire.reservas.detalle-reservacli')->layout($layout);
     }
 }

@@ -25,10 +25,11 @@ use App\Livewire\Servicios\DetalleServicios;
 use App\Livewire\Destinos\DestinoDetalle;
 use App\Livewire\Paquetes\DetallePaquete;
 use App\Livewire\Empresas\DetalleEmpresa;
-use App\Livewire\Reservas\Reservas;
+// use App\Livewire\Reservas\Reservas;
 use App\Livewire\Reservas\ReservaCliente;
 use App\Livewire\Reservas\DetalleReservacli;
 use App\Livewire\Reservas\DetalleReservaempre;
+use App\Livewire\Premios;
 
 // clientes
 use App\Livewire\Clientes\Pantalladividida;
@@ -42,6 +43,7 @@ use App\Livewire\Admin\Panelequipos;
 use App\Livewire\Admin\Panelservicios;
 use App\Livewire\Admin\Panelpaquetes;
 use App\Livewire\Admin\Panelpromociones;
+use App\Livewire\Reservas\Reservas;
 
 // para el admin
 use App\Livewire\Root\Usuarios;
@@ -113,7 +115,7 @@ Route::middleware('empresa')->group(function () {
     Route::get('/det_servicio', Panelservicios::class)->name('det_servicios');
     Route::get('/det_promociones', Panelpromociones::class)->name('det_promociones');
     Route::get('/det_paquetes', Panelpaquetes::class)->name('det_paquetes');
-    Route::get('/vista_detallereservaempre/{id}', DetalleReservaempre::class)->name('vistareservaempre'); 
+    Route::get('/reserva-empresa', Reservas::class)->name('reservaempre'); 
 });
 
 // para los clientes
@@ -122,9 +124,12 @@ Route::middleware('cliente')->group(function () {
     Route::get('/favoritos', Favoritos::class)->name('favoritos');
     Route::get('/reservas', Reservas::class)->name('reservas');
     Route::get('/reservacliente', ReservaCliente::class)->name('reservacli');
-    Route::get('/vista_detallereservacli/{id}', DetalleReservacli::class)->name('vistareservacli'); 
+    Route::get('/vista_detallereservacli/{id}', DetalleReservacli::class)->name('vistareservacli');
+    Route::get('/Premios', DetalleReservaempre::class)->name('premios');
+    Route::post('/premios/canjear/{paquete}', [Premios::class, 'canjear'])->name('premios.canjear');  
 });
 
 // para el administrador:
 Route::get('/usuarios',Usuarios::class)->name('usuarios');
 Route::get('/generales',DatosGenerales::class)->name('generales');
+// Route::get('/generales',DatosGenerales::class)->name('mis-reservas');

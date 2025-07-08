@@ -11,8 +11,8 @@ class Paquetes extends Model
     protected $table = 'paquetes';
 
     protected $fillable = [
-        'preciopaquete','nombrepaquete','cantidadpaquete','descripcion','imagen_principal',
-        'estado','fk_idempresa'	
+        'preciopaquete','nombrepaquete','descripcion','imagen_principal',
+        'estado','fk_idempresa','precio_base','personas_incluidas','precio_extra_persona'	
     ];
 
     public function empresa()
@@ -66,15 +66,19 @@ class Paquetes extends Model
         return $this->morphMany(favoritos::class, 'favoritable');
     }
 
+    public function servicios()
+    {
+        return $this->belongsToMany(Servicios::class, 'paquete_servicio', 'fk_idpaquete', 'fk_idservicio');
+    }
 
-
-
+    public function equipos()
+    {
+        return $this->belongsToMany(Equipos::class, 'paquete_equipo', 'fk_idpaquete', 'fk_idequipo');
+    }
 
     // Funcion para buscar paquetes por nombre
     public function detalles()
     {
         return $this->hasMany(\App\Models\DetallePaquetes::class, 'fk_idpaquete');
     }
-
-
 }

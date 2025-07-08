@@ -15,7 +15,4 @@ class Provincias extends Model
         'nameprovincia','fk_iddepartamento'	
     ];
 
-    // public function Departamento(){
-    //     return $this->belongsTo(Departamento::class, 'fk_iddepartamento');
-    // }
 }

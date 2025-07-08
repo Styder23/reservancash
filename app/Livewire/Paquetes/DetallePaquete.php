@@ -3,38 +3,84 @@
 namespace App\Livewire\Paquetes;
 
 use Livewire\Component;
-use App\Models\Paquetes;
 use App\Models\ClientePaquete;
 use App\Models\ClienteServicio;
 use App\Models\ClienteEquipo;
 use App\Models\ClienteDestino;
 use App\Models\ClienteReserva;
+use App\Models\Paquetes;
 use App\Models\Reservas;
+use App\Models\Pagos;
+use App\Models\premios;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class DetallePaquete extends Component
 {
+    use WithFileUploads;
+    
     public $paquete;
     public $fechaSeleccionada;
     public $personas = 1;
     public $mostrarFormularioPersonalizacion = false;
+    public $mostrarModalPago = false;
+    public $metodoPago = 'transferencia';
+    public $comprobantePago;
+    public $notasReserva;
     public $serviciosSeleccionados = [];
     public $equiposSeleccionados = [];
     public $destinosSeleccionados = [];
 
     protected $rules = [
-        'fechaSeleccionada' => 'required',
-        'personas' => 'required|numeric|min:1',
+        'fechaSeleccionada' => 'required|date',
+        'personas' => 'required|numeric|min:1|max:10',
         'serviciosSeleccionados' => 'array',
         'equiposSeleccionados' => 'array',
-        'destinosSeleccionados' => 'array'
+        'destinosSeleccionados' => 'array',
+        'metodoPago' => 'required|in:transferencia,yape,plin',
+        'comprobantePago' => 'required_if:metodoPago,yape,plin|image|max:2048',
+        'notasReserva' => 'nullable|string|max:500'
+    ];
+
+    protected $messages = [
+        'fechaSeleccionada.required' => 'Debes seleccionar una fecha de viaje.',
+        'personas.required' => 'Debes indicar el número de personas.',
+        'personas.min' => 'El mínimo de personas es 1.',
+        'personas.max' => 'El máximo de personas es 10.',
+        'comprobantePago.required_if' => 'Debes subir el comprobante de pago para Yape o Plin.',
+        'comprobantePago.image' => 'El comprobante debe ser una imagen.',
+        'comprobantePago.max' => 'El comprobante no debe superar los 2MB.',
     ];
 
     public function mount($id)
     {
         $this->cargarPaquete($id);
     }
-
+  
+    public function updatedFechaSeleccionada($value)
+    {
+        $this->validate([
+            'fechaSeleccionada' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+                function ($attribute, $value, $fail) {
+                    $disponibilidad = $this->paquete->dis_paquete->first();
+                    if (!$disponibilidad) {
+                        $fail('No hay disponibilidad para este paquete.');
+                        return;
+                    }
+                    
+                    if ($value < $disponibilidad->fecha_inicio || $value > $disponibilidad->fecha_fin) {
+                        $fail('La fecha seleccionada no está dentro del rango disponible.');
+                    }
+                }
+            ]
+        ]);
+    }
+    
     public function cargarPaquete($id)
     {
         $this->paquete = Paquetes::with([
@@ -53,26 +99,232 @@ class DetallePaquete extends Component
         }
     }
 
-    public function reservar()
+    public function abrirModalPago()
     {
         $this->validate([
             'fechaSeleccionada' => 'required',
-            'personas' => 'required|numeric|min:1'
+            'personas' => 'required|numeric|min:1|max:10'
         ]);
-
+        
         if (!Auth::check()) {
             return redirect()->route('login');
         }
+        
+        // Verificar disponibilidad - CORREGIDO
+        $disponibilidad = $this->paquete->dis_paquete->first();
+        if (!$disponibilidad) {
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'error',
+                'mensaje' => 'No hay disponibilidad configurada para este paquete.'
+            ]);
+            return;
+        }
+        
+        $cuposDisponibles = $disponibilidad->cupo - $this->paquete->reservas->count();
+        if ($cuposDisponibles < $this->personas) {
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'error',
+                'mensaje' => "Solo quedan {$cuposDisponibles} cupos disponibles para la cantidad de personas seleccionadas."
+            ]);
+            return;
+        }
+        
+        $this->mostrarModalPago = true;
+    }
 
-        // Crear reserva directa
-        Reservas::create([
-            'fechareserva' => now(),
-            'fk_idpaquete' => $this->paquete->id,
-            'fk_idusers' => Auth::id(),
+    public function cerrarModal()
+    {
+        $this->mostrarModalPago = false;
+        $this->reset(['metodoPago', 'comprobantePago', 'notasReserva']);
+        $this->metodoPago = 'transferencia'; // valor por defecto
+    }
+
+    protected $listeners = [
+        'abrirModalPago' => 'abrirModalPago'
+    ];
+    
+    public function emitirAlerta($tipo, $mensaje)
+    {
+        $this->dispatch('mostrarAlerta', [
+            'tipo' => $tipo,
+            'mensaje' => $mensaje
         ]);
+    }
+    
+    private function calcularPrecioTotal()
+    {
+        $personasIncluidas = $this->paquete->personas_incluidas ?? 1;
+        $precioBase = $this->paquete->preciopaquete;
+        
+        // Si hay más personas que las incluidas, calcular el extra
+        if ($this->personas > $personasIncluidas) {
+            $personasExtra = $this->personas - $personasIncluidas;
+            $precioBase += $personasExtra * $this->paquete->precio_extra_persona;
+        } else {
+            $precioBase = $this->paquete->preciopaquete;
+        }
+        
+        // Aplicar descuento si hay promoción
+        if ($this->paquete->det_paquete->first()->promos) {
+            $descuento = $this->paquete->det_paquete->first()->promos->descuento;
+            $precioBase = $precioBase * (1 - $descuento / 100);
+        }
+        
+        return $precioBase;
+    }
+    
+    public function reservar()
+    {
+        $this->validate([
+            'fechaSeleccionada' => 'required|date|after_or_equal:today',
+            'personas' => 'required|numeric|min:1|max:10',
+            'metodoPago' => 'required|in:transferencia,yape,plin', // minúsculas
+            // 'comprobantePago' => 'required_if:metodoPago,yape,plin|image|max:2048', // minúsculas
+            'notasReserva' => 'nullable|string|max:500'
+        ]);
+        
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+        
+        // Verificar disponibilidad - CORREGIDO
+        $disponibilidad = $this->paquete->dis_paquete->first();
+        if (!$disponibilidad) {
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'error',
+                'mensaje' => 'No hay disponibilidad configurada para este paquete.'
+            ]);
+            return;
+        }
+        
+        $cuposDisponibles = $disponibilidad->cupo - $this->paquete->reservas->count();
+        if ($cuposDisponibles < $this->personas) {
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'error',
+                'mensaje' => "Solo quedan {$cuposDisponibles} cupos disponibles para la fecha seleccionada."
+            ]);
+            return;
+        }
+        
+        DB::beginTransaction();
+        try {
+            $precioTotal = $this->calcularPrecioTotal();
+            
+            $reserva = Reservas::create([
+                'fechareserva' => now(),
+                'fecha_viaje' => $this->fechaSeleccionada,
+                'fk_idpaquete' => $this->paquete->id,
+                'fk_idusers' => Auth::id(),
+                'cantidad_personas' => $this->personas,
+                'estado' => 'pendiente',
+                'metodo_pago' => $this->metodoPago,
+                'total_pago' => $precioTotal,
+                'notas' => $this->notasReserva
+            ]);
 
-        session()->flash('success', 'Reserva realizada con éxito');
-        return redirect()->route('reservacli');
+            // Procesar pago
+            if (in_array($this->metodoPago, ['yape', 'plin', 'transferencia'])) {
+                $rutaComprobante = $this->comprobantePago->store('comprobantes', 'public');
+                
+                Pagos::create([
+                    'metodo' => $this->metodoPago,
+                    'comprobante_pago' => $rutaComprobante,
+                    'estado' => 'pendiente',
+                    'fecha_pago' => now(),
+                    'fk_idreserva' => $reserva->id
+                ]);
+            }
+            
+            // Guardar servicios/equipos adicionales si se personalizó
+            if (!empty($this->serviciosSeleccionados)) {
+                $reserva->servicios()->attach($this->serviciosSeleccionados);
+            }
+            
+            if (!empty($this->equiposSeleccionados)) {
+                $reserva->equipos()->attach($this->equiposSeleccionados);
+            }
+            
+            $this->actualizarPremiosUsuario();
+
+            DB::commit();
+            
+            // Enviar notificación por email
+            // Auth::user()->notify(new ReservaCreada($reserva));
+            
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'success',
+                'mensaje' => '¡Reserva realizada con éxito!'
+            ]);
+            
+            return redirect()->route('reservacli');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'error',
+                'mensaje' => 'Error al procesar la reserva: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    private function actualizarPremiosUsuario()
+    {
+        // Buscar o crear registro de premios para el usuario
+        $premioUsuario = \App\Models\premios::firstOrCreate(
+            ['fk_iduser' => Auth::id()],
+            [
+                'cantidad_reservas' => 0,
+                'premios_disponibles' => 0,
+                'premios_usados' => 0
+            ]
+        );
+        
+        // Incrementar la cantidad de reservas
+        $premioUsuario->increment('cantidad_reservas');
+        
+        // Lógica de premios: cada 5 reservas = 1 premio disponible
+        if ($premioUsuario->cantidad_reservas % 5 == 0) {
+            $premioUsuario->increment('premios_disponibles');
+            
+            // Opcional: Notificar al usuario que tiene un premio disponible
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'success',
+                'mensaje' => '¡Felicidades! Has ganado un premio por completar ' . $premioUsuario->cantidad_reservas . ' reservas.'
+            ]);
+        }
+    }
+
+    public function validarCampos()
+    {
+        $errores = [];
+        
+        if (!$this->fechaSeleccionada) {
+            $errores[] = 'Debes seleccionar una fecha de viaje';
+        }
+        
+        if (!$this->personas || $this->personas < 1 || $this->personas > 10) {
+            $errores[] = 'Ingresa un número válido de personas (1-10)';
+        }
+        
+        // Verificar disponibilidad - CORREGIDO
+        $disponibilidad = $this->paquete->dis_paquete->first();
+        if ($disponibilidad) {
+            $cuposDisponibles = $disponibilidad->cupo - $this->paquete->reservas->count();
+            if ($cuposDisponibles < $this->personas) {
+                $errores[] = "Solo quedan {$cuposDisponibles} cupos disponibles";
+            }
+        } else {
+            $errores[] = "No hay disponibilidad configurada para este paquete";
+        }
+        
+        if (!empty($errores)) {
+            $this->dispatch('validationError', [
+                'mensaje' => implode('. ', $errores)
+            ]);
+            return false;
+        }
+        
+        return true;
     }
 
     public function personalizarPaquete()
@@ -147,45 +399,12 @@ class DetallePaquete extends Component
         return redirect()->route('mis-reservas');
     }
 
-    private function calcularPrecioTotal()
-    {
-        $precioBase = $this->paquete->preciopaquete * $this->personas;
-
-        // Añadir servicios adicionales
-        $servicios = $this->paquete->ser_paquete
-            ->whereIn('servicio.id', $this->serviciosSeleccionados)
-            ->pluck('servicio');
-
-        foreach ($servicios as $servicio) {
-            $precioBase += $servicio->Det_servicio->precio_servicio ?? 0;
-        }
-
-        // Añadir equipos adicionales
-        $equipos = $this->paquete->equi_paquete
-            ->whereIn('equipo.id', $this->equiposSeleccionados)
-            ->pluck('equipo');
-
-        foreach ($equipos as $equipo) {
-            $precioBase += $equipo->Det_equipo->precio_equipo ?? 0;
-        }
-
-        return $precioBase;
-    }
-
     public function render()
     {
         return view('livewire.paquetes.detalle-paquete')
             ->layout(auth()->check() ? 'layouts.prueba' : 'layouts.guest')
             ->title($this->paquete->nombrepaquete ?? 'Detalle del Paquete');
     }
-
-
-
-
-
-
-
-
 
     public $whatsappActivo = false;
 

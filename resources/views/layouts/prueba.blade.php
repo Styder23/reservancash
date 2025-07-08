@@ -1,3 +1,44 @@
+<?php
+// Configuración del sistema de recompensas
+$max_reservas_premio = 5; // numero de reservas
+$reservas_confirmadas = 0;
+$reservas_pendientes_empresa = 0;
+$premio_disponible = false;
+
+// Obtener datos según el tipo de usuario
+if (session('user_type') == 'cliente') {
+    // Obtener datos del modelo premios
+    $premio_usuario = App\Models\premios::where('fk_iduser', Auth::id())->first();
+
+    if ($premio_usuario) {
+        $reservas_confirmadas = $premio_usuario->cantidad_reservas;
+    }
+
+    // Verificar si tiene premio disponible
+    $premio_disponible = $reservas_confirmadas >= $max_reservas_premio;
+} elseif (session('user_type') == 'empresa') {
+    // Consulta para reservas pendientes de la empresa
+    $reservas_pendientes_empresa =
+        DB::select(
+            "
+        SELECT COUNT(*) AS reservas 
+        FROM reservas r 
+        JOIN paquetes pa ON pa.id = r.fk_idpaquete 
+        JOIN empresas e ON e.id = pa.fk_idempresa 
+        JOIN representante_legal rp ON rp.fk_idempresa = e.id 
+        JOIN personas p ON p.id = rp.fk_idpersona 
+        JOIN users u ON u.fk_idpersona = p.id 
+        WHERE r.estado = 'pendiente' 
+        AND u.id = ?
+    ",
+            [Auth::id()],
+        )[0]->reservas ?? 0;
+}
+
+// Calcular porcentaje de progreso
+$porcentaje_progreso = min(($reservas_confirmadas / $max_reservas_premio) * 100, 100);
+?>
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -14,7 +55,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -23,7 +64,6 @@
 
     <!-- WIRE UI -->
     <wireui:scripts />
-    {{-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
     <!-- Responsive: Ajustar sidebar en móvil -->
     <style>
         @media (max-width: 768px) {
@@ -85,13 +125,6 @@
                                 <span x-show="sidebarOpen" class="ml-3">Mi Dashboard</span>
                             </a>
                         </li>
-                        {{-- <li>
-                            <a href="{{ route('destinos') }}"
-                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('destinos') ? 'bg-purple-600' : '' }}">
-                                <i class="fas fa-map-marked-alt w-5"></i>
-                                <span x-show="sidebarOpen" class="ml-3">Destinos</span>
-                            </a>
-                        </li> --}}
                         <li>
                             <a href="{{ route('paquetes') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
@@ -151,13 +184,6 @@
                                 <span x-show="sidebarOpen" class="ml-3">Mi Perfil</span>
                             </a>
                         </li>
-                        {{-- <li>
-                            <a href="{{ route('det_destinos') }}"
-                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
-                                <i class="fas fa-tools w-5"></i>
-                                <span x-show="sidebarOpen" class="ml-3">Mis Destinos</span>
-                            </a>
-                        </li> --}}
                         <li>
                             <a href="{{ route('det_servicios') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
@@ -187,7 +213,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#"
+                            <a href="{{ route('reservaempre') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
                                 <i class="fas fa-clipboard-list w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Reservas</span>
@@ -264,7 +290,6 @@
             <header class="bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500 shadow-lg">
                 <div class="px-6 py-4">
                     <div class="flex items-center justify-between">
-
                         <!-- Título de la página actual -->
                         <div class="flex items-center space-x-4">
                             <h1 class="text-2xl font-bold text-white">
@@ -290,12 +315,104 @@
 
                         <!-- Información del Usuario -->
                         <div class="flex items-center space-x-4">
-                            <!-- Notificaciones (opcional) -->
-                            <button class="relative p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
-                                <i class="fas fa-bell text-lg"></i>
-                                <span
-                                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                            </button>
+                            <!-- Notificaciones -->
+                            <div class="relative" x-data="{ notificationsOpen: false }">
+                                <button @click="notificationsOpen = !notificationsOpen"
+                                    class="relative p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+                                    <i class="fas fa-bell text-lg"></i>
+                                    @if (session('user_type') == 'cliente')
+                                        @if ($premio_disponible)
+                                            <span
+                                                class="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                                                <i class="fas fa-gift text-xs"></i>
+                                            </span>
+                                        @endif
+                                    @elseif (session('user_type') == 'empresa')
+                                        @if ($reservas_pendientes_empresa >= 0)
+                                            <span
+                                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                                {{ $reservas_pendientes_empresa }}
+                                            </span>
+                                        @endif
+                                    @endif
+                                </button>
+
+                                <!-- Dropdown de Notificaciones -->
+                                <div x-show="notificationsOpen" @click.away="notificationsOpen = false"
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75"
+                                    x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-95"
+                                    class="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-1 z-50">
+
+                                    <div class="px-4 py-2 text-xs text-gray-400 border-b">
+                                        Notificaciones
+                                    </div>
+
+                                    @if (session('user_type') == 'cliente')
+                                        @if ($premio_disponible)
+                                            <div class="px-4 py-3 border-l-4 border-yellow-500 bg-yellow-50">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-gift text-yellow-600 mr-3"></i>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-yellow-800">
+                                                            ¡Felicidades! 🎉
+                                                        </p>
+                                                        <p class="text-xs text-yellow-600">
+                                                            Ganaste un paquete gratis con {{ $reservas_confirmadas }}
+                                                            reservas confirmadas
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <a href="{{ route('premios') }}"
+                                                        class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white text-xs font-medium rounded-md hover:bg-yellow-600 transition-colors">
+                                                        <i class="fas fa-hand-paper mr-1"></i>
+                                                        Reclamar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="px-4 py-3 text-sm text-gray-600">
+                                                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                                Llevas {{ $reservas_confirmadas }} de {{ $max_reservas_premio }}
+                                                reservas para tu premio
+                                            </div>
+                                        @endif
+                                    @elseif (session('user_type') == 'empresa')
+                                        @if ($reservas_pendientes_empresa > 0)
+                                            <div class="px-4 py-3">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-clock text-orange-500 mr-3"></i>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-gray-800">
+                                                            Reservas Pendientes
+                                                        </p>
+                                                        <p class="text-xs text-gray-600">
+                                                            Tienes {{ $reservas_pendientes_empresa }} reservas
+                                                            esperando confirmación
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <a href="{{ route('reservaempre') }}"
+                                                        class="inline-flex items-center px-3 py-1 bg-orange-500 text-white text-xs font-medium rounded-md hover:bg-orange-600 transition-colors">
+                                                        <i class="fas fa-eye mr-1"></i>
+                                                        Ver Reservas
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="px-4 py-3 text-sm text-gray-600">
+                                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                                No tienes reservas pendientes
+                                            </div>
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
 
                             <!-- Dropdown del Usuario -->
                             <div class="relative" x-data="{ userMenuOpen: false }">
@@ -319,7 +436,7 @@
                                         @endif
                                     </div>
 
-                                    <i class="fas fa-chevron-down text-sm" :class={'rotate-180': userMenuOpen}"></i>
+                                    <i class="fas fa-chevron-down text-sm" :class="{ 'rotate-180': userMenuOpen }"></i>
                                 </button>
 
                                 <!-- Dropdown Menu -->
@@ -369,6 +486,46 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Barra de Progreso para Clientes -->
+                @if (session('user_type') == 'cliente')
+                    <div class="px-6 pb-4">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-trophy text-yellow-400"></i>
+                                    <span class="text-white font-medium text-sm">Programa de Recompensas</span>
+                                </div>
+                                <span class="text-white/80 text-sm">
+                                    {{ $reservas_confirmadas }}/{{ $max_reservas_premio }}
+                                </span>
+                            </div>
+
+                            <div class="w-full bg-white/20 rounded-full h-3 mb-2">
+                                <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500 ease-out relative overflow-hidden"
+                                    style="width: {{ $porcentaje_progreso }}%">
+                                    @if ($porcentaje_progreso > 0)
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-pulse">
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="text-xs text-white/80 text-center">
+                                @if ($premio_disponible)
+                                    <span class="text-yellow-300 font-medium">
+                                        <i class="fas fa-star mr-1"></i>
+                                        ¡Premio desbloqueado! Reclama tu paquete gratis
+                                    </span>
+                                @else
+                                    Te faltan {{ $max_reservas_premio - $reservas_confirmadas }} reservas para tu
+                                    premio
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </header>
 
             <!-- Contenido de la Página -->
@@ -392,8 +549,6 @@
         x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
     </div>
-
-
 
 </body>
 

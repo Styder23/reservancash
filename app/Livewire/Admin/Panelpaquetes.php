@@ -30,16 +30,32 @@ class Panelpaquetes extends Component
 {
     use WithFileUploads;
 
+    // Datos del destino
+    public $destino_id;
+    public $namedestino;
+    public $descripciondestino;
+    public $ubicaciondestino;
+    public $fk_iddistrito;
+    public $fk_idtipodestino;
+    public $destinos=[];
+    public $destinos_filtrados = [];
+    public $buscar_destino = '';
+
     // Datos del paquete principal
+    public $paqueteId;
     public $nombrepaquete = '';
     public $preciopaquete = 0;
-    public $cantidadpaquete = '';
     public $descripcion = '';
     public $imagen_principal;
     public $estado = 'activo';
     public $fk_idempresa;
     public $paquetes;
-    public $destinos;
+    public $personas_incluidas;
+    public $precioextra_porpersona;    
+
+    // Destinos seleccionados
+    public $destino_seleccionado = null;
+    public $mostrar_crear_destino = false;
 
     // Datos del detalle del paquete
     public $descripciondetalle;
@@ -115,7 +131,6 @@ class Panelpaquetes extends Component
     protected $rules = [
         'nombrepaquete' => 'required|string|max:255',
         'preciopaquete' => 'required|numeric|min:0',
-        'cantidadpaquete' => 'required|integer|min:1',
         'descripcion' => 'nullable|string',
         'descripciondetalle' => 'required|string|max:255',
         'fk_iddestino' => 'required|exists:destinos,id',
@@ -132,7 +147,6 @@ class Panelpaquetes extends Component
     protected $messages = [
         'nombrepaquete.required' => 'El nombre del paquete es obligatorio',
         'preciopaquete.required' => 'El precio del paquete es obligatorio',
-        'cantidadpaquete.required' => 'La cantidad del paquete es obligatoria',
         'fk_iddestino.required' => 'Debe seleccionar un destino',
         // 'servicios_seleccionados.required' => 'Debe seleccionar al menos un servicio',
         // 'equipos_seleccionados.required' => 'Debe seleccionar al menos un equipo',
@@ -153,8 +167,102 @@ class Panelpaquetes extends Component
         $this->cargarRutas();
         $this->cargarParadas();
         $this->cargarItinerarios();
+        $this->cargarDestinosEmpresa();
+    }
+    
+    // apartado de funciones para el destino por empresa
+    public function cargarDestinosEmpresa()
+    {
+        if ($this->empresaId) {
+            $this->destinos = Destinos::where('fk_idempresa', $this->empresaId)
+                ->with(['tipoDestino', 'distrito.provincia'])
+                ->get();
+            $this->destinos_filtrados = $this->destinos;
+        }
     }
 
+    public function seleccionarDestino($destinoId)
+    {
+        $this->destino_seleccionado = Destinos::with(['tipoDestino', 'distrito.provincia'])
+            ->find($destinoId);
+        $this->destino_id = $destinoId;
+        
+        // Emitir evento o mostrar mensaje de confirmación
+        $this->dispatch('destinoSeleccionado', $this->destino_seleccionado->namedestino);
+    }
+
+    public function toggleCrearDestino()
+    {
+        $this->mostrar_crear_destino = !$this->mostrar_crear_destino;
+        
+        if (!$this->mostrar_crear_destino) {
+            // Limpiar formulario al cancelar
+            $this->reset(['namedestino', 'descripciondestino', 'ubicaciondestino', 'fk_iddistrito', 'fk_idtipodestino']);
+        }
+    }
+
+    public function crearDestino()
+    {
+        $this->validate([
+            'namedestino' => 'required|string|max:255',
+            'descripciondestino' => 'required|string',
+            'fk_iddistrito' => 'required|exists:distritos,id',
+            'fk_idtipodestino' => 'required|exists:tipo_destinos,id',
+            'ubicaciondestino'=>'required|string|max:255',
+        ]);
+        
+        if (!$this->empresaId) {
+            session()->flash('error', 'No se pudo identificar la empresa.');
+            return;
+        }
+        
+        try {
+            $destino = Destinos::create([
+                'namedestino' => $this->namedestino,
+                'descripciondestino' => $this->descripciondestino,
+                'imagenes'=> '[]',
+                'ubicaciondestino' => $this->ubicaciondestino,
+                'fk_iddistrito' => $this->fk_iddistrito,
+                'fk_idtipodestino' => $this->fk_idtipodestino,
+                'fk_idempresa' => $this->empresaId, // Usar empresaId
+            ]);
+            
+            // Recargar destinos y seleccionar el nuevo
+            $this->cargarDestinosEmpresa();
+            $this->seleccionarDestino($destino->id);
+            
+            // Limpiar formulario
+            $this->mostrar_crear_destino = false;
+            $this->reset(['namedestino', 'descripciondestino', 'ubicaciondestino', 'fk_iddistrito', 'fk_idtipodestino']);
+            
+            session()->flash('success', 'Destino creado exitosamente.');
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al crear el destino: ' . $e->getMessage());
+        }
+    }
+    
+    public function updatedBuscarDestino()
+    {
+        if (empty($this->buscar_destino)) {
+            $this->destinos_filtrados = $this->destinos;
+        } else {
+            $this->destinos_filtrados = $this->destinos->filter(function ($destino) {
+                return stripos($destino->namedestino, $this->buscar_destino) !== false ||
+                    stripos($destino->tipoDestino->nametipo_destinos, $this->buscar_destino) !== false ||
+                    stripos($destino->distrito->namedistrito, $this->buscar_destino) !== false;
+            });
+        }
+    }
+
+    public function limpiarSeleccionDestino()
+    {
+        $this->destino_seleccionado = null;
+        $this->destino_id = null;
+    }
+    
+    // fin creacion de destinos
+    
     public function obtenerEmpresaUsuario()
     {
         $userId = auth()->id();
@@ -275,7 +383,6 @@ class Panelpaquetes extends Component
             'tab_activo',
             'nombrepaquete',
             'preciopaquete',
-            'cantidadpaquete',
             'descripcion',
         ]);
     }
@@ -302,11 +409,12 @@ class Panelpaquetes extends Component
         $this->reset([
             'nombrepaquete',
             'preciopaquete',
-            'cantidadpaquete',
             'descripcion',
             'imagen_principal',
             'estado',
             'descripciondetalle',
+            'personas_incluidas',
+            'precioextra_porpersona',
             'fk_iddestino',
             'fk_idpromociones',
             'servicios_seleccionados',
@@ -322,7 +430,8 @@ class Panelpaquetes extends Component
             'modoEdicion'
         ]);
         
-        $this->tab_activo = 'general';
+        $this->tab_activo = 'destino';
+        $this->mostrar_crear_destino = false;
         $this->imagenes_adicionales = [];
         $this->disponibilidades = [];
         $this->servicios_seleccionados = [];
@@ -380,14 +489,14 @@ class Panelpaquetes extends Component
 
     // funciones para el apartado de itinerarios
     
-    public function agregarItinerario($paqueteId)
+    public function agregarItinerario($id)
     {
-        $this->paquete_para_itinerario = $paqueteId;
+        $this->paqueteId = $id;
         $this->mostrar_formulario_itinerario = true;
         $this->limpiarFormularioItinerario();
         
         // Si ya hay itinerarios para este paquete, cargarlos
-        $this->itinerarios = Itinerarios::where('fk_idpaquete', $paqueteId)->get();
+        $this->itinerarios = Itinerarios::where('fk_idpaquete', $id)->get();
     }
 
     public function cerrarFormularioItinerario(){
@@ -470,7 +579,7 @@ class Panelpaquetes extends Component
         }
     }
 
-    // Funciones para cargar datos
+    // Funciones para cargar datos 
     private function cargarRutas()
     {
         $this->rutas = DB::table('rutas')->get();
@@ -645,6 +754,14 @@ class Panelpaquetes extends Component
     {
         $this->dispatch('disableSaveButton');
         
+        // Validar que se haya seleccionado un destino
+        if (!$this->destino_seleccionado) {
+            session()->flash('error', 'Debes seleccionar o crear un destino primero');
+            $this->dispatch('enableSaveButton');
+            return;
+        }
+
+        // Obtener empresa del usuario autenticado
         $userId = auth()->id();
         $empresa = DB::table('users')
             ->join('personas', 'personas.id', '=', 'users.fk_idpersona')
@@ -656,66 +773,84 @@ class Panelpaquetes extends Component
 
         if (!$empresa) {
             session()->flash('error', 'No se encontró la empresa asociada a este usuario');
+            $this->dispatch('enableSaveButton');
             return;
         }
 
-        $this->validate();
+        // Validaciones adicionales
+        $this->validate([
+            'nombrepaquete' => 'required|string|max:255',
+            'preciopaquete' => 'required|numeric|min:0',
+            'descripcion' => 'required|string',
+            'descripciondetalle' => 'required|string',
+            'personas_incluidas' => 'required|integer|min:1',
+            'precioextra_porpersona' => 'required|numeric|min:0',
+            'servicios_seleccionados' => 'required|array|min:1',
+            'equipos_seleccionados' => 'required|array|min:1',
+            'disponibilidades' => 'required|array|min:1',
+            'imagen_principal' => 'nullable|image|max:2048', // 2MB máximo
+        ]);
 
         try {
             DB::beginTransaction();
 
+            // Verificar si ya existe un paquete con el mismo nombre para esta empresa
             $paqueteExistente = Paquetes::where('nombrepaquete', $this->nombrepaquete)
-            ->where('fk_idempresa', $empresa->id)
-            ->first();
+                ->where('fk_idempresa', $empresa->id)
+                ->first();
             
             if ($paqueteExistente) {
-                throw new \Exception('Ya existe un paquete con este nombre');
+                throw new \Exception('Ya existe un paquete con este nombre en tu empresa');
             }
 
-            // Crear el paquete principal
+            // Guardar imagen principal
             $imagen_principal_path = null;
             if ($this->imagen_principal) {
                 $imagen_principal_path = $this->imagen_principal->store('paquetes', 'public');
             }
 
+            // Crear el paquete principal
             $paquete = Paquetes::create([
                 'preciopaquete' => $this->preciopaquete,
                 'nombrepaquete' => $this->nombrepaquete,
-                'cantidadpaquete' => $this->cantidadpaquete,
                 'descripcion' => $this->descripcion,
                 'imagen_principal' => $imagen_principal_path,
                 'estado' => $this->estado,
                 'fk_idempresa' => $empresa->id,
+                'personas_incluidas' => $this->personas_incluidas,
+                'precioextra_porpersona' => $this->precioextra_porpersona,
             ]);
+            
+            $this->paqueteId = $paquete->id;
+            // Calcular precios
+            $precio_servicios = $this->calcularPrecioServicios();
+            $precio_equipos = $this->calcularPrecioEquipos();
+            $precio_total = $this->preciopaquete + $precio_servicios + $precio_equipos;
+            
+            // Aplicar descuento si hay promoción
+            if ($this->fk_idpromociones) {
+                $promocion = Promociones::find($this->fk_idpromociones);
+                if ($promocion) {
+                    $precio_total = $precio_total * (1 - ($promocion->descuento / 100));
+                }
+            }
 
             // Crear el detalle del paquete
-            $precio_total = $this->calcularPrecioTotal();
-            
             DetallePaquetes::create([
                 'descripciondetalle' => $this->descripciondetalle,
-                'precioequipo' => $this->calcularPrecioEquipos(),
-                'precioservicio' => $this->calcularPrecioServicios(),
+                'precioequipo' => $precio_equipos,
+                'precioservicio' => $precio_servicios,
                 'preciototal' => $precio_total,
                 'fk_idpaquete' => $paquete->id,
-                'fk_iddestino' => $this->fk_iddestino,
+                'fk_iddestino' => $this->destino_seleccionado->id,
                 'fk_idpromociones' => $this->fk_idpromociones ?: null,
             ]);
 
-            // Asociar servicios
-            foreach ($this->servicios_seleccionados as $servicio_id) {
-                DB::table('paquete_servicio')->insert([
-                    'fk_idpaquete' => $paquete->id,
-                    'fk_idservicio' => $servicio_id ?? null,
-                ]);
-            }
+            // Asociar servicios (usando sync para mejor manejo)
+            $paquete->servicios()->sync($this->servicios_seleccionados);
 
-            // Asociar equipos
-            foreach ($this->equipos_seleccionados as $equipo_id) {
-                DB::table('paquete_equipo')->insert([
-                    'fk_idpaquete' => $paquete->id,
-                    'fk_idequipo' => $equipo_id ?? null,
-                ]);
-            }
+            // Asociar equipos (usando sync para mejor manejo)
+            $paquete->equipos()->sync($this->equipos_seleccionados);
 
             // Crear disponibilidades
             foreach ($this->disponibilidades as $disponibilidad) {
@@ -728,46 +863,41 @@ class Panelpaquetes extends Component
             }
 
             // Guardar imágenes adicionales
-            foreach ($this->imagenes_adicionales as $imagen) {
-                if ($imagen) {
+            if ($this->imagenes_adicionales) {
+                foreach ($this->imagenes_adicionales as $imagen) {
                     $ruta = $imagen->store('paquetes/adicionales', 'public');
                     
-                    // Usando la tabla polimórfica
                     imagenes::create([
                         'url' => $ruta,
-                        'tipo' => 'secundaria',
+                        'tipo' => $this->tipos_imagenes[$imagen->getClientOriginalName()] ?? 'secundaria',
                         'imageable_id' => $paquete->id,
                         'imageable_type' => Paquetes::class,
                     ]);
                 }
             }
 
-            // // Guardar itinerarios si existen datos
-            // if ($this->itinerario_dia && $this->itinerario_hora_inicio) {
-            //     $this->guardarItinerario($paquete->id);
-            // }
-
             DB::commit();
-            $this->mostrarModal = false;
-            session()->flash('mensaje', 'Paquete creado exitosamente con su itinerario.');
-            $this->resetearFormularioCompleto(); // Nueva función para resetear todo            
+            
+            // Resetear y mostrar mensaje de éxito
+            $this->resetearFormularioCompleto();
+            session()->flash('success', 'Paquete creado exitosamente');
+            return redirect()->route('det_paquetes'); // O la ruta que corresponda
             
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error al crear el paquete: ' . $e->getMessage());
-        } finally {
             $this->dispatch('enableSaveButton');
         }
     }
 
     // Función separada para manejar los itinerarios
-    protected function guardarItinerario($paqueteId)
+    public function guardarItinerario()
     {
         $this->validate([
             'itinerario_dia' => 'required|string',
             'itinerario_hora_inicio' => 'required|date_format:H:i',
             'itinerario_hora_fin' => 'nullable|date_format:H:i|after:itinerario_hora_inicio',
-            'rutas_seleccionadas' => 'required|array|min:1' // Cambiado de 'sometimes' a 'required'
+            'rutas_seleccionadas' => 'required|array|min:1'
         ]);
         
         $itinerario = Itinerarios::create([
@@ -775,24 +905,24 @@ class Panelpaquetes extends Component
             'hora_inicio' => $this->itinerario_hora_inicio,
             'hora_fin' => $this->itinerario_hora_fin,
             'descripcion' => $this->itinerario_descripcion,
-            'fk_idpaquete' => $paqueteId,
+            'fk_idpaquete' => $this->paqueteId, // Usar la propiedad del componente
         ]);
 
         if (!empty($this->rutas_seleccionadas)) {
             foreach ($this->rutas_seleccionadas as $ruta) {
-                // Verificar si la ruta existe
                 if (!isset($ruta['id'])) continue;
 
-                // Crear relación itinerario-ruta
                 itinerarioxruta::create([
                     'fk_iditinerario' => $itinerario->id,
                     'fk_idruta' => $ruta['id'],
                 ]);
 
-                // Guardar paradas para la ruta si no existen
                 $this->guardarParadasParaRuta($ruta);
             }
         }
+
+        session()->flash('success', 'Itinerario guardado exitosamente');
+        
     }
 
     // para jalar toda la info solo de paquetes nada mas
@@ -801,7 +931,6 @@ class Panelpaquetes extends Component
         return [
             'nombrepaquete' => $this->nombrepaquete,
             'preciopaquete' => $this->preciopaquete,
-            'cantidadpaquete' => $this->cantidadpaquete,
             'descripcion' => $this->descripcion,
             'descripciondetalle' => $this->descripciondetalle,
             'fk_iddestino' => $this->fk_iddestino,
@@ -863,7 +992,6 @@ class Panelpaquetes extends Component
             $this->paquete_editando_id = $paquete->id;
             $this->nombrepaquete = $paquete->nombrepaquete;
             $this->preciopaquete = $paquete->preciopaquete;
-            $this->cantidadpaquete = $paquete->cantidadpaquete;
             $this->descripcion = $paquete->descripcion;
             $this->estado = $paquete->estado;
 
@@ -959,7 +1087,6 @@ class Panelpaquetes extends Component
             $dataPaquete = [
                 'nombrepaquete' => $this->nombrepaquete,
                 'preciopaquete' => $this->preciopaquete,
-                'cantidadpaquete' => $this->cantidadpaquete,
                 'descripcion' => $this->descripcion,
                 'estado' => $this->estado,
             ];
@@ -1123,7 +1250,7 @@ class Panelpaquetes extends Component
 
     public function getNextTab($currentTab)
     {
-        $tabs = ['general', 'servicios', 'disponibilidad', 'imagenes', 'itinerario'];
+        $tabs = ['destino','general', 'servicios', 'disponibilidad', 'imagenes', 'itinerario'];
         $currentIndex = array_search($currentTab, $tabs);
         
         if ($currentIndex !== false && $currentIndex < count($tabs) - 1) {
@@ -1135,7 +1262,7 @@ class Panelpaquetes extends Component
 
     public function getPreviousTab($currentTab)
     {
-        $tabs = ['general', 'servicios', 'disponibilidad', 'imagenes', 'itinerario'];
+        $tabs = ['destino', 'general', 'servicios', 'disponibilidad', 'imagenes', 'itinerario'];
         $currentIndex = array_search($currentTab, $tabs);
         
         if ($currentIndex !== false && $currentIndex > 0) {

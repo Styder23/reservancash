@@ -52,6 +52,10 @@ class User extends Authenticatable
         return $this->belongsTo(TipoUsuarios::class, 'fk_idtipousu');
     }
 
+    public function premios()
+    {
+        return $this->hasOne(premios::class, 'fk_iduser');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -12,7 +12,14 @@ class Reservas extends Model
     protected $table = 'reservas';
 
     protected $fillable = [
-        'fechareserva','fk_idpaquete','fk_idusers'	
+        'fechareserva','fecha_viaje','fk_idpaquete','fk_idusers','cantidad_personas','estado','metodo_pago',
+        'total_pago','notas','motivo_cliente','fecha_solicitud_cancelacion'	
+    ];
+    
+    protected $dates = [
+        'fechareserva',
+        'fecha_viaje',
+        'created_at'
     ];
 
     public function paquete(){
@@ -20,6 +27,11 @@ class Reservas extends Model
     }
 
     public function users(){
-        return $this->belongsTo(Users::class, 'fk_idusers');
+        return $this->belongsTo(User::class, 'fk_idusers');
+    }
+
+    public function pago()
+    {
+        return $this->hasOne(Pagos::class, 'fk_idreserva');
     }
 }

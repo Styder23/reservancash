@@ -12,7 +12,8 @@ class Empresas extends Model
     protected $table = 'empresas';
 
     protected $fillable = [
-        'nameempresa','rucempresa','razonsocial','direccionempresa','telefonoempresa','logoempresa'
+        'nameempresa','rucempresa','razonsocial','direccionempresa','telefonoempresa','logoempresa',
+        'nombrebanco','numero_cuenta','numero_cci','qr_yape','qr_plin'
     ];
 
     public function paquete()

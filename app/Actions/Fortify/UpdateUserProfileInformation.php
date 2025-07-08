@@ -27,9 +27,13 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
 
-        // Si es empresa, agregar reglas para el video
         if ($user->tipousu && $user->tipousu->id == 2) {
             $rules['company_video'] = ['nullable', 'mimetypes:video/mp4,video/quicktime', 'max:5120'];
+            $rules['bank_name'] = ['nullable', 'string', 'max:255'];
+            $rules['account_type'] = ['nullable', 'string', 'max:255'];
+            $rules['account_number'] = ['nullable', 'string', 'max:255'];
+            $rules['account_holder'] = ['nullable', 'string', 'max:255'];
+            $rules['routing_number'] = ['nullable', 'string', 'max:255'];
         }
 
         Validator::make($input, $rules)->validateWithBag('updateProfileInformation');
@@ -39,9 +43,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user->updateProfilePhoto($input['photo']);
         }
 
-        // Si es empresa, manejar video
+        // Si es empresa, manejar video y datos bancarios
         if ($user->tipousu && $user->tipousu->id == 2) {
             $this->handleCompanyUpdates($user, $input);
+            $this->handleBankUpdates($user, $input);
         }
 
         // Actualizar email y nombre
@@ -54,7 +59,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             ])->save();
         }
 
-        // Actualizar datos de persona asociada
         if ($user->persona) {
             $personaData = [
                 'nombre' => $input['name'],
@@ -66,6 +70,23 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         }
     }
 
+    protected function handleBankUpdates(User $user, array $input): void
+    {
+        $empresa = $user->persona->empresa->first()?->empresa;
+        
+        if ($empresa) {
+            $bankData = [
+                'banco_nombre' => $input['bank_name'] ?? null,
+                'tipo_cuenta' => $input['account_type'] ?? null,
+                'numero_cuenta' => $input['account_number'] ?? null,
+                'titular_cuenta' => $input['account_holder'] ?? null,
+                'numero_ruta' => $input['routing_number'] ?? null,
+            ];
+            
+            $empresa->update($bankData);
+        }
+    }
+    
     protected function handleCompanyUpdates(User $user, array $input): void
     {
         $empresa = $user->persona->empresa->first()?->empresa;

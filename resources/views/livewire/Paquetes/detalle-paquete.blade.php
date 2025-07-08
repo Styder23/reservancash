@@ -1,24 +1,15 @@
-<script>
-    window.lightbox = function() {
-        return {
-            lightboxOpen: false,
-            lightboxIndex: 0,
-            lightboxImages: [
-                @if ($paquete->imagen_principal)
-                    "{{ asset('storage/' . $paquete->imagen_principal) }}",
-                @endif
-                @foreach ($paquete->imagenes as $imagen)
-                    "{{ asset('storage/' . $imagen->url) }}",
-                @endforeach
-            ],
-            openLightbox(index) {
-                this.lightboxIndex = index;
-                this.lightboxOpen = true;
-            }
-        }
-    }
-</script>
 <div>
+
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
     <!-- Header del Paquete -->
     <div class="relative h-48 bg-gradient-to-r from-blue-900 to-blue-700">
         <div class="absolute inset-0 bg-black opacity-40"></div>
@@ -37,11 +28,9 @@
 
     <div class="container mx-auto px-4 py-8">
         <div class="grid lg:grid-cols-3 gap-8">
+
             <!-- Contenido Principal -->
             <div class="lg:col-span-2">
-
-
-
                 <!-- Galería de Imágenes -->
                 <div class="mb-8" x-data="lightbox()">
                     <!-- Grid de miniaturas -->
@@ -67,7 +56,7 @@
                             @endphp
 
                             @if ($key < $maxVisibleImages)
-                                <div class="relative group">
+                                <div class="relative group h-full">
                                     <img src="{{ asset('storage/' . $imagen->url) }}" alt="Imagen del paquete"
                                         class="w-full h-full object-cover rounded-lg cursor-pointer transition-opacity duration-300 group-hover:opacity-90"
                                         @click="openLightbox({{ $realIndex }})">
@@ -92,20 +81,20 @@
                         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
                         x-transition:leave-end="opacity-0"
                         class="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4" x-cloak
-                        @click.away="lightboxOpen = false" @keydown.escape.window="lightboxOpen = false">
+                        @click.away="closeLightbox()" @keydown.escape.window="closeLightbox()">
 
                         <div class="relative w-full max-w-6xl h-full max-h-screen flex flex-col">
                             <!-- Controles superiores -->
                             <div class="flex justify-between items-center mb-4">
                                 <!-- Contador de imágenes -->
-                                <div class="text-white text-lg">
+                                <div class="text-white text-lg font-medium">
                                     <span x-text="lightboxIndex + 1"></span> / <span
                                         x-text="lightboxImages.length"></span>
                                 </div>
 
                                 <!-- Botón cerrar -->
-                                <button @click="lightboxOpen = false"
-                                    class="text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50">
+                                <button @click.stop="closeLightbox()"
+                                    class="text-white hover:text-gray-300 p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -115,18 +104,31 @@
                             </div>
 
                             <!-- Contenedor principal de imagen -->
-                            <div class="relative flex-1 flex items-center">
+                            <div class="relative flex-1 flex items-center justify-center">
                                 <!-- Imagen actual con transición -->
-                                <div class="w-full h-full flex items-center justify-center">
+                                {{-- <div class="w-full h-full flex items-center justify-center">
                                     <img :src="lightboxImages[lightboxIndex]"
                                         class="max-w-full max-h-full object-contain transition-opacity duration-300"
-                                        :class="{ 'opacity-100': currentImageLoaded, 'opacity-0': !currentImageLoaded }"
+                                        :class="{
+                                            'opacity-100 visible': currentImageLoaded,
+                                            'opacity-0 invisible': !currentImageLoaded
+                                        }"
                                         @load="currentImageLoaded = true">
                                 </div>
+                                <!-- Loading spinner -->
+                                <div x-show="!currentImageLoaded"
+                                    class="absolute inset-0 flex items-center justify-center">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                                </div>
+                                <!-- Navegación anterior -->
+                                <div x-show="!currentImageLoaded"
+                                    class="absolute inset-0 flex items-center justify-center">
+                                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                                </div> --}}
 
                                 <!-- Navegación anterior -->
                                 <button x-show="lightboxIndex > 0" @click="prevImage()"
-                                    class="absolute left-0 md:-left-12 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all duration-200">
+                                    class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all duration-200 z-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -136,7 +138,7 @@
 
                                 <!-- Navegación siguiente -->
                                 <button x-show="lightboxIndex < lightboxImages.length - 1" @click="nextImage()"
-                                    class="absolute right-0 md:-right-12 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all duration-200">
+                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all duration-200 z-10">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -146,14 +148,14 @@
                             </div>
 
                             <!-- Miniaturas de navegación -->
-                            <div class="mt-4 flex overflow-x-auto py-2 space-x-2" x-show="lightboxImages.length > 1">
+                            <div class="mt-4 flex overflow-x-auto py-2 space-x-2 scrollbar-hide"
+                                x-show="lightboxImages.length > 1">
                                 <template x-for="(image, index) in lightboxImages" :key="index">
-                                    <button @click="lightboxIndex = index"
+                                    <button @click="lightboxIndex = index; preloadImage(image)"
                                         class="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200"
                                         :class="{
-                                            'border-purple-500': lightboxIndex ===
-                                                index,
-                                            'border-transparent': lightboxIndex !== index
+                                            'border-blue-500 ring-2 ring-blue-300': lightboxIndex === index,
+                                            'border-gray-600 hover:border-gray-400': lightboxIndex !== index
                                         }">
                                         <img :src="image" class="w-full h-full object-cover"
                                             :alt="'Miniatura ' + (index + 1)">
@@ -388,13 +390,15 @@
             <!-- Panel de Reserva -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-xl shadow-lg p-6 sticky top-4">
-                    @if ($paquete->cantidadpaquete - $paquete->reservas->count() < 5)
+                    @if ($paquete->dis_paquete->first() && $paquete->dis_paquete->first()->cupo - $paquete->reservas->count() < 5)
                         <div class="text-center mb-6">
                             <span class="bg-red-100 text-red-800 text-sm font-semibold px-3 py-1 rounded-full">
-                                Solo quedan {{ $paquete->cantidadpaquete - $paquete->reservas->count() }} cupos
+                                Solo quedan {{ $paquete->dis_paquete->first()->cupo - $paquete->reservas->count() }}
+                                cupos
                             </span>
                         </div>
                     @endif
+
 
                     <div class="text-center mb-6">
                         @if ($paquete->det_paquete->first()->promos)
@@ -408,45 +412,43 @@
                                 {{ $paquete->det_paquete->first()->promos->descuento }}%</span>
                         @else
                             <div class="text-3xl font-bold text-blue-600 mb-1">
-                                ${{ number_format($paquete->preciopaquete, 2) }}</div>
+                                S/.{{ number_format($paquete->preciopaquete, 2) }}</div>
                             <div class="text-gray-600">por persona</div>
                         @endif
                     </div>
 
                     <div class="space-y-4 mb-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de inicio</label>
-                            <select
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de viaje</label>
+                            <input type="date" wire:model="fechaSeleccionada" min="{{ now()->format('Y-m-d') }}"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                @foreach ($paquete->dis_paquete as $disponibilidad)
-                                    <option value="{{ $disponibilidad->fecha_inicio }}">
-                                        {{ \Carbon\Carbon::parse($disponibilidad->fecha_inicio)->format('d M Y') }}
-                                        -
-                                        {{ \Carbon\Carbon::parse($disponibilidad->fecha_fin)->format('d M Y') }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            @error('fechaSeleccionada')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Número de personas</label>
-                            <select
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                @for ($i = 1; $i <= min(5, $paquete->cantidadpaquete - $paquete->reservas->count()); $i++)
-                                    <option>{{ $i }} persona{{ $i > 1 ? 's' : '' }}</option>
-                                @endfor
-                            </select>
+                            <div class="flex items-center">
+
+                                <input type="number" wire:model="personas" min="1" max="10"
+                                    class="w-full px-3 py-2 border-t border-b border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            </div>
+                            @error('personas')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
-                    <button wire:click="reservar"
+                    <button wire:click="abrirModalPago"
                         class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 mb-4">
                         Reservar ahora
                     </button>
 
                     @php
-                        $telefono = $paquete->empresa->telefonoempresa ?? '51999999999'; // Ajusta según tu relación
-                        $urlWhatsapp = "https://wa.me/{$telefono}";
+                        $telefono = $paquete->empresa->telefonoempresa ?? '51999999999';
+                        $urlWhatsapp = "https://wa.me/{$telefono}?text=Hola, estoy interesado en el paquete: {{ $paquete->nombrepaquete }}";
                     @endphp
 
                     <a href="{{ $urlWhatsapp }}" target="_blank"
@@ -454,10 +456,10 @@
                         <i class="fab fa-whatsapp mr-2 text-xl"></i> Contactar por WhatsApp
                     </a>
 
-                    <button wire:click="personalizarPaquete"
+                    {{-- <button wire:click="personalizarPaquete"
                         class="w-full bg-yellow-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-yellow-600 transition duration-200 mb-4">
                         Personalizar paquete
-                    </button>
+                    </button> --}}
 
                     <div class="border-t pt-4">
                         <div class="flex items-center text-sm text-gray-600 mb-2">
@@ -480,6 +482,237 @@
             </div>
         </div>
     </div>
+
+    @if ($mostrarModalPago)
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" x-data>
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                <!-- Encabezado -->
+                <div class="flex justify-between items-center p-6 border-b">
+                    <h3 class="text-xl font-bold text-gray-900">Método de Pago</h3>
+                    <button wire:click="$set('mostrarModalPago', false)" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Contenido principal - Diseño horizontal -->
+                <div class="flex flex-1 overflow-hidden">
+                    <!-- Columna izquierda - Métodos de pago -->
+                    <div class="w-1/3 p-6 border-r overflow-y-auto">
+                        <form>
+                            <div class="space-y-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Seleccione método de
+                                    pago</label>
+
+                                <!-- Transferencia Bancaria -->
+                                <div class="p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 
+                                {{ $metodoPago === 'transferencia' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300' }}"
+                                    wire:click="$set('metodoPago', 'transferencia')">
+                                    <div class="flex items-center">
+                                        <input wire:model="metodoPago" id="transferencia" type="radio"
+                                            value="transferencia"
+                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        <label for="transferencia"
+                                            class="ml-3 block text-sm font-medium text-gray-700">
+                                            Transferencia Bancaria
+                                        </label>
+                                    </div>
+                                    @if ($metodoPago === 'transferencia')
+                                        <div class="mt-3 text-xs text-gray-500">
+                                            <p>Realiza la transferencia a nuestra cuenta bancaria:</p>
+                                            <p class="font-medium mt-1">Banco: Interbank</p>
+                                            <p class="font-medium">Cuenta: 123-456789-01-23</p>
+                                            <p class="font-medium">CCI: 00312300456789012345</p>
+                                            <p class="font-medium">Titular: Turismo Adventure SAC</p>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Yape -->
+                                <div class="p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 
+                                {{ $metodoPago === 'yape' ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300' }}"
+                                    wire:click="$set('metodoPago', 'yape')">
+                                    <div class="flex items-center">
+                                        <input wire:model="metodoPago" id="yape" type="radio" value="yape"
+                                            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                        <label for="yape" class="ml-3 block text-sm font-medium text-gray-700">
+                                            Yape
+                                        </label>
+                                    </div>
+                                    @if ($metodoPago === 'yape')
+                                        <div class="mt-3 text-xs text-gray-500">
+                                            <p>Escanea el código QR o yapea al número:</p>
+                                            <p class="font-medium mt-1">987 654 321</p>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Plin -->
+                                <div class="p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 
+                                {{ $metodoPago === 'plin' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300' }}"
+                                    wire:click="$set('metodoPago', 'plin')">
+                                    <div class="flex items-center">
+                                        <input wire:model="metodoPago" id="plin" type="radio" value="plin"
+                                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
+                                        <label for="plin" class="ml-3 block text-sm font-medium text-gray-700">
+                                            Plin
+                                        </label>
+                                    </div>
+                                    @if ($metodoPago === 'plin')
+                                        <div class="mt-3 text-xs text-gray-500">
+                                            <p>Escanea el código QR o plinea al número:</p>
+                                            <p class="font-medium mt-1">987 654 321</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Columna derecha - Detalles y QR -->
+                    <div class="w-2/3 p-6 overflow-y-auto flex flex-col">
+                        <!-- QR y detalles de pago -->
+                        <div class="flex-1">
+                            @if ($metodoPago === 'yape')
+                                <div class="text-center">
+                                    <h4 class="text-lg font-bold text-purple-700 mb-4">Paga con Yape</h4>
+                                    <div
+                                        class="mx-auto w-48 h-48 bg-purple-100 rounded-lg flex items-center justify-center p-2">
+                                        <!-- Reemplaza con tu QR real -->
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YAPE:987654321"
+                                            alt="QR Yape" class="w-full h-full">
+                                    </div>
+                                    <p class="mt-3 text-sm text-gray-600">Escanea el código QR con Yape</p>
+                                    <p class="text-sm font-medium text-purple-700">o yapea al número: 987 654 321</p>
+                                </div>
+                            @elseif($metodoPago === 'plin')
+                                <div class="text-center">
+                                    <h4 class="text-lg font-bold text-green-700 mb-4">Paga con Plin</h4>
+                                    <div
+                                        class="mx-auto w-48 h-48 bg-green-100 rounded-lg flex items-center justify-center p-2">
+                                        <!-- Reemplaza con tu QR real -->
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PLIN:987654321"
+                                            alt="QR Plin" class="w-full h-full">
+                                    </div>
+                                    <p class="mt-3 text-sm text-gray-600">Escanea el código QR con Plin</p>
+                                    <p class="text-sm font-medium text-green-700">o plinea al número: 987 654 321</p>
+                                </div>
+                            @elseif($metodoPago === 'transferencia')
+                                <div class="text-center">
+                                    <h4 class="text-lg font-bold text-blue-700 mb-4">Transferencia Bancaria</h4>
+                                    <div class="bg-blue-50 rounded-lg p-4 max-w-md mx-auto">
+                                        <div class="space-y-2 text-left">
+                                            <p class="text-sm"><span class="font-medium">Banco:</span> Interbank</p>
+                                            <p class="text-sm"><span class="font-medium">Cuenta:</span>
+                                                123-456789-01-23</p>
+                                            <p class="text-sm"><span class="font-medium">CCI:</span>
+                                                00312300456789012345</p>
+                                            <p class="text-sm"><span class="font-medium">Titular:</span> Turismo
+                                                Adventure SAC</p>
+                                            <p class="text-sm"><span class="font-medium">Monto:</span>
+                                                S/.{{ number_format(
+                                                    $paquete->det_paquete->first()->promos
+                                                        ? $paquete->preciopaquete * (1 - $paquete->det_paquete->first()->promos->descuento / 100) * $personas
+                                                        : $paquete->preciopaquete * $personas,
+                                                    2,
+                                                ) }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Comprobante de pago (si aplica) -->
+                            @if (in_array($metodoPago, ['yape', 'plin']))
+                                <div class="mt-8">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Subir comprobante de pago
+                                    </label>
+                                    <div class="mt-1 flex flex-col items-center">
+                                        <div class="w-full max-w-xs">
+                                            <input type="file" wire:model="comprobantePago" accept="image/*"
+                                                class="block w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-md file:border-0
+                                    file:text-sm file:font-semibold
+                                    {{ $metodoPago === 'yape' ? 'file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100' : 'file:bg-green-50 file:text-green-700 hover:file:bg-green-100' }}">
+                                        </div>
+                                        @error('comprobantePago')
+                                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                                        @enderror
+                                        @if ($comprobantePago)
+                                            <div class="mt-4">
+                                                <p class="text-sm font-medium mb-2">Vista previa:</p>
+                                                <img src="{{ $comprobantePago->temporaryUrl() }}" alt="Vista previa"
+                                                    class="h-32 border rounded-lg">
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Resumen y botones -->
+                        <div class="mt-6">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium text-gray-900 mb-2">Resumen de reserva</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Paquete:</span>
+                                        <span class="font-medium">{{ $paquete->nombrepaquete }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Fecha de viaje:</span>
+                                        <span
+                                            class="font-medium">{{ \Carbon\Carbon::parse($fechaSeleccionada)->format('d M Y') }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Personas:</span>
+                                        <span class="font-medium">{{ $personas }}</span>
+                                    </div>
+                                    <div class="flex justify-between border-t pt-2 mt-2">
+                                        <span class="text-gray-600">Total a pagar:</span>
+                                        <span class="font-bold text-blue-600">
+                                            S/.{{ number_format(
+                                                $paquete->det_paquete->first()->promos
+                                                    ? $paquete->preciopaquete * (1 - $paquete->det_paquete->first()->promos->descuento / 100) * $personas
+                                                    : $paquete->preciopaquete * $personas,
+                                                2,
+                                            ) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-3 pt-4">
+                                <button type="button" wire:click="cerrarModal"
+                                    class="flex-1 bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-200">
+                                    Cancelar
+                                </button>
+                                <button type="button" wire:click="reservar"
+                                    class="flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center justify-center">
+                                    <span wire:loading.remove wire:target="reservar">Confirmar reserva</span>
+                                    <span wire:loading wire:target="reservar">
+                                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                            </path>
+                                        </svg>
+                                        Procesando...
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     @if ($mostrarFormularioPersonalizacion)
         <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -550,7 +783,7 @@
         </div>
     @endif
 
-    <<<<<<< HEAD <script>
+    <script>
         function lightbox() {
             return {
                 lightboxOpen: false,
@@ -565,18 +798,31 @@
                     @endforeach
                 ],
 
+                init() {
+                    // Escuchar eventos de teclado
+                    document.addEventListener('keydown', (e) => this.handleKeydown(e));
+
+                    // Limpiar overflow cuando se cierre
+                    this.$watch('lightboxOpen', (value) => {
+                        if (!value) {
+                            document.body.style.overflow = '';
+                        }
+                    });
+                },
+
                 openLightbox(index) {
                     this.lightboxIndex = index;
                     this.lightboxOpen = true;
                     this.currentImageLoaded = false;
-                    // Deshabilitar scroll del body
                     document.body.style.overflow = 'hidden';
+                    this.preloadImage(this.lightboxImages[index]);
                 },
 
                 nextImage() {
                     if (this.lightboxIndex < this.lightboxImages.length - 1) {
                         this.currentImageLoaded = false;
                         this.lightboxIndex++;
+                        this.preloadImage(this.lightboxImages[this.lightboxIndex]);
                     }
                 },
 
@@ -584,17 +830,199 @@
                     if (this.lightboxIndex > 0) {
                         this.currentImageLoaded = false;
                         this.lightboxIndex--;
+                        this.preloadImage(this.lightboxImages[this.lightboxIndex]);
                     }
                 },
 
-                // Restaurar scroll al cerrar
+                // Método para precargar imágenes
+                preloadImage(src) {
+                    this.currentImageLoaded = false;
+                    const img = new Image();
+                    img.onload = () => {
+                        this.currentImageLoaded = true;
+                    };
+                    img.onerror = () => {
+                        console.error('Error loading image:', src);
+                        // Mostrar placeholder si la imagen falla
+                        this.currentImageLoaded = true;
+                    };
+                    img.src = src;
+                },
+
+                // Método para cerrar el lightbox
                 closeLightbox() {
                     this.lightboxOpen = false;
                     document.body.style.overflow = '';
+                    // Mueve el setTimeout para asegurar la transición
+                    setTimeout(() => {
+                        this.currentImageLoaded = false;
+                    }, 300);
+                },
+
+                // Navegación con teclado
+                handleKeydown(event) {
+                    if (!this.lightboxOpen) return;
+
+                    switch (event.key) {
+                        case 'Escape':
+                            this.closeLightbox();
+                            break;
+                        case 'ArrowRight':
+                            this.nextImage();
+                            break;
+                        case 'ArrowLeft':
+                            this.prevImage();
+                            break;
+                    }
+                }
+            }
+        }
+
+        // Función para validar reserva
+        function validarReserva() {
+            return {
+                procesandoReserva: false,
+
+                async procesarReserva() {
+                    // Verificar autenticación
+                    if (!@json(auth()->check())) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Inicia sesión',
+                            text: 'Debes iniciar sesión para realizar una reserva',
+                            showCancelButton: true,
+                            confirmButtonText: 'Iniciar sesión',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/login';
+                            }
+                        });
+                        return;
+                    }
+
+                    // Verificar campos requeridos
+                    const fecha = document.querySelector('select[wire\\:model="fechaSeleccionada"]')?.value;
+                    const personas = document.querySelector('input[wire\\:model="personas"]')?.value;
+
+                    if (!fecha) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Campo requerido',
+                            text: 'Por favor selecciona una fecha de viaje'
+                        });
+                        return;
+                    }
+
+                    if (!personas || personas < 1 || personas > 10) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Número de personas inválido',
+                            text: 'Ingresa un número válido de personas (1-10)'
+                        });
+                        return;
+                    }
+
+                    // Verificar disponibilidad
+                    const cuposDisponibles = {{ $paquete->cantidadpaquete - $paquete->reservas->count() }};
+                    if (cuposDisponibles < parseInt(personas)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'No hay suficientes cupos',
+                            text: `Solo quedan ${cuposDisponibles} cupos disponibles`
+                        });
+                        return;
+                    }
+
+                    // Si todo está bien, llamar al método de Livewire
+                    this.procesandoReserva = true;
+                    try {
+                        await Livewire.dispatch('abrirModalPago');
+                    } catch (error) {
+                        console.error('Error al procesar reserva:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error del sistema',
+                            text: 'Ocurrió un error inesperado. Por favor intenta nuevamente.'
+                        });
+                    } finally {
+                        this.procesandoReserva = false;
+                    }
+                }
+            }
+        }
+
+        // Eventos para Livewire
+        document.addEventListener('livewire:initialized', () => {
+            // Manejar alertas del sistema
+            Livewire.on('mostrarAlerta', (data) => {
+                const alertData = Array.isArray(data) ? data[0] : data;
+
+                Swal.fire({
+                    icon: alertData.tipo,
+                    title: alertData.tipo === 'success' ? '¡Éxito!' : alertData.tipo === 'warning' ?
+                        '¡Atención!' : 'Error',
+                    text: alertData.mensaje,
+                    confirmButtonColor: alertData.tipo === 'success' ? '#10b981' : alertData
+                        .tipo === 'warning' ? '#f59e0b' : '#ef4444',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+
+            // Manejar errores de validación
+            Livewire.on('validationError', (data) => {
+                const errorData = Array.isArray(data) ? data[0] : data;
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de validación',
+                    text: errorData.mensaje || 'Por favor revisa los datos ingresados',
+                    confirmButtonColor: '#ef4444'
+                });
+            });
+        });
+
+        // Función para manejar el modal de pago
+        function modalPago() {
+            return {
+                mostrarModal: false,
+                metodoPago: 'yape',
+                comprobante: null,
+
+                cerrarModal() {
+                    this.mostrarModal = false;
+                    this.comprobante = null;
+                },
+
+                manejarArchivo(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        // Validar tipo de archivo
+                        if (!file.type.startsWith('image/')) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Archivo inválido',
+                                text: 'Por favor selecciona una imagen válida'
+                            });
+                            event.target.value = '';
+                            return;
+                        }
+
+                        // Validar tamaño (2MB máximo)
+                        if (file.size > 2 * 1024 * 1024) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Archivo muy grande',
+                                text: 'El archivo no debe superar los 2MB'
+                            });
+                            event.target.value = '';
+                            return;
+                        }
+
+                        this.comprobante = file;
+                    }
                 }
             }
         }
     </script>
-    =======
-    >>>>>>> 89e6056bf8f45acaa836daa6fb4f2aeca641c31f
 </div>
