@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Turismo Natural</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         :root {
             --color-primary: #7e22ce;
@@ -464,6 +465,15 @@
                 display: none;
             }
         }
+
+
+        /* */
+
+
+
+
+
+        /* */
     </style>
 </head>
 
@@ -701,6 +711,7 @@
                     <!-- Datos de la Cuenta -->
                     <div class="form-section">
                         <h3 class="section-title"><i class="fas fa-key"></i> Datos de Acceso</h3>
+
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label" for="email">Correo Electrónico</label>
@@ -712,6 +723,13 @@
                                         required>
                                 </div>
                             </div>
+                            {{-- --}}
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" id="verifyEmailButton">
+                                    <i class="fas fa-check" id=""></i> Verificar
+                                </button>
+                            </div>
+                            {{-- --}}
                             <div class="form-group">
                                 <label class="form-label" for="password">Contraseña</label>
                                 <div class="input-group">
@@ -719,7 +737,7 @@
                                         <i class="fas fa-lock"></i>
                                     </span>
                                     <input class="form-control" type="password" id="password" name="password"
-                                        required>
+                                        required disabled>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -729,9 +747,10 @@
                                         <i class="fas fa-lock"></i>
                                     </span>
                                     <input class="form-control" type="password" id="password_confirmation"
-                                        name="password_confirmation" required>
+                                        name="password_confirmation" required disabled>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
@@ -771,26 +790,49 @@
                         </div>
                     </div>
                 @endif
+
+
+                {{-- --}}
+                <!-- Modal para verificación -->
+                <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 hidden"
+                    id="verificationModal">
+                    <div class="bg-white rounded-lg shadow-lg max-w-sm w-full">
+                        <div class="modal-header flex justify-between items-center p-4 border-b">
+                            <h3 class="text-lg font-semibold">Verificación de Correo</h3>
+                            <button type="button" class="text-gray-600 hover:text-gray-800"
+                                id="closeModalButtonX"><i class="fas fa-window-close fa-2x"></i></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <p>Se ha enviado un código de verificación a <strong id="modalEmailDisplay"></strong>. Por
+                                favor, revisa tu bandeja de entrada (incluyendo spam).</p> <input type="text"
+                                id="verificationCode" class="mt-2 p-2 border border-gray-300 rounded w-full"
+                                placeholder="Código de verificación" maxlength="6">
+                            <div id="modalAlerts" class="mt-3">
+                            </div>
+                        </div>
+                        <div class="modal-footer flex justify-end p-4 border-t">
+                            <button type="button"
+                                class="bg-gray-300 text-gray-700 hover:bg-gray-400 rounded px-6 py-2 mr-2"
+                                id="closeModalButtonFooter">Cerrar</button>
+                            <button type="button"
+                                class="bg-blue-500 text-white hover:bg-blue-600 rounded px-4 py-2 mr-2"
+                                id="resendCodeButton">Reenviar Código</button>
+                            <button type="button"
+                                class="bg-green-500 text-white hover:bg-green-600 rounded px-6 py-2"
+                                id="validateCodeButton">Validar</button>
+                        </div>
+                    </div>
+                </div>
+                {{-- --}}
+
+
             </div>
         </div>
     </div>
 
-    {{-- modal de confirmación --}}
-    {{-- <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Registro exitoso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Usuario creado correctamente. Serás redirigido a la página de login.</p>
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
     <script>
+        // Función para inicializar el toggle de tipo de usuario
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar cuando el DOM esté listo
             initializeUserTypeToggle();
@@ -799,6 +841,235 @@
             initializeAlerts();
             updateRequiredFields();
         });
+
+        /* */
+        // Funcion al hacer clcik en verificar
+        document.getElementById('verifyEmailButton').onclick = function(event) {
+            event.preventDefault(); // Evita el envío del formulario
+
+            // Verificar campos de información personal
+            const documentType = document.getElementById('document_type').value;
+            const documentNumber = document.getElementById('document_number').value;
+            const nombres = document.getElementById('nombres').value;
+            const apellidos = document.getElementById('apellidos').value;
+            const telefono = document.getElementById('telefono').value;
+            const email = document.getElementById('email').value;
+
+            // Verificar que todos los campos estén completos
+            /*if (documentType && documentNumber && nombres && apellidos && telefono && email) {
+                // Aquí puedes agregar la lógica para enviar el código al correo
+                console.log(`Enviando código a: ${email}`);*/
+
+            // Abrir el modal
+
+
+            document.getElementById('verificationModal').classList.remove('hidden');
+            /* } else {
+                 alert("Por favor, completa todos los campos de información personal.");
+             }*/
+        };
+
+        // Función para cerrar el modal
+        function closeModal() {
+            document.getElementById('verificationModal').classList.add('hidden');
+            // Opcional: Limpiar el campo del código de verificación al cerrar
+            document.getElementById('verificationCode').value = '';
+            // Opcional: Limpiar los mensajes de alerta del modal al cerrar
+            document.getElementById('modalAlerts').innerHTML = '';
+        }
+        // Asignar la función closeModal a ambos botones de cierre
+        document.getElementById('closeModalButtonX').onclick = closeModal;
+        document.getElementById('closeModalButtonFooter').onclick = closeModal;
+        // Cerrar el modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('verificationModal')) {
+                closeModal();
+            }
+        };
+        // Model al centro
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('verificationModal')) {
+                document.getElementById('verificationModal').classList.add('hidden');
+            }
+        };
+
+  
+        
+
+        /* --- Función para mostrar alertas dentro del modal --- */
+        function showModalAlert(message, type = 'error') {
+            const modalAlerts = document.getElementById('modalAlerts');
+            modalAlerts.innerHTML = ''; // Limpiar alertas anteriores
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className =
+                `p-3 rounded-md text-sm ${type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+            alertDiv.textContent = message;
+            modalAlerts.appendChild(alertDiv);
+        }
+
+        /* --- Función para cerrar el modal --- */
+        function closeModal() {
+            document.getElementById('verificationModal').classList.add('hidden');
+            document.getElementById('verificationCode').value = ''; // Limpiar el campo del código
+            document.getElementById('modalAlerts').innerHTML = ''; // Limpiar los mensajes de alerta
+        }
+
+        // Asignar la función closeModal a ambos botones de cierre
+        document.getElementById('closeModalButtonX').onclick = closeModal;
+        document.getElementById('closeModalButtonFooter').onclick = closeModal;
+
+        // Cerrar el modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('verificationModal')) {
+                closeModal();
+            }
+        };
+
+
+
+
+        /* --- Función al hacer clic en verificar (ENVÍO DEL CÓDIGO) --- */
+        document.getElementById('verifyEmailButton').onclick = function(event) {
+            event.preventDefault(); // Evita el envío del formulario
+
+            const emailInput = document.getElementById('email');
+            const email = emailInput.value.trim(); // Captura el email y elimina espacios
+
+            if (!email) {
+                alert("Por favor, ingresa tu correo electrónico para verificar.");
+                return;
+            }
+
+            if (!/\S+@\S+\.\S+/.test(email)) { // Validación básica de formato de email
+                alert("Por favor, ingresa un correo electrónico válido.");
+                return;
+            }
+
+            // Aquí hacemos la solicitud al backend para enviar el código
+            fetch('/send-verification-code', { // Esta será la nueva ruta en tu backend
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Si usas Laravel o similar
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Si el backend dice que el correo se envió con éxito, mostramos el modal
+                        document.getElementById('modalEmailDisplay').textContent = email;
+                        document.getElementById('verificationModal').classList.remove('hidden');
+                        showModalAlert('Se ha enviado un código de verificación a tu correo.', 'success');
+                        // Opcional: Deshabilitar el botón de reenvío por un tiempo para evitar spam
+                        const resendButton = document.getElementById('resendCodeButton');
+                        resendButton.disabled = true;
+                        setTimeout(() => {
+                            resendButton.disabled = false;
+                        }, 60000); // Habilitar después de 60 segundos
+                    } else {
+                        alert(data.message || 'Error al enviar el código de verificación.');
+                        // showModalAlert(data.message || 'Error al enviar el código de verificación.', 'error'); // Si prefieres la alerta dentro del modal
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar el código:', error);
+                    alert('Ocurrió un error en la comunicación. Intenta de nuevo más tarde.');
+                    // showModalAlert('Ocurrió un error en la comunicación. Intenta de nuevo más tarde.', 'error');
+                });
+        };
+
+        /* --- Función para validar código (ya existente, con mejoras) --- */
+        document.getElementById('validateCodeButton').addEventListener('click', function() {
+            const code = document.getElementById('verificationCode').value.trim();
+            const email = document.getElementById('email').value.trim(); // Obtener el email del campo principal
+
+            if (code.length !== 6 || !/^\d+$/.test(code)) { // Aseguramos 6 dígitos y que sean solo números
+                showModalAlert('El código de verificación debe ser un número de 6 dígitos.', 'error');
+                return;
+            }
+
+            fetch('/validate-verification-code', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email, // Envía el email también para validar
+                        code: code
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('password').disabled = false;
+                        document.getElementById('password_confirmation').disabled = false;
+                        showModalAlert('Código verificado correctamente.', 'success');
+                        setTimeout(() => {
+                            closeModal(); // Cierra el modal
+                        }, 1500);
+                    } else {
+                        showModalAlert(data.message ||
+                            'Código de verificación incorrecto o expirado. Intenta de nuevo.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en la validación:', error);
+                    showModalAlert('Ocurrió un error al validar el código. Por favor, intenta más tarde.',
+                        'error');
+                });
+        });
+
+        /* --- Función para reenviar código (similar al envío inicial) --- */
+        document.getElementById('resendCodeButton').addEventListener('click', function() {
+            const email = document.getElementById('email').value.trim();
+
+            if (!email || !/\S+@\S+\.\S+/.test(email)) {
+                showModalAlert('No se puede reenviar el código sin un correo electrónico válido.', 'error');
+                return;
+            }
+
+            fetch('/send-verification-code', { // Reutilizamos la misma ruta de envío
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showModalAlert('Se ha reenviado un nuevo código a tu correo.', 'success');
+                        document.getElementById('verificationCode').value =
+                        ''; // Limpiar el campo para el nuevo código
+                        // Deshabilitar el botón de reenvío nuevamente
+                        const resendButton = document.getElementById('resendCodeButton');
+                        resendButton.disabled = true;
+                        setTimeout(() => {
+                            resendButton.disabled = false;
+                        }, 60000); // Habilitar después de 60 segundos
+                    } else {
+                        showModalAlert(data.message ||
+                            'No se pudo reenviar el código. Intenta de nuevo más tarde.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al reenviar el código:', error);
+                    showModalAlert('Ocurrió un error al reenviar el código. Por favor, intenta más tarde.',
+                        'error');
+                });
+        });
+
+
+        /* */
+
 
         // Cambiar entre tipo de usuario (Cliente/Empresa)
         function initializeUserTypeToggle() {
@@ -997,12 +1268,12 @@
                 successAlert.id = 'dynamic-success-alert';
                 successAlert.className = 'alert alert-success';
                 successAlert.innerHTML = `
-            <div class="alert-content">
-                <i class="fas fa-check-circle"></i>
-                <span>${message}</span>
-                <button onclick="closeAlert('dynamic-success-alert')" class="alert-close">&times;</button>
-            </div>
-        `;
+                <div class="alert-content">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${message}</span>
+                    <button onclick="closeAlert('dynamic-success-alert')" class="alert-close">&times;</button>
+                </div>
+            `;
 
                 const form = document.getElementById('registerForm');
                 if (form) {
@@ -1024,12 +1295,12 @@
                 errorAlert.id = 'dynamic-error-alert';
                 errorAlert.className = 'alert alert-error';
                 errorAlert.innerHTML = `
-            <div class="alert-content">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>${message}</span>
-                <button onclick="closeAlert('dynamic-error-alert')" class="alert-close">&times;</button>
-            </div>
-        `;
+                <div class="alert-content">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${message}</span>
+                    <button onclick="closeAlert('dynamic-error-alert')" class="alert-close">&times;</button>
+                </div>
+            `;
 
                 const form = document.getElementById('registerForm');
                 if (form) {
