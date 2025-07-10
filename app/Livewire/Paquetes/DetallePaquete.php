@@ -356,7 +356,6 @@ class DetallePaquete extends Component
                 $reserva->equipos()->attach($this->equiposSeleccionados);
             }
             
-            $this->actualizarPremiosUsuario();
 
             DB::commit();
             
@@ -375,33 +374,6 @@ class DetallePaquete extends Component
             $this->dispatch('mostrarAlerta', [
                 'tipo' => 'error',
                 'mensaje' => 'Error al procesar la reserva: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    private function actualizarPremiosUsuario()
-    {
-        // Buscar o crear registro de premios para el usuario
-        $premioUsuario = \App\Models\premios::firstOrCreate(
-            ['fk_iduser' => Auth::id()],
-            [
-                'cantidad_reservas' => 0,
-                'premios_disponibles' => 0,
-                'premios_usados' => 0
-            ]
-        );
-        
-        // Incrementar la cantidad de reservas
-        $premioUsuario->increment('cantidad_reservas');
-        
-        // Lógica de premios: cada 5 reservas = 1 premio disponible
-        if ($premioUsuario->cantidad_reservas % 5 == 0) {
-            $premioUsuario->increment('premios_disponibles');
-            
-            // Opcional: Notificar al usuario que tiene un premio disponible
-            $this->dispatch('mostrarAlerta', [
-                'tipo' => 'success',
-                'mensaje' => '¡Felicidades! Has ganado un premio por completar ' . $premioUsuario->cantidad_reservas . ' reservas.'
             ]);
         }
     }

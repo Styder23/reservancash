@@ -108,7 +108,7 @@ class Reservas extends Component
             $reserva = ModelReservas::findOrFail($this->reservaSeleccionada);
             $reserva->update(['estado' => 'confirmada']);
             
-            // Actualizar o crear el registro en la tabla de premios
+            // Actualizar premios del CLIENTE que hizo la reserva
             $this->actualizarPremiosUsuario($reserva->fk_idusers);
 
             $this->cerrarModales();
@@ -118,15 +118,18 @@ class Reservas extends Component
         }
     }
 
-    private function actualizarPremiosUsuario($userId)
+    private function actualizarPremiosUsuario($clienteId)
     {
-        try {
-            // Registrar la reserva confirmada usando el método del modelo
-            premios::registrarReservaConfirmada($userId);
-            
-        } catch (\Exception $e) {
-            // Log del error sin afectar la confirmación de la reserva
-            \Log::error('Error al actualizar premios del usuario: ' . $e->getMessage());
+        // Usar el método del modelo premios que ya tienes implementado
+        $premio = \App\Models\premios::registrarReservaConfirmada($clienteId);
+        
+        // Verificar si el cliente ganó un premio
+        if ($premio->puedeReclamarPremio()) {
+            // Opcional: Notificar que tiene un premio disponible
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'success',
+                'mensaje' => '¡El cliente ha ganado un premio! Tiene ' . $premio->cantidad_reservas . ' reservas confirmadas.'
+            ]);
         }
     }
 

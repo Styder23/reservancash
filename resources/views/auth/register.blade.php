@@ -536,6 +536,9 @@
                                 <input type="hidden" name="user_type" value="2">
                             </div>
                         </div>
+
+                        <!-- Input único para user_type (se actualiza con JavaScript) -->
+                        <input type="hidden" name="user_type" value="3" id="hidden_user_type">
                     </div>
 
                     <!-- Sección para Cliente -->
@@ -545,7 +548,8 @@
                             <div class="form-group">
                                 <label class="form-label" for="document_type">Tipo de Documento</label>
                                 <select class="form-control" id="document_type" name="document_type" required>
-                                    <option value="dni">DNI</option>
+                                    <option value="">Seleccione</option>
+                                    <option value="dni" selected>DNI</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -555,7 +559,8 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="document_number"
-                                        name="document_number" maxlength="8" required>
+                                        name="document_number" maxlength="8" pattern="[0-9]{8}" placeholder="12345678"
+                                        required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -564,7 +569,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-user"></i>
                                     </span>
-                                    <input class="form-control" type="text" id="nombres" name="nombres" required>
+                                    <input class="form-control" type="text" id="nombres" name="nombres"
+                                        placeholder="Juan Carlos" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -574,7 +580,7 @@
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <input class="form-control" type="text" id="apellidos" name="apellidos"
-                                        required>
+                                        placeholder="Pérez García" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -584,7 +590,7 @@
                                         <i class="fas fa-phone"></i>
                                     </span>
                                     <input class="form-control" type="tel" id="telefono" name="telefono"
-                                        maxlength="9" required>
+                                        maxlength="9" pattern="[0-9]{9}" placeholder="987654321" required>
                                 </div>
                             </div>
                         </div>
@@ -601,7 +607,7 @@
                                         <i class="fas fa-trademark"></i>
                                     </span>
                                     <input class="form-control" type="text" id="nombre_empresa"
-                                        name="nombre_empresa">
+                                        name="nombre_empresa" placeholder="Mi Empresa SAC">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -611,7 +617,7 @@
                                         <i class="fas fa-hashtag"></i>
                                     </span>
                                     <input class="form-control" type="text" id="ruc" name="ruc"
-                                        maxlength="11">
+                                        maxlength="11" pattern="[0-9]{11}" placeholder="12345678901">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -620,8 +626,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-file-signature"></i>
                                     </span>
-                                    <input class="form-control" type="text" id="razon_social"
-                                        name="razon_social">
+                                    <input class="form-control" type="text" id="razon_social" name="razon_social"
+                                        placeholder="MI EMPRESA SOCIEDAD ANÓNIMA CERRADA">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -631,7 +637,7 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                     </span>
                                     <input class="form-control" type="text" id="direccion_empresa"
-                                        name="direccion_empresa">
+                                        name="direccion_empresa" placeholder="Av. Principal 123, Lima">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -641,7 +647,8 @@
                                         <i class="fas fa-phone-alt"></i>
                                     </span>
                                     <input class="form-control" type="tel" id="telefono_empresa"
-                                        name="telefono_empresa" maxlength="9">
+                                        name="telefono_empresa" maxlength="9" pattern="[0-9]{9}"
+                                        placeholder="987654321">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -662,7 +669,8 @@
                                 <label class="form-label" for="doc_type_representante">Tipo de Documento</label>
                                 <select class="form-control" id="doc_type_representante"
                                     name="doc_type_representante">
-                                    <option value="dni">DNI</option>
+                                    <option value="">Seleccione</option>
+                                    <option value="dni" selected>DNI</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -672,7 +680,8 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="doc_number_representante"
-                                        name="doc_number_representante" maxlength="8">
+                                        name="doc_number_representante" maxlength="8" pattern="[0-9]{8}"
+                                        placeholder="12345678">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -682,7 +691,7 @@
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <input class="form-control" type="text" id="nombres_representante"
-                                        name="nombres_representante">
+                                        name="nombres_representante" placeholder="María Elena">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -692,7 +701,7 @@
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <input class="form-control" type="text" id="apellidos_representante"
-                                        name="apellidos_representante">
+                                        name="apellidos_representante" placeholder="González López">
                                 </div>
                             </div>
                         </div>
@@ -775,21 +784,6 @@
         </div>
     </div>
 
-    {{-- modal de confirmación --}}
-    {{-- <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Registro exitoso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Usuario creado correctamente. Serás redirigido a la página de login.</p>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar cuando el DOM esté listo
@@ -821,13 +815,14 @@
                     const targetSection = document.getElementById(targetId);
                     if (targetSection) targetSection.style.display = 'block';
 
-                    // Actualizar el valor del tipo de usuario
-                    document.querySelectorAll('input[name="user_type"]').forEach(input => {
-                        input.disabled = true;
-                    });
+                    // CORREGIDO: Actualizar el valor del tipo de usuario correctamente
+                    const userTypeValue = this.querySelector('input[name="user_type"]').value;
+                    console.log('Tipo de usuario seleccionado:', userTypeValue); // Debug
 
-                    const selectedInput = this.querySelector('input');
-                    if (selectedInput) selectedInput.disabled = false;
+                    // Actualizar todos los inputs hidden de user_type
+                    document.querySelectorAll('input[name="user_type"]').forEach(input => {
+                        input.value = userTypeValue;
+                    });
 
                     updateRequiredFields();
                 });
@@ -854,6 +849,7 @@
             if (!activeOption) return;
 
             const isCompany = activeOption.getAttribute('data-target') === 'company-section';
+            console.log('Es empresa:', isCompany); // Debug
 
             // Campos de cliente
             const clientFields = ['document_type', 'document_number', 'nombres', 'apellidos', 'telefono'];
@@ -868,26 +864,50 @@
                 // Hacer campos de empresa requeridos
                 companyFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = true;
+                    if (input) {
+                        input.required = true;
+                        input.removeAttribute('disabled');
+                    }
                 });
 
-                // Hacer campos de cliente opcionales
+                // Hacer campos de cliente opcionales y limpiar valores
                 clientFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = false;
+                    if (input) {
+                        input.required = false;
+                        input.value = ''; // Limpiar valor
+                        // No deshabilitar, solo quitar required
+                    }
                 });
             } else {
                 // Hacer campos de cliente requeridos
                 clientFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = true;
+                    if (input) {
+                        input.required = true;
+                        input.removeAttribute('disabled');
+                    }
                 });
 
-                // Hacer campos de empresa opcionales
+                // Hacer campos de empresa opcionales y limpiar valores
                 companyFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = false;
+                    if (input) {
+                        input.required = false;
+                        input.value = ''; // Limpiar valor
+                        // No deshabilitar, solo quitar required
+                    }
                 });
+
+                // También limpiar el archivo de logo
+                const logoInput = document.getElementById('logo_empresa');
+                if (logoInput) {
+                    logoInput.value = '';
+                    const nextElement = logoInput.nextElementSibling;
+                    if (nextElement) {
+                        nextElement.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Subir Logo';
+                    }
+                }
             }
         }
 
@@ -901,6 +921,13 @@
 
                 const form = e.target;
                 const button = document.getElementById('registerButton');
+                const formData = new FormData(form);
+
+                // AGREGADO: Debug para ver qué se está enviando
+                console.log('Datos del formulario:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, ':', value);
+                }
 
                 if (!button) return;
 
@@ -909,50 +936,54 @@
 
                 fetch(form.action, {
                         method: form.method,
-                        body: new FormData(form),
+                        body: formData,
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'Accept': 'application/json'
                         }
                     })
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
+                        console.log('Response status:', response.status);
+                        return response.json().then(data => {
+                            if (response.ok) {
+                                return data;
+                            } else {
+                                throw {
+                                    status: response.status,
+                                    data: data
+                                };
+                            }
+                        });
                     })
                     .then(data => {
+                        console.log('Data received:', data);
                         if (data.success && data.redirect) {
-                            // Mostrar modal de éxito o mensaje
-                            const successModal = document.getElementById('successModal');
-                            if (successModal && typeof bootstrap !== 'undefined') {
-                                const modal = new bootstrap.Modal(successModal);
-                                modal.show();
-                            } else {
-                                // Mostrar mensaje de éxito si no hay modal
-                                showSuccessMessage(data.message);
-                            }
-
-                            // Redirigir después de 3 segundos
+                            showSuccessMessage(data.message);
                             setTimeout(() => {
                                 window.location.href = data.redirect;
                             }, 3000);
                         } else if (!data.success && data.errors) {
-                            // Manejar errores de validación
                             displayErrors(data.errors);
                             setButtonLoading(button, false);
                         } else if (!data.success) {
-                            // Error general
                             showErrorMessage(data.message || 'Ha ocurrido un error');
                             setButtonLoading(button, false);
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        console.error('Error completo:', error);
                         setButtonLoading(button, false);
 
-                        // Mostrar mensaje de error al usuario
-                        showErrorMessage('Ha ocurrido un error. Por favor, inténtelo de nuevo.');
+                        if (error.status === 422 && error.data) {
+                            if (error.data.errors) {
+                                console.log('Errores de validación:', error.data.errors);
+                                displayErrors(error.data.errors);
+                            } else {
+                                showErrorMessage(error.data.message || 'Errores de validación');
+                            }
+                        } else {
+                            showErrorMessage('Ha ocurrido un error. Por favor, inténtelo de nuevo.');
+                        }
                     });
             });
         }
@@ -966,7 +997,7 @@
             } else {
                 button.disabled = false;
                 button.classList.remove('btn-loading');
-                button.innerHTML = '<i class="fas fa-paper-plane"></i> Registrarse';
+                button.innerHTML = '<i class="fas fa-user-plus"></i> Registrarse';
             }
         }
 
@@ -983,7 +1014,7 @@
                 if (input) {
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'error-message text-danger small mt-1';
-                    errorDiv.textContent = errors[field][0]; // Primer error del campo
+                    errorDiv.textContent = errors[field][0];
                     input.parentNode.appendChild(errorDiv);
                 }
             });
@@ -1003,7 +1034,6 @@
                 <button onclick="closeAlert('dynamic-success-alert')" class="alert-close">&times;</button>
             </div>
         `;
-
                 const form = document.getElementById('registerForm');
                 if (form) {
                     form.parentNode.insertBefore(successAlert, form);
@@ -1017,7 +1047,6 @@
 
         // Función para mostrar mensaje de error general
         function showErrorMessage(message) {
-            // Crear o actualizar alerta de error
             let errorAlert = document.getElementById('dynamic-error-alert');
             if (!errorAlert) {
                 errorAlert = document.createElement('div');
@@ -1030,7 +1059,6 @@
                 <button onclick="closeAlert('dynamic-error-alert')" class="alert-close">&times;</button>
             </div>
         `;
-
                 const form = document.getElementById('registerForm');
                 if (form) {
                     form.parentNode.insertBefore(errorAlert, form);
@@ -1055,11 +1083,9 @@
 
         // Inicializar manejo de alertas
         function initializeAlerts() {
-            // Auto-cerrar alerts después de 5 segundos (excepto los dinámicos de error)
             setTimeout(function() {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
-                    // No auto-cerrar alertas de error específicas
                     if (!alert.id.includes('error') && !alert.id.includes('Error')) {
                         alert.style.opacity = '0';
                         setTimeout(function() {

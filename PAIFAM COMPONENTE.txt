@@ -1,0 +1,597 @@
+<?php
+
+namespace App\Livewire\Wizard;
+
+use Livewire\Component;
+use App\Models\VisitaCumplimiento;
+use App\Models\AcuerdoRiesgo;
+use App\Models\RiesgoxPoblador;
+use App\Models\RiesgenxPoblador;
+use App\Models\RiesgoIdentificado;
+use App\Models\Cumplimiento;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class Paifam extends Component
+{
+    use LivewireAlert;
+
+    public $idficha;
+    public $modo = 'ver';
+    public $visitDates = []; // Array dinámico en lugar de fijo
+    public $numeroVisitas = 4; // Número configurable de visitas
+    public $fechasEstablecidas = [];
+
+
+    // Propiedades para las tablas
+    public $formData = []; // Para la información de los pobladores
+    public $formData1 = []; // Para los riesgos por género
+    public $riesgosGuardadosEtapa = []; // Para los riesgos por etapa
+    public $riesgosDetectados = []; // Para los riesgos familiares
+    public $riesgosVivienda = []; // Para los riesgos de vivienda
+
+    // Propiedades para acuerdos, responsables, visitas y observaciones
+    public $acuerdos = [
+        'individual' => [],
+        'genero' => [],
+        'familiar' => [],
+        'vivienda' => []
+    ];
+    
+    public $responsables = [
+        'individual' => [],
+        'genero' => [],
+        'familiar' => [],
+        'vivienda' => []
+    ];
+    
+    public $visitas = [
+        'individual' => [],
+        'genero' => [],
+        'familiar' => [],
+        'vivienda' => []
+    ];
+    
+    public $observacionesVisitas = [
+        'individual' => [],
+        'genero' => [],
+        'familiar' => [],
+        'vivienda' => []
+    ];
+
+    // Variables para visitas específicas
+    public $acuerdoId; 
+    public $visitId;
+    public $visitDate;
+    public $visitObservation;
+    public $visitAssistance;
+
+    public $showModal = false;
+    
+    public function mount($idficha)
+    {
+        $this->idficha = $idficha;
+        $this->modo = request()->query('modo', 'ver');
+        
+        // Check if session has saved dates
+        if (session()->has('visit_dates')) {
+            $this->visitDates = session('visit_dates');
+        } else {
+            // Default empty dates
+            $this->visitDates = [
+                'visita_1' => null,
+                'visita_2' => null,
+                'visita_3' => null,
+                'visita_4' => null
+            ];
+        }
+
+        // Cargar datos al montar el componente
+        $this->cargardatos();
+    }
+
+    public function cargardatos()
+    {
+        try {
+            // 1. Cargar información de los pobladores para la sección de salud individual
+            $pobladores = DB::select("
+                SELECT 
+                    p.id as `index`,
+                    CONCAT_WS(' ', p.nombres, p.apell_pat, p.apell_mat) AS nombre_completo,
+                    YEAR(CURDATE()) - YEAR(p.fec_naci) 
+                    - (DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(p.fec_naci, '%m%d')) AS edad
+                FROM familias f
+                JOIN familiasx_pobladores fp ON fp.fk_idfamilias = f.id
+                JOIN pobladores p ON p.id = fp.fk_idpoblador
+                WHERE f.id = ?
+            ", [$this->idficha]);
+    
+            $this->formData = $pobladores;
+    
+            // Inicializar arrays para evitar errores
+            $this->riesgosGuardadosEtapa = [];
+            $this->formData1 = [];
+            $this->acuerdos = ['individual' => [], 'genero' => [], 'familiar' => [], 'vivienda' => []];
+            $this->responsables = ['individual' => [], 'genero' => [], 'familiar' => [], 'vivienda' => []];
+            $this->visitas = ['individual' => [], 'genero' => [], 'familiar' => [], 'vivienda' => []];
+            $this->observaciones = ['individual' => [], 'genero' => [], 'familiar' => [], 'vivienda' => []];
+    
+            // 2. Cargar riesgos por etapa de vida (salud individual)
+            $riesgosEtapa = DB::select("
+                SELECT 
+                    r.id,
+                    p.id as miembro_id,
+                    CONCAT_WS(' ', p.nombres, p.apell_pat, p.apell_mat) AS miembro_nombre,
+                    r.descripcion as riesgo_nombre,
+                    ar.acuerdo,
+                    ar.responsable
+                FROM riesgos_identificados r
+                JOIN familias f ON f.id = r.id_familia
+                JOIN pobladores p ON r.id_poblador = p.id
+                LEFT JOIN acuerdos ar ON ar.id_riesgo = r.id
+                WHERE f.id = ? AND r.tipo_riesgo = 'individual'
+                ORDER BY p.id, r.id
+            ", [$this->idficha]);
+    
+            // Organizar los riesgos por etapa
+            foreach ($riesgosEtapa as $riesgo) {
+                $miembroId = $riesgo->miembro_id;
+                $riesgoId = $riesgo->id;
+                
+                if (!isset($this->riesgosGuardadosEtapa[$miembroId])) {
+                    $this->riesgosGuardadosEtapa[$miembroId] = [];
+                }
+                
+                $this->riesgosGuardadosEtapa[$miembroId][] = [
+                    'id' => $riesgoId,
+                    'miembro_id' => $miembroId,
+                    'miembro_nombre' => $riesgo->miembro_nombre,
+                    'riesgo_nombre' => $riesgo->riesgo_nombre
+                ];
+                
+                // Guardar acuerdos, responsables y observaciones
+                if (!empty($riesgo->acuerdo)) {
+                    $this->acuerdos['individual'][$miembroId][$riesgoId] = $riesgo->acuerdo;
+                }
+                
+                if (!empty($riesgo->responsable)) {
+                    $this->responsables['individual'][$miembroId][$riesgoId] = $riesgo->responsable;
+                }
+            }
+    
+            // 3. Cargar riesgos por género (salud individual)
+            $riesgosGenero = DB::select("
+                SELECT 
+                    r.id,
+                    p.id as miembro_id,
+                    CONCAT_WS(' ', p.nombres, p.apell_pat, p.apell_mat) AS miembro_nombre,
+                    r.descripcion as riesgo_nombre,
+                    ar.acuerdo,
+                    ar.responsable
+                FROM riesgos_identificados r
+                JOIN pobladores p ON r.id_poblador = p.id
+                LEFT JOIN acuerdos ar ON ar.id_riesgo = r.id
+                WHERE r.id_familia = ? AND r.tipo_riesgo = 'individual'
+                ORDER BY p.id, r.id
+            ", [$this->idficha]);
+    
+            // Organizar los riesgos por género
+            foreach ($riesgosGenero as $index => $riesgo) {
+                $miembroId = $riesgo->miembro_id;
+                $riesgoId = $riesgo->id;
+                
+                if (!isset($this->formData1[$miembroId])) {
+                    $this->formData1[$miembroId] = [];
+                }
+                
+                $this->formData1[$miembroId][$riesgoId] = [
+                    'id' => $riesgoId,
+                    'miembro_id' => $miembroId,
+                    'miembro_nombre' => $riesgo->miembro_nombre,
+                    'riesgo_nombre' => $riesgo->riesgo_nombre
+                ];
+                
+                // Guardar acuerdos, responsables y observaciones
+                if (!empty($riesgo->acuerdo)) {
+                    $this->acuerdos['genero'][$miembroId][$riesgoId] = $riesgo->acuerdo;
+                }
+                
+                if (!empty($riesgo->responsable)) {
+                    $this->responsables['genero'][$miembroId][$riesgoId] = $riesgo->responsable;
+                }
+                
+            }
+    
+            // 4. Cargar visitas y cumplimientos
+            $visitasCumplimientos = DB::select("
+                SELECT 
+                    v.id as visita_id,
+                    v.fecha_visita,
+                    v.numero_visita,
+                    c.id as cumplimiento_id,
+                    c.estado,
+                    c.observaciones,
+                    c.id_acuerdo as acuerdo_id,
+                    r.tipo_riesgo
+                FROM visitas v
+                JOIN familias f ON f.id = v.id_familia
+                LEFT JOIN cumplimientos c ON c.id_visita = v.id
+                LEFT JOIN acuerdos a on a.id=c.id_acuerdo
+                LEFT JOIN riesgos_identificados r ON r.id = a.id_riesgo
+                WHERE f.id = ?
+                ORDER BY v.numero_visita, c.id_acuerdo
+            ", [$this->idficha]);
+    
+            // Procesar fechas de visitas y cumplimientos
+            foreach ($visitasCumplimientos as $vc) {
+                $numVisita = $vc->numero_visita;
+                
+                // Guardar fechas de visitas
+                if ($numVisita >= 1 && $numVisita <= 4) {
+                    $this->visitDates['visita_' . $numVisita] = $vc->fecha_visita;
+                    $this->fechasEstablecidas['visita_' . $numVisita] = true;
+                }
+                
+                // Procesar cumplimientos si existen
+                if (!empty($vc->cumplimiento_id) && !empty($vc->acuerdo_id)) {
+                    $tipo = $vc->tipo_riesgo; // individual, genero, familiar, vivienda
+                    $estado = $vc->estado == 'cumplido' ? 'check' : ($vc->estado == 'no cumplido' ? 'nc' : '');
+                    
+                    // Para riesgos individuales y de género, necesitamos miembro_id y riesgo_id
+                    if (in_array($tipo, ['individual', 'genero'])) {
+                        // Buscar el riesgo correspondiente
+                        $riesgoInfo = DB::selectOne("
+                            SELECT id_poblador as miembro_id, id as riesgo_id 
+                            FROM riesgos_identificados 
+                            WHERE id = ?
+                        ", [$vc->acuerdo_id]);
+                        
+                        if ($riesgoInfo) {
+                            $miembroId = $riesgoInfo->miembro_id;
+                            $riesgoId = $riesgoInfo->riesgo_id;
+                            
+                            $this->visitas[$tipo][$miembroId][$riesgoId]['visita_' . $numVisita] = $estado;
+                            
+                            if (!empty($vc->observaciones)) {
+                                $this->observaciones[$tipo][$miembroId][$riesgoId] = $vc->observaciones;
+                            }
+                        }
+                    } 
+                    // Para riesgos familiares y de vivienda
+                    else if (in_array($tipo, ['familiar', 'vivienda'])) {
+                        $this->visitas[$tipo][0][$vc->acuerdo_id]['visita_' . $numVisita] = $estado;
+                        
+                        if (!empty($vc->observaciones)) {
+                            $this->observaciones[$tipo][0][$vc->acuerdo_id] = $vc->observaciones;
+                        }
+                    }
+                }
+            }
+    
+        } catch(\Exception $e) {
+            \Log::error('Error cargando datos de familia: ' . $e->getMessage());
+            $this->alert('error', 'Error al cargar los datos: ' . $e->getMessage());
+        }
+    }
+    
+    // Método auxiliar para determinar a qué tipo pertenece un acuerdo
+    private function determinarTipoAcuerdo($acuerdoId)
+    {
+        // Consulta para determinar el tipo de acuerdo (individual, familiar, etc.)
+        $acuerdoInfo = DB::selectOne("
+            SELECT 
+                ar.id,
+                r.tipo_riesgo,
+                r.id_poblador
+            FROM acuerdos ar
+            JOIN riesgos_identificados r ON r.id = ar.id_riesgo
+            WHERE ar.id = ?
+        ", [$acuerdoId]);
+        
+        if (!$acuerdoInfo) {
+            return null;
+        }
+        
+        switch ($acuerdoInfo->tipo_riesgo) {
+            case 'individual':
+                // Buscar en riesgosGuardadosEtapa
+                foreach ($this->riesgosGuardadosEtapa as $grupoId => $riesgos) {
+                    foreach ($riesgos as $riesgo) {
+                        if ($riesgo['id'] == $acuerdoInfo->id) {
+                            return ['individual', $grupoId, $riesgo['id']];
+                        }
+                    }
+                }
+                break;
+                
+            case 'genero':
+                // Buscar en formData1
+                foreach ($this->formData1 as $grupoId => $riesgos) {
+                    foreach ($riesgos as $index => $riesgo) {
+                        if ($riesgo['id'] == $acuerdoInfo->id) {
+                            return ['genero', $grupoId, $index];
+                        }
+                    }
+                }
+                break;
+                
+            case 'familiar':
+                // Para riesgos familiares, el grupo siempre es 0
+                foreach ($this->riesgosDetectados as $index => $descripcion) {
+                    // Aquí tendríamos que buscar por descripción, lo cual no es ideal
+                    // En una implementación real, deberías asegurarte de tener IDs
+                    return ['familiar', 0, $index];
+                }
+                break;
+                
+            case 'vivienda':
+                // Para riesgos de vivienda
+                foreach ($this->riesgosVivienda as $index => $riesgo) {
+                    if ($riesgo['id'] == $acuerdoInfo->id) {
+                        return ['vivienda', 0, $index];
+                    }
+                }
+                break;
+        }
+        
+        return null;
+    }
+    
+    public function validarFecha($campo)
+    {
+        // Validar que las fechas estén en orden cronológico
+        $fechas = array_filter($this->visitDates);
+        $fechasOrdenadas = $fechas;
+        ksort($fechasOrdenadas);
+        
+        if (array_values($fechas) !== array_values($fechasOrdenadas)) {
+            $this->addError($campo, 'Las fechas deben estar en orden cronológico.');
+            return false;
+        }
+        
+        $this->fechasEstablecidas[$campo] = true;
+        return true;
+    }
+    
+    public function updateVisitDates()
+    {
+        $this->validate([
+            'visitDates.visita_1' => 'nullable|date',
+            'visitDates.visita_2' => 'nullable|date|after_or_equal:visitDates.visita_1',
+            'visitDates.visita_3' => 'nullable|date|after_or_equal:visitDates.visita_2',
+            'visitDates.visita_4' => 'nullable|date|after_or_equal:visitDates.visita_3',
+        ]);
+        
+        try {
+            // Guardar fechas de visita en la base de datos
+            foreach ($this->visitDates as $numeroVisita => $fecha) {
+                if (!empty($fecha)) {
+                    $numero = str_replace('visita_', '', $numeroVisita);
+                    
+                    // Verificar si ya existe la visita
+                    $visitaExistente = DB::selectOne("
+                        SELECT id FROM visitas 
+                        WHERE id_familia = ? AND numero_visita = ?
+                    ", [$this->idficha, $numero]);
+                    
+                    if ($visitaExistente) {
+                        // Actualizar la fecha
+                        DB::update("
+                            UPDATE visitas 
+                            SET fecha_visita = ? 
+                            WHERE id = ?
+                        ", [Carbon::parse($fecha)->format('Y-m-d'), $visitaExistente->id]);
+                    } else {
+                        // Insertar nueva visita
+                        DB::insert("
+                            INSERT INTO visitas (id_familia, numero_visita, fecha_visita, created_at, updated_at)
+                            VALUES (?, ?, ?, NOW(), NOW())
+                        ", [$this->idficha, $numero, Carbon::parse($fecha)->format('Y-m-d')]);
+                    }
+                }
+            }
+            
+            // Save to session
+            session(['visit_dates' => $this->visitDates]);
+            
+            $this->showModal = false;
+            $this->dispatch('visitDatesUpdated', $this->visitDates);
+            
+            session()->flash('message', 'Fechas de visita registradas con éxito.');
+        } catch (\Exception $e) {
+            \Log::error('Error guardando fechas de visita: ' . $e->getMessage());
+            $this->alert('error', 'Error al guardar las fechas: ' . $e->getMessage());
+        }
+    }
+    
+    public function guardarCambios()
+{
+    try {
+        // Guardar acuerdos y responsables
+        foreach ($this->acuerdos['individual'] as $grupoIndex => $riesgos) {
+            foreach ($riesgos as $riesgoId => $acuerdo) {
+                $responsable = $this->responsables['individual'][$grupoIndex][$riesgoId] ?? '';
+                
+                // Verificar si ya existe el acuerdo
+                $acuerdoExistente = DB::selectOne("
+                    SELECT id FROM acuerdos 
+                    WHERE id_riesgo = ?
+                ", [$riesgoId]);
+                
+                if ($acuerdoExistente) {
+                    // Actualizar
+                    DB::update("
+                        UPDATE acuerdos 
+                        SET acuerdo = ?, responsable = ?, updated_at = NOW()
+                        WHERE id = ?
+                    ", [$acuerdo, $responsable, $acuerdoExistente->id]);
+                } else {
+                    // Insertar
+                    DB::insert("
+                        INSERT INTO acuerdos (id_riesgo, acuerdo, responsable, created_at, updated_at)
+                        VALUES (?, ?, ?, NOW(), NOW())
+                    ", [$riesgoId, $acuerdo, $responsable]);
+                }
+            }
+        }
+        
+        // Guardar cumplimientos de visitas
+        foreach ($this->visitas['individual'] as $grupoIndex => $riesgos) {
+            foreach ($riesgos as $riesgoId => $visitas) {
+                foreach ($visitas as $numeroVisita => $estado) {
+                    if (!empty($estado)) {
+                        $numero = str_replace('visita_', '', $numeroVisita);
+                        
+                        // Buscar la visita
+                        $visita = DB::selectOne("
+                            SELECT id FROM visitas 
+                            WHERE id_familia = ? AND numero_visita = ?
+                        ", [$this->idficha, $numero]);
+                        
+                        if ($visita) {
+                            $estadoTexto = $estado === 'check' ? 'cumplido' : 'no cumplido';
+                            $observacion = $this->observaciones['individual'][$grupoIndex][$riesgoId] ?? '';
+                            
+                            // Verificar si ya existe el cumplimiento
+                            $cumplimientoExistente = DB::selectOne("
+                                SELECT c.id FROM cumplimientos c
+                                left join acuerdos ar on ar.id=c.id_acuerdo
+                                JOIN riesgos_identificados r ON r.id = ar.id_riesgo 
+                                WHERE id_visita = ? AND id_riesgo = ?
+                            ", [$visita->id, $riesgoId]);
+                            
+                            if ($cumplimientoExistente) {
+                                // Actualizar
+                                DB::update("
+                                    UPDATE cumplimientos 
+                                    SET estado = ?, observaciones = ?, updated_at = NOW()
+                                    WHERE id = ?
+                                ", [$estadoTexto, $observacion, $cumplimientoExistente->id]);
+                            } else {
+                                // Insertar
+                                DB::insert("
+                                    INSERT INTO cumplimientos (id_visita, id_riesgo, estado, observaciones, created_at, updated_at)
+                                    VALUES (?, ?, ?, ?, NOW(), NOW())
+                                ", [$visita->id, $riesgoId, $estadoTexto, $observacion]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        $this->alert('success', 'Cambios guardados con éxito');
+    } catch (\Exception $e) {
+        \Log::error('Error guardando cambios: ' . $e->getMessage());
+        $this->alert('error', 'Error al guardar los cambios: ' . $e->getMessage());
+    }
+}
+public function getHayRiesgosProperty()
+{
+    return count($this->riesgosGuardadosEtapa) > 0;
+}
+    public function eliminarRiesgo($grupoIndex, $riesgoId)
+    {
+        try {
+            // Eliminar el riesgo de la base de datos
+            DB::delete("
+                DELETE FROM riesgos_identificados
+                WHERE id = ?
+            ", [$riesgoId]);
+            
+            // Eliminar acuerdos relacionados
+            DB::delete("
+                DELETE FROM acuerdos
+                WHERE id_riesgo = ?
+            ", [$riesgoId]);
+            
+            // Recargar datos
+            $this->cargardatos();
+            
+            $this->alert('success', 'Riesgo eliminado con éxito');
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando riesgo: ' . $e->getMessage());
+            $this->alert('error', 'Error al eliminar el riesgo: ' . $e->getMessage());
+        }
+    }
+    
+    public function eliminarRiesgoSeleccionado($grupoIndex, $indexItem)
+    {
+        try {
+            // Obtener el ID del riesgo
+            $riesgo = $this->formData1[$grupoIndex][$indexItem];
+            $riesgoId = $riesgo['id'];
+            
+            // Eliminar el riesgo
+            $this->eliminarRiesgo($grupoIndex, $riesgoId);
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando riesgo: ' . $e->getMessage());
+            $this->alert('error', 'Error al eliminar el riesgo: ' . $e->getMessage());
+        }
+    }
+    
+    public function eliminarRiesgoFamiliar($index)
+    {
+        try {
+            // Buscar el riesgo por su descripción
+            $descripcion = $this->riesgosDetectados[$index];
+            
+            $riesgo = DB::selectOne("
+                SELECT id 
+                FROM riesgos_identificados
+                WHERE id_familia = ? AND tipo_riesgo = 'familiar' AND descripcion = ?
+            ", [$this->idficha, $descripcion]);
+            
+            if ($riesgo) {
+                $this->eliminarRiesgo(0, $riesgo->id);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando riesgo familiar: ' . $e->getMessage());
+            $this->alert('error', 'Error al eliminar el riesgo familiar: ' . $e->getMessage());
+        }
+    }
+    
+    public function eliminarRiesgoVivienda($index)
+    {
+        try {
+            // Obtener el ID del riesgo
+            $riesgoId = $this->riesgosVivienda[$index]['id'];
+            
+            // Eliminar el riesgo
+            DB::delete("
+                DELETE FROM riesgos_identificados
+                WHERE id = ?
+            ", [$riesgoId]);
+            
+            // Eliminar acuerdos relacionados
+            DB::delete("
+                DELETE FROM acuerdos
+                WHERE id_riesgo = ?
+            ", [$riesgoId]);
+            
+            // Recargar datos
+            $this->cargardatos();
+            
+            $this->alert('success', 'Riesgo de vivienda eliminado con éxito');
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando riesgo de vivienda: ' . $e->getMessage());
+            $this->alert('error', 'Error al eliminar el riesgo de vivienda: ' . $e->getMessage());
+        }
+    }
+    
+    public function openModal()
+    {
+        $this->showModal = true;
+    }
+    
+    public function closeModal()
+    {
+        $this->showModal = false;
+    }
+
+    public function render()
+    {
+        return view('livewire.wizard.paifam')->layout('layout.app1');
+    }
+}

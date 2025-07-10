@@ -4,6 +4,8 @@ $max_reservas_premio = 5; // numero de reservas
 $reservas_confirmadas = 0;
 $reservas_pendientes_empresa = 0;
 $premio_disponible = false;
+$premios_disponibles_total = 0;
+$premios_usados_total = 0;
 
 // Obtener datos según el tipo de usuario
 if (session('user_type') == 'cliente') {
@@ -12,9 +14,11 @@ if (session('user_type') == 'cliente') {
 
     if ($premio_usuario) {
         $reservas_confirmadas = $premio_usuario->cantidad_reservas;
+        $premios_disponibles_total = $premio_usuario->premios_disponibles;
+        $premios_usados_total = $premio_usuario->premios_usados;
     }
 
-    // Verificar si tiene premio disponible
+    // Verificar si tiene premio disponible para reclamar
     $premio_disponible = $reservas_confirmadas >= $max_reservas_premio;
 } elseif (session('user_type') == 'empresa') {
     // Consulta para reservas pendientes de la empresa
@@ -37,6 +41,12 @@ if (session('user_type') == 'cliente') {
 
 // Calcular porcentaje de progreso
 $porcentaje_progreso = min(($reservas_confirmadas / $max_reservas_premio) * 100, 100);
+
+// Calcular reservas restantes para el próximo premio
+$reservas_restantes = $max_reservas_premio - $reservas_confirmadas;
+if ($reservas_restantes <= 0) {
+    $reservas_restantes = 0;
+}
 ?>
 
 <!DOCTYPE html>

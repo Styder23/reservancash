@@ -29,11 +29,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 
         if ($user->tipousu && $user->tipousu->id == 2) {
             $rules['company_video'] = ['nullable', 'mimetypes:video/mp4,video/quicktime', 'max:5120'];
-            $rules['bank_name'] = ['nullable', 'string', 'max:255'];
-            $rules['account_type'] = ['nullable', 'string', 'max:255'];
-            $rules['account_number'] = ['nullable', 'string', 'max:255'];
-            $rules['account_holder'] = ['nullable', 'string', 'max:255'];
-            $rules['routing_number'] = ['nullable', 'string', 'max:255'];
+            $rules['nombrebanco'] = ['nullable', 'string', 'max:255'];
+            $rules['numero_cuenta'] = ['nullable', 'string', 'max:255'];
+            $rules['numero_cci'] = ['nullable', 'string', 'max:255'];
+            $rules['qr_yape'] = ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
+            $rules['qr_plin'] = ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
         }
 
         Validator::make($input, $rules)->validateWithBag('updateProfileInformation');
@@ -68,25 +68,61 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             
             $user->persona->update($personaData);
         }
+        
     }
 
     protected function handleBankUpdates(User $user, array $input): void
     {
-        $empresa = $user->persona->empresa->first()?->empresa;
+        \Log::debug('Datos recibidos:', $input);
+        \Log::debug('Archivo QR Yape recibido:', isset($input['qr_yape']) ? ['name' => $input['qr_yape']->getClientOriginalName()] : ['no_file']);
         
-        if ($empresa) {
-            $bankData = [
-                'banco_nombre' => $input['bank_name'] ?? null,
-                'tipo_cuenta' => $input['account_type'] ?? null,
-                'numero_cuenta' => $input['account_number'] ?? null,
-                'titular_cuenta' => $input['account_holder'] ?? null,
-                'numero_ruta' => $input['routing_number'] ?? null,
-            ];
-            
-            $empresa->update($bankData);
+        $empresa = $user->persona->empresa->first()->empresa;
+        
+        $bankData = [
+            'nombrebanco' => $input['nombrebanco'] ?? $empresa->nombrebanco,
+            'numero_cuenta' => $input['numero_cuenta'] ?? $empresa->numero_cuenta,
+            'numero_cci' => $input['numero_cci'] ?? $empresa->numero_cci,
+        ];
+
+        // Procesar QR Yape
+        if (request()->hasFile('qr_yape')) {
+            $file = request()->file('qr_yape');
+            if ($file->isValid()) {
+                if ($empresa->qr_yape) {
+                    Storage::disk('public')->delete($empresa->qr_yape);
+                }
+                $bankData['qr_yape'] = $file->store('empresa/qr', 'public');
+            }
         }
+
+        // Procesar QR Plin
+        if (request()->hasFile('qr_plin')) {
+            $file = request()->file('qr_plin');
+            if ($file->isValid()) {
+                if ($empresa->qr_plin) {
+                    Storage::disk('public')->delete($empresa->qr_plin);
+                }
+                $bankData['qr_plin'] = $file->store('empresa/qr', 'public');
+            }
+        }
+
+        $empresa->update($bankData);
     }
     
+    public function deleteQrYape(User $user)
+    {
+        $empresa = $user->persona->empresa->first()->empresa;
+        Storage::disk('public')->delete($empresa->qr_yape);
+        $empresa->update(['qr_yape' => null]);
+    }
+
+    public function deleteQrPlin(User $user)
+    {
+        $empresa = $user->persona->empresa->first()->empresa;
+        Storage::disk('public')->delete($empresa->qr_plin);
+        $empresa->update(['qr_plin' => null]);
+    }
+
     protected function handleCompanyUpdates(User $user, array $input): void
     {
         $empresa = $user->persona->empresa->first()?->empresa;

@@ -104,8 +104,12 @@ class ReservaCliente extends Component
     {
         return Reservas::with(['paquete', 'users'])
             ->where('fk_idusers', Auth::id())
+            ->whereIn('estado', ['pendiente', 'confirmada']) // Solo mostrar pendientes y confirmadas
             ->when($this->filtroEstado, function($query) {
-                $query->where('estado', $this->filtroEstado);
+                // Solo permitir filtrar por los estados permitidos
+                if (in_array($this->filtroEstado, ['pendiente', 'confirmada'])) {
+                    $query->where('estado', $this->filtroEstado);
+                }
             })
             ->when($this->fechaFiltro, function($query) {
                 $query->whereDate('fechareserva', $this->fechaFiltro);

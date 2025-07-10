@@ -300,7 +300,11 @@
                             <h4 class="text-md font-medium text-gray-800 flex items-center">
                                 <i class="fas fa-qrcode mr-2 text-purple-600"></i> Códigos QR de Pago
                             </h4>
-
+                            @php
+                                $empresa = $this->user->persona->empresa->first()->empresa;
+                                // Forzar la carga fresca de los datos
+                                $empresa->refresh();
+                            @endphp
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <!-- QR Yape -->
                                 <div x-data="{ qrYapeName: null, qrYapePreview: null }">
@@ -308,10 +312,8 @@
                                         Yape</label>
 
                                     @if ($empresa->qr_yape)
-                                        <div class="mt-2 mb-3 flex justify-center">
-                                            <img src="{{ Storage::url($empresa->qr_yape) }}" alt="QR Yape"
-                                                class="w-24 h-24 object-cover rounded-lg border-2 border-purple-100 shadow-sm">
-                                        </div>
+                                        <img src="{{ Storage::url($empresa->qr_yape) }}" alt="QR Yape"
+                                            class="w-24 h-24 object-cover rounded-lg border-2 border-purple-100 shadow-sm">
                                     @endif
 
                                     <div class="flex gap-2">
@@ -325,13 +327,13 @@
                                         @if ($empresa->qr_yape)
                                             <button type="button"
                                                 class="inline-flex items-center justify-center px-4 py-2 bg-white border border-red-200 rounded-md font-semibold text-xs text-red-600 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
-                                                wire:click="deleteQrYape">
+                                                onclick="confirm('¿Eliminar QR Yape?') && document.getElementById('delete-qr-yape-form').submit()">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         @endif
                                     </div>
 
-                                    <input type="file" id="qr_yape" class="hidden" wire:model="qr_yape"
+                                    <input type="file" id="qr_yape" name="qr_yape" class="hidden"
                                         x-ref="qrYape"
                                         x-on:change="
                                             qrYapeName = $refs.qrYape.files[0].name;
@@ -343,11 +345,14 @@
                                         "
                                         accept="image/jpeg,image/png,image/jpg" />
 
-                                    <div class="mt-2 text-xs text-gray-500" x-show="qrYapeName"
-                                        x-text="'Archivo: ' + qrYapeName"></div>
-                                    @error('qr_yape')
-                                        <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
-                                    @enderror
+                                    <!-- Formulario oculto para eliminar -->
+                                    @if ($empresa->qr_yape)
+                                        <form id="delete-qr-yape-form" method="POST"
+                                            action="{{ route('delete.qr.yape') }}" class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    @endif
                                 </div>
 
                                 <!-- QR Plin -->
@@ -356,10 +361,8 @@
                                         Plin</label>
 
                                     @if ($empresa->qr_plin)
-                                        <div class="mt-2 mb-3 flex justify-center">
-                                            <img src="{{ Storage::url($empresa->qr_plin) }}" alt="QR Plin"
-                                                class="w-24 h-24 object-cover rounded-lg border-2 border-purple-100 shadow-sm">
-                                        </div>
+                                        <img src="{{ Storage::url($empresa->qr_plin) }}" alt="QR Plin"
+                                            class="w-24 h-24 object-cover rounded-lg border-2 border-purple-100 shadow-sm">
                                     @endif
 
                                     <div class="flex gap-2">
