@@ -133,6 +133,13 @@ $porcentaje_progreso = min(($reservas_confirmadas / $max_reservas_premio) * 100,
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('pantalladividida') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-columns w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Pantalla dividida</span>
+                            </a>
+                        </li>
+                        {{-- <li>
                             <a href="{{ route('servicios') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('servicios') ? 'bg-purple-600' : '' }}">
                                 <i class="fas fa-concierge-bell w-5"></i>
@@ -145,8 +152,7 @@ $porcentaje_progreso = min(($reservas_confirmadas / $max_reservas_premio) * 100,
                                 <i class="fas fa-heart w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Equipos</span>
                             </a>
-                        </li>
-
+                        </li> --}}
                         <li>
                             <a href="{{ route('reservacli') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
@@ -155,17 +161,17 @@ $porcentaje_progreso = min(($reservas_confirmadas / $max_reservas_premio) * 100,
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('paquetecliente') }}"
-                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('empresas') ? 'bg-purple-600' : '' }}">
-                                <i class="fas fa-building w-5"></i>
-                                <span x-show="sidebarOpen" class="ml-3">Mis Paquetes</span>
-                            </a>
-                        </li>
-                        <li>
                             <a href="{{ route('favoritos') }}"
                                 class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors">
                                 <i class="fas fa-heart w-5"></i>
                                 <span x-show="sidebarOpen" class="ml-3">Favoritos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('paquetecliente') }}"
+                                class="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors {{ request()->routeIs('empresas') ? 'bg-purple-600' : '' }}">
+                                <i class="fas fa-building w-5"></i>
+                                <span x-show="sidebarOpen" class="ml-3">Historial</span>
                             </a>
                         </li>
                     @elseif(session('user_type') == 'empresa')

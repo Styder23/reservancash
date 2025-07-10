@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Turismo Natural</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         :root {
             --color-primary: #7e22ce;
@@ -465,15 +464,6 @@
                 display: none;
             }
         }
-
-
-        /* */
-
-
-
-
-
-        /* */
     </style>
 </head>
 
@@ -546,6 +536,9 @@
                                 <input type="hidden" name="user_type" value="2">
                             </div>
                         </div>
+
+                        <!-- Input único para user_type (se actualiza con JavaScript) -->
+                        <input type="hidden" name="user_type" value="3" id="hidden_user_type">
                     </div>
 
                     <!-- Sección para Cliente -->
@@ -555,7 +548,8 @@
                             <div class="form-group">
                                 <label class="form-label" for="document_type">Tipo de Documento</label>
                                 <select class="form-control" id="document_type" name="document_type" required>
-                                    <option value="dni">DNI</option>
+                                    <option value="">Seleccione</option>
+                                    <option value="dni" selected>DNI</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -565,7 +559,8 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="document_number"
-                                        name="document_number" maxlength="8" required>
+                                        name="document_number" maxlength="8" pattern="[0-9]{8}" placeholder="12345678"
+                                        required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -574,7 +569,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-user"></i>
                                     </span>
-                                    <input class="form-control" type="text" id="nombres" name="nombres" required>
+                                    <input class="form-control" type="text" id="nombres" name="nombres"
+                                        placeholder="Juan Carlos" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -584,7 +580,7 @@
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <input class="form-control" type="text" id="apellidos" name="apellidos"
-                                        required>
+                                        placeholder="Pérez García" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -594,7 +590,7 @@
                                         <i class="fas fa-phone"></i>
                                     </span>
                                     <input class="form-control" type="tel" id="telefono" name="telefono"
-                                        maxlength="9" required>
+                                        maxlength="9" pattern="[0-9]{9}" placeholder="987654321" required>
                                 </div>
                             </div>
                         </div>
@@ -611,7 +607,7 @@
                                         <i class="fas fa-trademark"></i>
                                     </span>
                                     <input class="form-control" type="text" id="nombre_empresa"
-                                        name="nombre_empresa">
+                                        name="nombre_empresa" placeholder="Mi Empresa SAC">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -621,7 +617,7 @@
                                         <i class="fas fa-hashtag"></i>
                                     </span>
                                     <input class="form-control" type="text" id="ruc" name="ruc"
-                                        maxlength="11">
+                                        maxlength="11" pattern="[0-9]{11}" placeholder="12345678901">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -630,8 +626,8 @@
                                     <span class="input-group-prepend">
                                         <i class="fas fa-file-signature"></i>
                                     </span>
-                                    <input class="form-control" type="text" id="razon_social"
-                                        name="razon_social">
+                                    <input class="form-control" type="text" id="razon_social" name="razon_social"
+                                        placeholder="MI EMPRESA SOCIEDAD ANÓNIMA CERRADA">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -641,7 +637,7 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                     </span>
                                     <input class="form-control" type="text" id="direccion_empresa"
-                                        name="direccion_empresa">
+                                        name="direccion_empresa" placeholder="Av. Principal 123, Lima">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -651,7 +647,8 @@
                                         <i class="fas fa-phone-alt"></i>
                                     </span>
                                     <input class="form-control" type="tel" id="telefono_empresa"
-                                        name="telefono_empresa" maxlength="9">
+                                        name="telefono_empresa" maxlength="9" pattern="[0-9]{9}"
+                                        placeholder="987654321">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -672,7 +669,8 @@
                                 <label class="form-label" for="doc_type_representante">Tipo de Documento</label>
                                 <select class="form-control" id="doc_type_representante"
                                     name="doc_type_representante">
-                                    <option value="dni">DNI</option>
+                                    <option value="">Seleccione</option>
+                                    <option value="dni" selected>DNI</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -682,7 +680,8 @@
                                         <i class="fas fa-id-card"></i>
                                     </span>
                                     <input class="form-control" type="text" id="doc_number_representante"
-                                        name="doc_number_representante" maxlength="8">
+                                        name="doc_number_representante" maxlength="8" pattern="[0-9]{8}"
+                                        placeholder="12345678">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -692,7 +691,7 @@
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <input class="form-control" type="text" id="nombres_representante"
-                                        name="nombres_representante">
+                                        name="nombres_representante" placeholder="María Elena">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -702,7 +701,7 @@
                                         <i class="fas fa-user"></i>
                                     </span>
                                     <input class="form-control" type="text" id="apellidos_representante"
-                                        name="apellidos_representante">
+                                        name="apellidos_representante" placeholder="González López">
                                 </div>
                             </div>
                         </div>
@@ -711,7 +710,6 @@
                     <!-- Datos de la Cuenta -->
                     <div class="form-section">
                         <h3 class="section-title"><i class="fas fa-key"></i> Datos de Acceso</h3>
-
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label" for="email">Correo Electrónico</label>
@@ -723,13 +721,6 @@
                                         required>
                                 </div>
                             </div>
-                            {{-- --}}
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" id="verifyEmailButton">
-                                    <i class="fas fa-check" id=""></i> Verificar
-                                </button>
-                            </div>
-                            {{-- --}}
                             <div class="form-group">
                                 <label class="form-label" for="password">Contraseña</label>
                                 <div class="input-group">
@@ -737,7 +728,7 @@
                                         <i class="fas fa-lock"></i>
                                     </span>
                                     <input class="form-control" type="password" id="password" name="password"
-                                        required disabled>
+                                        required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -747,10 +738,9 @@
                                         <i class="fas fa-lock"></i>
                                     </span>
                                     <input class="form-control" type="password" id="password_confirmation"
-                                        name="password_confirmation" required disabled>
+                                        name="password_confirmation" required>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -790,49 +780,11 @@
                         </div>
                     </div>
                 @endif
-
-
-                {{-- --}}
-                <!-- Modal para verificación -->
-                <div class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 hidden"
-                    id="verificationModal">
-                    <div class="bg-white rounded-lg shadow-lg max-w-sm w-full">
-                        <div class="modal-header flex justify-between items-center p-4 border-b">
-                            <h3 class="text-lg font-semibold">Verificación de Correo</h3>
-                            <button type="button" class="text-gray-600 hover:text-gray-800"
-                                id="closeModalButtonX"><i class="fas fa-window-close fa-2x"></i></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <p>Se ha enviado un código de verificación a <strong id="modalEmailDisplay"></strong>. Por
-                                favor, revisa tu bandeja de entrada (incluyendo spam).</p> <input type="text"
-                                id="verificationCode" class="mt-2 p-2 border border-gray-300 rounded w-full"
-                                placeholder="Código de verificación" maxlength="6">
-                            <div id="modalAlerts" class="mt-3">
-                            </div>
-                        </div>
-                        <div class="modal-footer flex justify-end p-4 border-t">
-                            <button type="button"
-                                class="bg-gray-300 text-gray-700 hover:bg-gray-400 rounded px-6 py-2 mr-2"
-                                id="closeModalButtonFooter">Cerrar</button>
-                            <button type="button"
-                                class="bg-blue-500 text-white hover:bg-blue-600 rounded px-4 py-2 mr-2"
-                                id="resendCodeButton">Reenviar Código</button>
-                            <button type="button"
-                                class="bg-green-500 text-white hover:bg-green-600 rounded px-6 py-2"
-                                id="validateCodeButton">Validar</button>
-                        </div>
-                    </div>
-                </div>
-                {{-- --}}
-
-
             </div>
         </div>
     </div>
 
-
     <script>
-        // Función para inicializar el toggle de tipo de usuario
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar cuando el DOM esté listo
             initializeUserTypeToggle();
@@ -841,235 +793,6 @@
             initializeAlerts();
             updateRequiredFields();
         });
-
-        /* */
-        // Funcion al hacer clcik en verificar
-        document.getElementById('verifyEmailButton').onclick = function(event) {
-            event.preventDefault(); // Evita el envío del formulario
-
-            // Verificar campos de información personal
-            const documentType = document.getElementById('document_type').value;
-            const documentNumber = document.getElementById('document_number').value;
-            const nombres = document.getElementById('nombres').value;
-            const apellidos = document.getElementById('apellidos').value;
-            const telefono = document.getElementById('telefono').value;
-            const email = document.getElementById('email').value;
-
-            // Verificar que todos los campos estén completos
-            /*if (documentType && documentNumber && nombres && apellidos && telefono && email) {
-                // Aquí puedes agregar la lógica para enviar el código al correo
-                console.log(`Enviando código a: ${email}`);*/
-
-            // Abrir el modal
-
-
-            document.getElementById('verificationModal').classList.remove('hidden');
-            /* } else {
-                 alert("Por favor, completa todos los campos de información personal.");
-             }*/
-        };
-
-        // Función para cerrar el modal
-        function closeModal() {
-            document.getElementById('verificationModal').classList.add('hidden');
-            // Opcional: Limpiar el campo del código de verificación al cerrar
-            document.getElementById('verificationCode').value = '';
-            // Opcional: Limpiar los mensajes de alerta del modal al cerrar
-            document.getElementById('modalAlerts').innerHTML = '';
-        }
-        // Asignar la función closeModal a ambos botones de cierre
-        document.getElementById('closeModalButtonX').onclick = closeModal;
-        document.getElementById('closeModalButtonFooter').onclick = closeModal;
-        // Cerrar el modal al hacer clic fuera de él
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('verificationModal')) {
-                closeModal();
-            }
-        };
-        // Model al centro
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('verificationModal')) {
-                document.getElementById('verificationModal').classList.add('hidden');
-            }
-        };
-
-  
-        
-
-        /* --- Función para mostrar alertas dentro del modal --- */
-        function showModalAlert(message, type = 'error') {
-            const modalAlerts = document.getElementById('modalAlerts');
-            modalAlerts.innerHTML = ''; // Limpiar alertas anteriores
-
-            const alertDiv = document.createElement('div');
-            alertDiv.className =
-                `p-3 rounded-md text-sm ${type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
-            alertDiv.textContent = message;
-            modalAlerts.appendChild(alertDiv);
-        }
-
-        /* --- Función para cerrar el modal --- */
-        function closeModal() {
-            document.getElementById('verificationModal').classList.add('hidden');
-            document.getElementById('verificationCode').value = ''; // Limpiar el campo del código
-            document.getElementById('modalAlerts').innerHTML = ''; // Limpiar los mensajes de alerta
-        }
-
-        // Asignar la función closeModal a ambos botones de cierre
-        document.getElementById('closeModalButtonX').onclick = closeModal;
-        document.getElementById('closeModalButtonFooter').onclick = closeModal;
-
-        // Cerrar el modal al hacer clic fuera de él
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('verificationModal')) {
-                closeModal();
-            }
-        };
-
-
-
-
-        /* --- Función al hacer clic en verificar (ENVÍO DEL CÓDIGO) --- */
-        document.getElementById('verifyEmailButton').onclick = function(event) {
-            event.preventDefault(); // Evita el envío del formulario
-
-            const emailInput = document.getElementById('email');
-            const email = emailInput.value.trim(); // Captura el email y elimina espacios
-
-            if (!email) {
-                alert("Por favor, ingresa tu correo electrónico para verificar.");
-                return;
-            }
-
-            if (!/\S+@\S+\.\S+/.test(email)) { // Validación básica de formato de email
-                alert("Por favor, ingresa un correo electrónico válido.");
-                return;
-            }
-
-            // Aquí hacemos la solicitud al backend para enviar el código
-            fetch('/send-verification-code', { // Esta será la nueva ruta en tu backend
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}', // Si usas Laravel o similar
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Si el backend dice que el correo se envió con éxito, mostramos el modal
-                        document.getElementById('modalEmailDisplay').textContent = email;
-                        document.getElementById('verificationModal').classList.remove('hidden');
-                        showModalAlert('Se ha enviado un código de verificación a tu correo.', 'success');
-                        // Opcional: Deshabilitar el botón de reenvío por un tiempo para evitar spam
-                        const resendButton = document.getElementById('resendCodeButton');
-                        resendButton.disabled = true;
-                        setTimeout(() => {
-                            resendButton.disabled = false;
-                        }, 60000); // Habilitar después de 60 segundos
-                    } else {
-                        alert(data.message || 'Error al enviar el código de verificación.');
-                        // showModalAlert(data.message || 'Error al enviar el código de verificación.', 'error'); // Si prefieres la alerta dentro del modal
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al enviar el código:', error);
-                    alert('Ocurrió un error en la comunicación. Intenta de nuevo más tarde.');
-                    // showModalAlert('Ocurrió un error en la comunicación. Intenta de nuevo más tarde.', 'error');
-                });
-        };
-
-        /* --- Función para validar código (ya existente, con mejoras) --- */
-        document.getElementById('validateCodeButton').addEventListener('click', function() {
-            const code = document.getElementById('verificationCode').value.trim();
-            const email = document.getElementById('email').value.trim(); // Obtener el email del campo principal
-
-            if (code.length !== 6 || !/^\d+$/.test(code)) { // Aseguramos 6 dígitos y que sean solo números
-                showModalAlert('El código de verificación debe ser un número de 6 dígitos.', 'error');
-                return;
-            }
-
-            fetch('/validate-verification-code', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email, // Envía el email también para validar
-                        code: code
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('password').disabled = false;
-                        document.getElementById('password_confirmation').disabled = false;
-                        showModalAlert('Código verificado correctamente.', 'success');
-                        setTimeout(() => {
-                            closeModal(); // Cierra el modal
-                        }, 1500);
-                    } else {
-                        showModalAlert(data.message ||
-                            'Código de verificación incorrecto o expirado. Intenta de nuevo.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error en la validación:', error);
-                    showModalAlert('Ocurrió un error al validar el código. Por favor, intenta más tarde.',
-                        'error');
-                });
-        });
-
-        /* --- Función para reenviar código (similar al envío inicial) --- */
-        document.getElementById('resendCodeButton').addEventListener('click', function() {
-            const email = document.getElementById('email').value.trim();
-
-            if (!email || !/\S+@\S+\.\S+/.test(email)) {
-                showModalAlert('No se puede reenviar el código sin un correo electrónico válido.', 'error');
-                return;
-            }
-
-            fetch('/send-verification-code', { // Reutilizamos la misma ruta de envío
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showModalAlert('Se ha reenviado un nuevo código a tu correo.', 'success');
-                        document.getElementById('verificationCode').value =
-                        ''; // Limpiar el campo para el nuevo código
-                        // Deshabilitar el botón de reenvío nuevamente
-                        const resendButton = document.getElementById('resendCodeButton');
-                        resendButton.disabled = true;
-                        setTimeout(() => {
-                            resendButton.disabled = false;
-                        }, 60000); // Habilitar después de 60 segundos
-                    } else {
-                        showModalAlert(data.message ||
-                            'No se pudo reenviar el código. Intenta de nuevo más tarde.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al reenviar el código:', error);
-                    showModalAlert('Ocurrió un error al reenviar el código. Por favor, intenta más tarde.',
-                        'error');
-                });
-        });
-
-
-        /* */
-
 
         // Cambiar entre tipo de usuario (Cliente/Empresa)
         function initializeUserTypeToggle() {
@@ -1092,13 +815,14 @@
                     const targetSection = document.getElementById(targetId);
                     if (targetSection) targetSection.style.display = 'block';
 
-                    // Actualizar el valor del tipo de usuario
-                    document.querySelectorAll('input[name="user_type"]').forEach(input => {
-                        input.disabled = true;
-                    });
+                    // CORREGIDO: Actualizar el valor del tipo de usuario correctamente
+                    const userTypeValue = this.querySelector('input[name="user_type"]').value;
+                    console.log('Tipo de usuario seleccionado:', userTypeValue); // Debug
 
-                    const selectedInput = this.querySelector('input');
-                    if (selectedInput) selectedInput.disabled = false;
+                    // Actualizar todos los inputs hidden de user_type
+                    document.querySelectorAll('input[name="user_type"]').forEach(input => {
+                        input.value = userTypeValue;
+                    });
 
                     updateRequiredFields();
                 });
@@ -1125,6 +849,7 @@
             if (!activeOption) return;
 
             const isCompany = activeOption.getAttribute('data-target') === 'company-section';
+            console.log('Es empresa:', isCompany); // Debug
 
             // Campos de cliente
             const clientFields = ['document_type', 'document_number', 'nombres', 'apellidos', 'telefono'];
@@ -1139,26 +864,50 @@
                 // Hacer campos de empresa requeridos
                 companyFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = true;
+                    if (input) {
+                        input.required = true;
+                        input.removeAttribute('disabled');
+                    }
                 });
 
-                // Hacer campos de cliente opcionales
+                // Hacer campos de cliente opcionales y limpiar valores
                 clientFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = false;
+                    if (input) {
+                        input.required = false;
+                        input.value = ''; // Limpiar valor
+                        // No deshabilitar, solo quitar required
+                    }
                 });
             } else {
                 // Hacer campos de cliente requeridos
                 clientFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = true;
+                    if (input) {
+                        input.required = true;
+                        input.removeAttribute('disabled');
+                    }
                 });
 
-                // Hacer campos de empresa opcionales
+                // Hacer campos de empresa opcionales y limpiar valores
                 companyFields.forEach(field => {
                     const input = document.getElementById(field);
-                    if (input) input.required = false;
+                    if (input) {
+                        input.required = false;
+                        input.value = ''; // Limpiar valor
+                        // No deshabilitar, solo quitar required
+                    }
                 });
+
+                // También limpiar el archivo de logo
+                const logoInput = document.getElementById('logo_empresa');
+                if (logoInput) {
+                    logoInput.value = '';
+                    const nextElement = logoInput.nextElementSibling;
+                    if (nextElement) {
+                        nextElement.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Subir Logo';
+                    }
+                }
             }
         }
 
@@ -1172,6 +921,13 @@
 
                 const form = e.target;
                 const button = document.getElementById('registerButton');
+                const formData = new FormData(form);
+
+                // AGREGADO: Debug para ver qué se está enviando
+                console.log('Datos del formulario:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, ':', value);
+                }
 
                 if (!button) return;
 
@@ -1180,50 +936,54 @@
 
                 fetch(form.action, {
                         method: form.method,
-                        body: new FormData(form),
+                        body: formData,
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'Accept': 'application/json'
                         }
                     })
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
+                        console.log('Response status:', response.status);
+                        return response.json().then(data => {
+                            if (response.ok) {
+                                return data;
+                            } else {
+                                throw {
+                                    status: response.status,
+                                    data: data
+                                };
+                            }
+                        });
                     })
                     .then(data => {
+                        console.log('Data received:', data);
                         if (data.success && data.redirect) {
-                            // Mostrar modal de éxito o mensaje
-                            const successModal = document.getElementById('successModal');
-                            if (successModal && typeof bootstrap !== 'undefined') {
-                                const modal = new bootstrap.Modal(successModal);
-                                modal.show();
-                            } else {
-                                // Mostrar mensaje de éxito si no hay modal
-                                showSuccessMessage(data.message);
-                            }
-
-                            // Redirigir después de 3 segundos
+                            showSuccessMessage(data.message);
                             setTimeout(() => {
                                 window.location.href = data.redirect;
                             }, 3000);
                         } else if (!data.success && data.errors) {
-                            // Manejar errores de validación
                             displayErrors(data.errors);
                             setButtonLoading(button, false);
                         } else if (!data.success) {
-                            // Error general
                             showErrorMessage(data.message || 'Ha ocurrido un error');
                             setButtonLoading(button, false);
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        console.error('Error completo:', error);
                         setButtonLoading(button, false);
 
-                        // Mostrar mensaje de error al usuario
-                        showErrorMessage('Ha ocurrido un error. Por favor, inténtelo de nuevo.');
+                        if (error.status === 422 && error.data) {
+                            if (error.data.errors) {
+                                console.log('Errores de validación:', error.data.errors);
+                                displayErrors(error.data.errors);
+                            } else {
+                                showErrorMessage(error.data.message || 'Errores de validación');
+                            }
+                        } else {
+                            showErrorMessage('Ha ocurrido un error. Por favor, inténtelo de nuevo.');
+                        }
                     });
             });
         }
@@ -1237,7 +997,7 @@
             } else {
                 button.disabled = false;
                 button.classList.remove('btn-loading');
-                button.innerHTML = '<i class="fas fa-paper-plane"></i> Registrarse';
+                button.innerHTML = '<i class="fas fa-user-plus"></i> Registrarse';
             }
         }
 
@@ -1254,7 +1014,7 @@
                 if (input) {
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'error-message text-danger small mt-1';
-                    errorDiv.textContent = errors[field][0]; // Primer error del campo
+                    errorDiv.textContent = errors[field][0];
                     input.parentNode.appendChild(errorDiv);
                 }
             });
@@ -1268,13 +1028,12 @@
                 successAlert.id = 'dynamic-success-alert';
                 successAlert.className = 'alert alert-success';
                 successAlert.innerHTML = `
-                <div class="alert-content">
-                    <i class="fas fa-check-circle"></i>
-                    <span>${message}</span>
-                    <button onclick="closeAlert('dynamic-success-alert')" class="alert-close">&times;</button>
-                </div>
-            `;
-
+            <div class="alert-content">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+                <button onclick="closeAlert('dynamic-success-alert')" class="alert-close">&times;</button>
+            </div>
+        `;
                 const form = document.getElementById('registerForm');
                 if (form) {
                     form.parentNode.insertBefore(successAlert, form);
@@ -1288,20 +1047,18 @@
 
         // Función para mostrar mensaje de error general
         function showErrorMessage(message) {
-            // Crear o actualizar alerta de error
             let errorAlert = document.getElementById('dynamic-error-alert');
             if (!errorAlert) {
                 errorAlert = document.createElement('div');
                 errorAlert.id = 'dynamic-error-alert';
                 errorAlert.className = 'alert alert-error';
                 errorAlert.innerHTML = `
-                <div class="alert-content">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>${message}</span>
-                    <button onclick="closeAlert('dynamic-error-alert')" class="alert-close">&times;</button>
-                </div>
-            `;
-
+            <div class="alert-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${message}</span>
+                <button onclick="closeAlert('dynamic-error-alert')" class="alert-close">&times;</button>
+            </div>
+        `;
                 const form = document.getElementById('registerForm');
                 if (form) {
                     form.parentNode.insertBefore(errorAlert, form);
@@ -1326,11 +1083,9 @@
 
         // Inicializar manejo de alertas
         function initializeAlerts() {
-            // Auto-cerrar alerts después de 5 segundos (excepto los dinámicos de error)
             setTimeout(function() {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(function(alert) {
-                    // No auto-cerrar alertas de error específicas
                     if (!alert.id.includes('error') && !alert.id.includes('Error')) {
                         alert.style.opacity = '0';
                         setTimeout(function() {

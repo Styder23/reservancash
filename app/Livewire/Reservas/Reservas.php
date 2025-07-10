@@ -109,7 +109,7 @@ class Reservas extends Component
             $reserva->update(['estado' => 'confirmada']);
             
             // Actualizar o crear el registro en la tabla de premios
-            $this->actualizarPremiosUsuario($reserva->fk_idusers);
+            $this->actualizarPremiosUsuario();
 
             $this->cerrarModales();
             session()->flash('success', 'Reserva confirmada exitosamente.');
@@ -118,7 +118,7 @@ class Reservas extends Component
         }
     }
 
-    private function actualizarPremiosUsuario($userId)
+    /*private function actualizarPremiosUsuario($userId)
     {
         try {
             // Registrar la reserva confirmada usando el método del modelo
@@ -127,6 +127,32 @@ class Reservas extends Component
         } catch (\Exception $e) {
             // Log del error sin afectar la confirmación de la reserva
             \Log::error('Error al actualizar premios del usuario: ' . $e->getMessage());
+        }
+    }*/
+    private function actualizarPremiosUsuario()
+    {
+        // Buscar o crear registro de premios para el usuario
+        $premioUsuario = \App\Models\premios::firstOrCreate(
+            ['fk_iduser' => Auth::id()],
+            [
+                'cantidad_reservas' => 0,
+                'premios_disponibles' => 0,
+                'premios_usados' => 0
+            ]
+        );
+        
+        // Incrementar la cantidad de reservas
+        $premioUsuario->increment('cantidad_reservas');
+        
+        // Lógica de premios: cada 5 reservas = 1 premio disponible
+        if ($premioUsuario->cantidad_reservas % 5 == 0) {
+            $premioUsuario->increment('premios_disponibles');
+            
+            // Opcional: Notificar al usuario que tiene un premio disponible
+            $this->dispatch('mostrarAlerta', [
+                'tipo' => 'success',
+                'mensaje' => '¡Felicidades! Has ganado un premio por completar ' . $premioUsuario->cantidad_reservas . ' reservas.'
+            ]);
         }
     }
 

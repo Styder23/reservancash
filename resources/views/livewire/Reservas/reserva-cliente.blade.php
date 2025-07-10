@@ -7,16 +7,13 @@
 
             <!-- Filtros -->
             <div class="flex space-x-4">
-                <select wire:model="filtroEstado"
+                <select wire:model.live="filtroEstado"
                     class="px-4 py-2 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <option value="">Todos los estados</option>
                     <option value="pendiente">Pendientes</option>
                     <option value="confirmado">Confirmadas</option>
                     <option value="cancelada">Canceladas</option>
                 </select>
-
-                <input type="date" wire:model="fechaFiltro"
-                    class="px-4 py-2 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
             </div>
         </div>
 

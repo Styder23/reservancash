@@ -4,39 +4,38 @@ import string
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
-import mysql.connector # O 'pymysql' si lo prefieres
+import pymysql
 
 app = Flask(__name__)
 
-# --- Configuración de Flask-Mail (mantener igual) ---
-app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
-app.config['MAIL_USE_SSL'] = os.environ.get('MAIL_USE_SSL', 'False').lower() == 'true'
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'tu_correo@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'tu_contraseña_de_aplicacion')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'tu_correo@gmail.com')
+# --- Configuración de Flask-Mail ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'luisfeversantillancornelio@gmail.com'
+app.config['MAIL_PASSWORD'] = 'luisfever'
+app.config['MAIL_DEFAULT_SENDER'] = 'luisfeversantillancornelio@gmail.com'
 mail = Mail(app)
 
 # --- Configuración de la Base de Datos ---
-# ¡IMPORTANTE! Reemplaza con tus credenciales reales o variables de entorno
 DB_CONFIG = {
     'host': os.environ.get('DB_HOST', 'localhost'),
     'user': os.environ.get('DB_USER', 'root'),
-    'password': os.environ.get('DB_PASSWORD', 'your_db_password'), # Tu contraseña de DB
-    'database': os.environ.get('DB_NAME', 'bdturismo')
+    'password': os.environ.get('DB_PASSWORD', 'your_db_password'),  # Cambia esto por tu contraseña real
+    'database': os.environ.get('DB_NAME', 'bdturismo'),
+    'cursorclass': pymysql.cursors.DictCursor  # Para que todos los cursores devuelvan diccionarios
 }
 
 # --- Función para obtener conexión a la DB ---
 def get_db_connection():
     try:
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = pymysql.connect(**DB_CONFIG)
         return conn
-    except mysql.connector.Error as err:
+    except pymysql.MySQLError as err:
         print(f"Error al conectar a la base de datos: {err}")
         return None
 
-# --- Función para generar un código al azar de 6 dígitos (mantener igual) ---
+# --- Función para generar un código de verificación ---
 def generate_verification_code():
     return ''.join(random.choices(string.digits, k=6))
 
@@ -51,23 +50,23 @@ def send_verification_code():
 
     conn = get_db_connection()
     if conn is None:
-        return jsonify({'success': False, 'message': 'Error interno del servidor al conectar con la base de datos.'}), 500
+        return jsonify({'success': False, 'message': 'Error al conectar a la base de datos.'}), 500
 
     try:
-        cursor = conn.cursor()
-        code = generate_verification_code()
-        expires_at = datetime.now() + timedelta(minutes=5)
+        with conn.cursor() as cursor:
+            code = generate_verification_code()
+            expires_at = datetime.now() + timedelta(minutes=5)
 
-        # Eliminar códigos antiguos para este email antes de insertar uno nuevo
-        cursor.execute("DELETE FROM email_verifications WHERE email = %s", (email,))
-        conn.commit()
+            # Eliminar códigos anteriores
+            cursor.execute("DELETE FROM email_verifications WHERE email = %s", (email,))
+            conn.commit()
 
-        # Insertar el nuevo código en la base de datos
-        insert_query = "INSERT INTO email_verifications (email, verification_code, expires_at) VALUES (%s, %s, %s)"
-        cursor.execute(insert_query, (email, code, expires_at))
-        conn.commit()
+            # Insertar nuevo código
+            insert_query = "INSERT INTO email_verifications (email, verification_code, expires_at, created_at) VALUES (%s, %s, %s, NOW())"
+            cursor.execute(insert_query, (email, code, expires_at))
+            conn.commit()
 
-        # Enviar el correo (la lógica del correo se mantiene igual)
+        # Enviar correo
         msg = Message('Código de Verificación - Tu Aplicación',
                       sender=app.config['MAIL_DEFAULT_SENDER'],
                       recipients=[email])
@@ -89,12 +88,12 @@ def send_verification_code():
                     <h2>Verificación de Correo Electrónico</h2>
                 </div>
                 <p>Hola,</p>
-                <p>Gracias por registrarte en nuestra aplicación. Para completar tu verificación, por favor, usa el siguiente código:</p>
+                <p>Gracias por registrarte en nuestra aplicación. Usa el siguiente código para verificar tu correo:</p>
                 <div class="code-box">
                     {code}
                 </div>
-                <p>Este código es válido por **5 minutos**. Si no solicitaste este código, puedes ignorar este correo.</p>
-                <p>Saludos cordiales,<br>El equipo de Tu Aplicación</p>
+                <p>Este código es válido por <strong>5 minutos</strong>.</p>
+                <p>Saludos,<br>El equipo de Tu Aplicación</p>
                 <div class="footer">
                     <p>&copy; {datetime.now().year} Tu Aplicación. Todos los derechos reservados.</p>
                 </div>
@@ -102,17 +101,14 @@ def send_verification_code():
         </body>
         </html>
         """
-
         mail.send(msg)
         return jsonify({'success': True, 'message': 'Código enviado exitosamente.'})
 
     except Exception as e:
-        print(f"Error al enviar correo o guardar en DB: {e}")
-        return jsonify({'success': False, 'message': 'Error al procesar la solicitud de verificación.'}), 500
+        print(f"Error al procesar solicitud: {e}")
+        return jsonify({'success': False, 'message': 'Error interno al enviar el código.'}), 500
     finally:
-        if conn:
-            cursor.close()
-            conn.close()
+        conn.close()
 
 # --- Ruta para validar el código de verificación ---
 @app.route('/validate-verification-code', methods=['POST'])
@@ -126,44 +122,41 @@ def validate_verification_code():
 
     conn = get_db_connection()
     if conn is None:
-        return jsonify({'success': False, 'message': 'Error interno del servidor al conectar con la base de datos.'}), 500
+        return jsonify({'success': False, 'message': 'Error al conectar a la base de datos.'}), 500
 
     try:
-        cursor = conn.cursor(dictionary=True) # Usamos dictionary=True para obtener resultados como diccionarios
-        select_query = "SELECT verification_code, expires_at FROM email_verifications WHERE email = %s ORDER BY created_at DESC LIMIT 1"
-        cursor.execute(select_query, (email,))
-        stored_code_info = cursor.fetchone()
+        with conn.cursor() as cursor:
+            select_query = "SELECT verification_code, expires_at FROM email_verifications WHERE email = %s ORDER BY created_at DESC LIMIT 1"
+            cursor.execute(select_query, (email,))
+            result = cursor.fetchone()
 
-        if not stored_code_info:
-            return jsonify({'success': False, 'message': 'No hay código de verificación para este email o ya expiró.'}), 400
+            if not result:
+                return jsonify({'success': False, 'message': 'No se encontró un código válido.'}), 400
 
-        stored_code = stored_code_info['verification_code']
-        expires_at = stored_code_info['expires_at']
+            stored_code = result['verification_code']
+            expires_at = result['expires_at']
 
-        if datetime.now() > expires_at:
-            # Si el código ha expirado, lo eliminamos de la DB
-            delete_query = "DELETE FROM email_verifications WHERE email = %s AND verification_code = %s"
-            cursor.execute(delete_query, (email, stored_code))
-            conn.commit()
-            return jsonify({'success': False, 'message': 'El código de verificación ha expirado.'}), 400
+            if datetime.now() > expires_at:
+                # Código expirado
+                cursor.execute("DELETE FROM email_verifications WHERE email = %s AND verification_code = %s", (email, stored_code))
+                conn.commit()
+                return jsonify({'success': False, 'message': 'El código ha expirado.'}), 400
 
-        if code_entered == stored_code:
-            # Código válido y no expirado. Lo eliminamos de la DB después de usarlo.
-            delete_query = "DELETE FROM email_verifications WHERE email = %s AND verification_code = %s"
-            cursor.execute(delete_query, (email, stored_code))
-            conn.commit()
-            return jsonify({'success': True, 'message': 'Código validado correctamente.'})
-        else:
-            return jsonify({'success': False, 'message': 'Código de verificación incorrecto.'}), 400
+            if code_entered == stored_code:
+                # Código válido
+                cursor.execute("DELETE FROM email_verifications WHERE email = %s AND verification_code = %s", (email, stored_code))
+                conn.commit()
+                return jsonify({'success': True, 'message': 'Código validado correctamente.'})
+            else:
+                return jsonify({'success': False, 'message': 'Código incorrecto.'}), 400
 
     except Exception as e:
-        print(f"Error al validar código en DB: {e}")
-        return jsonify({'success': False, 'message': 'Error interno del servidor al validar el código.'}), 500
+        print(f"Error al validar el código: {e}")
+        return jsonify({'success': False, 'message': 'Error al validar el código.'}), 500
     finally:
-        if conn:
-            cursor.close()
-            conn.close()
+        conn.close()
 
-# --- Ejecutar la aplicación Flask (mantener igual) ---
+# --- Ejecutar la aplicación ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+# --- Fin del archivo app.py ---

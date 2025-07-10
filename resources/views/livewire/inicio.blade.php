@@ -1,4 +1,4 @@
-<div>
+<div class="bg-purple-200">
     <!-- Hero Section con imagen de fondo -->
     <div class="relative bg-cover bg-center h-96" style="background-image: url('inicioarriba.jpg')">
         <div class="absolute inset-0 bg-black opacity-50"></div>
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Buscador de servicios turísticos -->
-    <div class="bg-purple-300 py-6 shadow-md">
+    <div class="bg-purple-300 py-6 shadow-md mb-16">
         <div class="container mx-auto px-6">
             <form class="flex flex-col md:flex-row gap-4">
                 <!-- Option Destinos -->
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Sección de paquetes destacados -->
-    <div id="servicios" class="py-10 bg-purple-200">
+    <div id="servicios" class="py-10 bg-purple-200 mb-16">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Paquetes destacados</h2>
             <!-- Contenedor de los N paquetes -->
@@ -160,7 +160,7 @@
     </div>
 
     <!-- Sección de promociones destacados -->
-    <div id="servicios" class="py-10 bg-purple-200">
+    <div id="servicios" class="py-10 bg-purple-200 mb-16">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Promociones destacados</h2>
             <!-- Contenedor de las N promociones -->
@@ -245,7 +245,7 @@
         </div>
     </div>
 
-    <!-- Sección de emopresas de turismo -->
+    <!-- Sección de empresas de turismo -->
     <div class="py-10 bg-purple-200 mb-16">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Nuestras Empresas</h2>
@@ -284,7 +284,7 @@
     </div>
 
     <!-- Sección de itinerarios populares -->
-    <div class="py-10 bg-gray-50">
+    <div class="py-10 bg-purple-200 mb-16">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-8">Itinerarios populares</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -318,8 +318,8 @@
                                     </li>
                                 @endforeach
                             </ul>
-                            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Ver itinerario
-                                completo →</a>
+                            <a href="{{ route('vistapaquete', $itinerario->id) }}" class="text-blue-600
+                                hover:text-blue-800 font-medium">Ver itinerario completo →</a>
                         </div>
                     </div>
                 @empty
@@ -362,8 +362,278 @@
         </div>
     </div-->
 
+    <!-- Sección de reseñas populares -->
+    <div class="py-10 bg-purple-200 mb-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-8">Reseñas Populares</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                @forelse($resenas->take(3) as $resena)
+                    @if ($resena['paquete'] && $resena['comentario'])
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">
+                                    {{ $resena['paquete']->nombrepaquete }}
+                                </h3>
+
+                                <!-- Valoración (estrellas) -->
+                                <div class="flex items-center mb-4">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= $resena['comentario']->estrellas)
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500"
+                                                fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                            </svg>
+                                        @else
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300"
+                                                fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                            </svg>
+                                        @endif
+                                    @endfor
+                                    <span class="ml-2 text-gray-600">({{ $resena['comentario']->estrellas }}/5)</span>
+                                </div>
+
+                                <!-- Comentario -->
+                                <p class="text-gray-700 mb-4 italic">
+                                    "{{ $resena['comentario']->comentario }}"
+                                </p>
+
+                                <!-- Información del usuario -->
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span class="font-medium">{{ $resena['comentario']->users->name }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-8 0a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2H8z" />
+                                        </svg>
+                                        <span>{{ $resena['paquete']->empresa->nameempresa }}</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-8 0a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 00-2-2H8z" />
+                                        </svg>
+                                        <span>{{ \Carbon\Carbon::parse($resena['comentario']->fecha)->format('d/m/Y') }}</span>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route('vistapaquete', $resena['paquete']->id) }}"
+                                    class="text-blue-600 hover:text-blue-800 font-medium">Ver paquete completo →</a>
+                            </div>
+                        </div>
+                    @endif
+                @empty
+                    <div class="col-span-full text-center text-gray-500">
+                        No hay reseñas disponibles por ahora.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Sección de promoción de la plataforma -->
+    <div class="py-16 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">¡Únete a la Revolución del Turismo Digital!</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">La plataforma que conecta empresas turísticas con
+                    miles de viajeros</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <div class="p-8 lg:p-12">
+                        <div class="flex items-center mb-6">
+                            <div
+                                class="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-bold px-4 py-2 rounded-full mr-4">
+                                🚀 NUEVO
+                            </div>
+                            <span class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                ¡Primer mes GRATIS!
+                            </span>
+                        </div>
+
+                        <h3
+                            class="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            ReservÁncash: Tu Ventana al Éxito Turístico
+                        </h3>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-start">
+                                <div class="bg-blue-100 rounded-full p-2 mr-4 mt-1">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Visibilidad Total</h4>
+                                    <p class="text-gray-600">Posiciónate en el mercado turístico con una presencia
+                                        digital profesional</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="bg-purple-100 rounded-full p-2 mr-4 mt-1">
+                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Para Todas las Empresas</h4>
+                                    <p class="text-gray-600">Pequeñas, medianas o grandes empresas turísticas, todas
+                                        son bienvenidas</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <div class="bg-green-100 rounded-full p-2 mr-4 mt-1">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Flexibilidad Total</h4>
+                                    <p class="text-gray-600">Muestra tus paquetes con servicios y equipos incluidos
+                                        según tu criterio</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-8">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-3xl font-bold text-blue-600">GRATIS</div>
+                                    <div class="text-sm text-gray-600">Primer mes</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-gray-800">$30.00</div>
+                                    <div class="text-sm text-gray-600">Mensual después</div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <span
+                                    class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">
+                                    🎯 Inversión mínima, resultados máximos
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="#"
+                                class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl transition duration-300 text-center transform hover:scale-105">
+                                🚀 Comenzar GRATIS
+                            </a>
+                            <a href="#"
+                                class="flex-1 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-4 px-8 rounded-xl transition duration-300 text-center">
+                                📞 Más Información
+                            </a>
+                        </div>
+                    </div>
+
+                    <div
+                        class="relative bg-gradient-to-br from-blue-600 to-purple-600 p-8 lg:p-12 flex items-center justify-center">
+                        <!-- Imagen generada con CSS -->
+                        <div class="relative w-full max-w-md">
+                            <!-- Fondo decorativo -->
+                            <div class="absolute inset-0 bg-white/10 rounded-3xl transform rotate-6"></div>
+                            <div class="absolute inset-0 bg-white/5 rounded-3xl transform -rotate-3"></div>
+
+                            <!-- Contenedor principal -->
+                            <div class="relative bg-white/20 backdrop-blur-sm rounded-3xl p-8 text-white">
+                                <div class="text-center mb-6">
+                                    <div
+                                        class="bg-white/30 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m5.707-4.707a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-2xl font-bold mb-2">ReservÁncash</h4>
+                                    <p class="text-white/90 text-sm">Plataforma Turística Digital</p>
+                                </div>
+
+                                <!-- Elementos decorativos -->
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="bg-white/20 rounded-lg p-3 text-center">
+                                        <div class="font-bold text-lg">500+</div>
+                                        <div class="text-white/80">Empresas</div>
+                                    </div>
+                                    <div class="bg-white/20 rounded-lg p-3 text-center">
+                                        <div class="font-bold text-lg">50k+</div>
+                                        <div class="text-white/80">Viajeros</div>
+                                    </div>
+                                    <div class="bg-white/20 rounded-lg p-3 text-center">
+                                        <div class="font-bold text-lg">24/7</div>
+                                        <div class="text-white/80">Soporte</div>
+                                    </div>
+                                    <div class="bg-white/20 rounded-lg p-3 text-center">
+                                        <div class="font-bold text-lg">98%</div>
+                                        <div class="text-white/80">Satisfacción</div>
+                                    </div>
+                                </div>
+
+                                <!-- Iconos flotantes -->
+                                <div
+                                    class="absolute -top-4 -right-4 bg-yellow-400 w-8 h-8 rounded-full flex items-center justify-center">
+                                    <span class="text-lg">⭐</span>
+                                </div>
+                                <div
+                                    class="absolute -bottom-4 -left-4 bg-green-400 w-8 h-8 rounded-full flex items-center justify-center">
+                                    <span class="text-lg">🎯</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de testimonios rápidos -->
+            <div class="mt-16 text-center">
+                <h3 class="text-2xl font-bold text-gray-800 mb-8">¿Por qué elegir ReservÁncash?</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-4xl mb-4">🌟</div>
+                        <h4 class="font-bold text-lg mb-2">Fácil de usar</h4>
+                        <p class="text-gray-600">Interfaz intuitiva diseñada para empresas turísticas</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-4xl mb-4">📈</div>
+                        <h4 class="font-bold text-lg mb-2">Aumenta tus ventas</h4>
+                        <p class="text-gray-600">Conecta con miles de viajeros potenciales</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="text-4xl mb-4">🚀</div>
+                        <h4 class="font-bold text-lg mb-2">Crece digitalmente</h4>
+                        <p class="text-gray-600">Herramientas modernas para el turismo del futuro</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sección de contacto -->
-    <div id="contacto" class="py-16 bg-gray-100">
+    <div id="contacto" class="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>

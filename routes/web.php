@@ -37,17 +37,22 @@ use App\Livewire\dividida;
 use App\Livewire\Clientes\Favoritos;
 use App\Livewire\Crearpaquete;
 
+
 // para las empresas
 use App\Livewire\Admin\PanelDestino;
 use App\Livewire\Admin\Panelequipos;
 use App\Livewire\Admin\Panelservicios;
 use App\Livewire\Admin\Panelpaquetes;
 use App\Livewire\Admin\Panelpromociones;
+
 use App\Livewire\Reservas\Reservas;
 
 // para el admin
 use App\Livewire\Root\Usuarios;
 use App\Livewire\Root\DatosGenerales;
+
+
+
 
 Route::get('/', function () {
     return redirect('/inicio');
@@ -84,6 +89,7 @@ Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
 Route::get('/register', [CustomRegisterController::class, 'create'])->name('register');
 Route::post('/register', [CustomRegisterController::class, 'store']);
+
 
 Route::middleware([
     'auth:sanctum',

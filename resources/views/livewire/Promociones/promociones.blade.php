@@ -1,4 +1,4 @@
-<div>
+<div class="bg-purple-300">
     <div class="max-w-7xl mx-auto px-6 py-10">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">
             <span class="text-purple-600">Las promociones Turisticas</span> para tu Aventura

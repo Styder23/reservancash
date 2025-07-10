@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Paquetes;
 use App\Models\Itinerarios;
+use App\Models\UserItinerario;
 
 class Inicio extends Component
 {
@@ -25,6 +26,8 @@ class Inicio extends Component
     public $rangosDuracion = [];
     public $distritos = [];
 
+    public $userItinierario = [];
+    public $resenas;
 
 
     // Funcion para mostrar los destinos
@@ -45,10 +48,14 @@ class Inicio extends Component
             ->get();
 
 
-
-
         // Todos los paquetes
         $this->paquetes = Paquetes::with('detalles')->get();
+
+
+
+        $this->cargarResenas();
+
+
 
         // Solo paquetes con promoción y descuento
         $this->paquetesConPromocion = Paquetes::whereHas('detalles', function ($q) {
@@ -97,7 +104,7 @@ class Inicio extends Component
 
 
 
-        
+
         // Cargar duraciones de la tabla paquete_disponibilidad
         $duraciones = \DB::table('paquete_disponibilidad')
             ->selectRaw('DATEDIFF(fecha_fin, fecha_inicio) as dias')
@@ -130,5 +137,37 @@ class Inicio extends Component
             $inicio += $salto;
         }
         $this->rangosDuracion = $rangosDuracion;
+    }
+
+
+    // Función para obtener el número total de valoraciones
+    public function getTotalValoraciones()
+    {
+        return $this->paquete->comentarios()->whereNotNull('estrellas')->count();
+    }
+
+
+
+
+    // Carga las reseñas
+    public function cargarResenas()
+    {
+        $paquetes = Paquetes::with(['empresa', 'userItinerarios.users'])
+            ->where('estado', 1)
+            ->take(3)
+            ->get();
+
+        $comentarios = UserItinerario::with(['users', 'paquete.empresa'])
+            ->whereNotNull('comentario')
+            ->latest('fecha')
+            ->take(3)
+            ->get();
+
+        $this->resenas = $comentarios->map(function ($comentario, $index) use ($paquetes) {
+            return [
+                'paquete' => $paquetes->get($index),
+                'comentario' => $comentario
+            ];
+        });
     }
 }

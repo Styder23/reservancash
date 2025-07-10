@@ -6,7 +6,7 @@
             <h1 class="text-3xl font-bold text-purple-800 mb-4 md:mb-0">Mis Favoritos</h1>
 
             <div class="relative w-full md:w-64">
-                <input wire:model.debounce.300ms="search" type="text" placeholder="Buscar en favoritos..."
+                <input wire:model.live="search" type="text" placeholder="Buscar en favoritos..."
                     class="w-full pl-10 pr-4 py-2 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <svg class="absolute left-3 top-2.5 h-5 w-5 text-purple-400" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">

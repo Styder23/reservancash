@@ -86,4 +86,12 @@ class Paquetes extends Model
     {
         return $this->hasMany(UserItinerario::class, 'fk_idpaquete')->orderBy('fecha', 'desc');
     }
+
+    public function userItinerarios()
+    {
+        return $this->hasMany(UserItinerario::class, 'fk_idpaquete');
+    }
+
+
+
 }

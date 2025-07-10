@@ -356,7 +356,7 @@ class DetallePaquete extends Component
                 $reserva->equipos()->attach($this->equiposSeleccionados);
             }
             
-            $this->actualizarPremiosUsuario();
+            //$this->actualizarPremiosUsuario();
 
             DB::commit();
             
@@ -379,7 +379,7 @@ class DetallePaquete extends Component
         }
     }
 
-    private function actualizarPremiosUsuario()
+    /*private function actualizarPremiosUsuario()
     {
         // Buscar o crear registro de premios para el usuario
         $premioUsuario = \App\Models\premios::firstOrCreate(
@@ -404,7 +404,7 @@ class DetallePaquete extends Component
                 'mensaje' => '¡Felicidades! Has ganado un premio por completar ' . $premioUsuario->cantidad_reservas . ' reservas.'
             ]);
         }
-    }
+    }*/
 
     public function validarCampos()
     {
