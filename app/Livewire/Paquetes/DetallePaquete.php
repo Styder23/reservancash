@@ -490,17 +490,17 @@ class DetallePaquete extends Component
             ->title($this->paquete->nombrepaquete ?? 'Detalle del Paquete');
     }
 
-    public $whatsappActivo = false;
+    // public $whatsappActivo = false;
 
-    public function contactarWhatsApp($paqueteId)
-    {
-        $this->whatsappActivo = true;
+    // public function contactarWhatsApp($paqueteId)
+    // {
+    //     $this->whatsappActivo = true;
 
-        // Guardar el paquete como "contactado" en sesión
-        $contactados = session()->get('paquetesContactados', []);
-        if (!in_array($paqueteId, $contactados)) {
-            $contactados[] = $paqueteId;
-            session(['paquetesContactados' => $contactados]);
-        }
-    }
+    //     // Guardar el paquete como "contactado" en sesión
+    //     $contactados = session()->get('paquetesContactados', []);
+    //     if (!in_array($paqueteId, $contactados)) {
+    //         $contactados[] = $paqueteId;
+    //         session(['paquetesContactados' => $contactados]);
+    //     }
+    // }
 }

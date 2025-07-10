@@ -25,57 +25,60 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'phone' => ['nullable', 'string', 'max:20'],
         ];
 
         if ($user->tipousu && $user->tipousu->id == 2) {
-            $rules['company_video'] = ['nullable', 'mimetypes:video/mp4,video/quicktime', 'max:5120'];
-            $rules['nombrebanco'] = ['nullable', 'string', 'max:255'];
-            $rules['numero_cuenta'] = ['nullable', 'string', 'max:255'];
-            $rules['numero_cci'] = ['nullable', 'string', 'max:255'];
-            $rules['qr_yape'] = ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
-            $rules['qr_plin'] = ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
+            $rules = array_merge($rules, [
+                'company_video' => ['nullable', 'mimetypes:video/mp4,video/quicktime', 'max:5120'],
+                'nombrebanco' => ['nullable', 'string', 'max:255'],
+                'numero_cuenta' => ['nullable', 'string', 'max:255'],
+                'numero_cci' => ['nullable', 'string', 'max:255'],
+                'qr_yape' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+                'qr_plin' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            ]);
         }
 
         Validator::make($input, $rules)->validateWithBag('updateProfileInformation');
 
-        // Actualizar foto de perfil del usuario (para cliente o representante legal)
+        // Actualizar foto de perfil
         if (isset($input['photo'])) {
             $user->updateProfilePhoto($input['photo']);
         }
 
-        // Si es empresa, manejar video y datos bancarios
-        if ($user->tipousu && $user->tipousu->id == 2) {
-            $this->handleCompanyUpdates($user, $input);
-            $this->handleBankUpdates($user, $input);
-        }
+        // Actualizar datos básicos
+        $userData = [
+            'name' => $input['name'],
+            'email' => $input['email'],
+        ];
 
-        // Actualizar email y nombre
         if ($input['email'] !== $user->email && $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
+            $user->forceFill(array_merge($userData, [
+                'email_verified_at' => null,
+            ]))->save();
+            $user->sendEmailVerificationNotification();
         } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
+            $user->forceFill($userData)->save();
         }
 
+        // Actualizar datos de persona
         if ($user->persona) {
-            $personaData = [
+            $user->persona->update([
                 'nombre' => $input['name'],
                 'email' => $input['email'],
                 'telefono' => $input['phone'] ?? $user->persona->telefono
-            ];
-            
-            $user->persona->update($personaData);
+            ]);
         }
-        
+
+        // Actualizar datos de empresa si es necesario
+        if ($user->tipousu && $user->tipousu->id == 2 && $user->persona && $user->persona->empresa->first()) {
+            $this->handleCompanyUpdates($user, $input);
+            $this->handleBankUpdates($user, $input);
+        }
     }
 
     protected function handleBankUpdates(User $user, array $input): void
     {
-        \Log::debug('Datos recibidos:', $input);
-        \Log::debug('Archivo QR Yape recibido:', isset($input['qr_yape']) ? ['name' => $input['qr_yape']->getClientOriginalName()] : ['no_file']);
-        
         $empresa = $user->persona->empresa->first()->empresa;
         
         $bankData = [
@@ -85,25 +88,23 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         ];
 
         // Procesar QR Yape
-        if (request()->hasFile('qr_yape')) {
-            $file = request()->file('qr_yape');
-            if ($file->isValid()) {
-                if ($empresa->qr_yape) {
-                    Storage::disk('public')->delete($empresa->qr_yape);
-                }
-                $bankData['qr_yape'] = $file->store('empresa/qr', 'public');
+        if (isset($input['qr_yape']) && $input['qr_yape']->isValid()) {
+            // Eliminar anterior si existe
+            if ($empresa->qr_yape && Storage::disk('public')->exists($empresa->qr_yape)) {
+                Storage::disk('public')->delete($empresa->qr_yape);
             }
+            // Guardar nuevo
+            $bankData['qr_yape'] = $input['qr_yape']->store('empresa/qr', 'public');
         }
 
         // Procesar QR Plin
-        if (request()->hasFile('qr_plin')) {
-            $file = request()->file('qr_plin');
-            if ($file->isValid()) {
-                if ($empresa->qr_plin) {
-                    Storage::disk('public')->delete($empresa->qr_plin);
-                }
-                $bankData['qr_plin'] = $file->store('empresa/qr', 'public');
+        if (isset($input['qr_plin']) && $input['qr_plin']->isValid()) {
+            // Eliminar anterior si existe
+            if ($empresa->qr_plin && Storage::disk('public')->exists($empresa->qr_plin)) {
+                Storage::disk('public')->delete($empresa->qr_plin);
             }
+            // Guardar nuevo
+            $bankData['qr_plin'] = $input['qr_plin']->store('empresa/qr', 'public');
         }
 
         $empresa->update($bankData);

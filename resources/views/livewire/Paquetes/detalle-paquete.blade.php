@@ -754,10 +754,10 @@
                                     @if ($metodoPago === 'transferencia')
                                         <div class="mt-3 text-xs text-gray-500">
                                             <p>Realiza la transferencia a nuestra cuenta bancaria:</p>
-                                            <p class="font-medium mt-1">Banco: Interbank</p>
-                                            <p class="font-medium">Cuenta: 123-456789-01-23</p>
-                                            <p class="font-medium">CCI: 00312300456789012345</p>
-                                            <p class="font-medium">Titular: Turismo Adventure SAC</p>
+                                            <p class="font-medium mt-1">{{ $paquete->empresa->nombrebanco }}</p>
+                                            <p class="font-medium">Cuenta: {{ $paquete->empresa->numero_cuenta }}</p>
+                                            <p class="font-medium">CCI: {{ $paquete->empresa->numero_cci }}</p>
+                                            <p class="font-medium">Titular: {{ $paquete->empresa->nameempresa }}</p>
                                         </div>
                                     @endif
                                 </div>
@@ -776,7 +776,7 @@
                                     @if ($metodoPago === 'yape')
                                         <div class="mt-3 text-xs text-gray-500">
                                             <p>Escanea el código QR o yapea al número:</p>
-                                            <p class="font-medium mt-1">987 654 321</p>
+                                            <p class="font-medium mt-1">{{ $paquete->empresa->telefonoempresa }}</p>
                                         </div>
                                     @endif
                                 </div>
@@ -795,7 +795,7 @@
                                     @if ($metodoPago === 'plin')
                                         <div class="mt-3 text-xs text-gray-500">
                                             <p>Escanea el código QR o plinea al número:</p>
-                                            <p class="font-medium mt-1">987 654 321</p>
+                                            <p class="font-medium mt-1">{{ $paquete->empresa->telefonoempresa }}</p>
                                         </div>
                                     @endif
                                 </div>
@@ -836,13 +836,14 @@
                                     <h4 class="text-lg font-bold text-blue-700 mb-4">Transferencia Bancaria</h4>
                                     <div class="bg-blue-50 rounded-lg p-4 max-w-md mx-auto">
                                         <div class="space-y-2 text-left">
-                                            <p class="text-sm"><span class="font-medium">Banco:</span> Interbank</p>
+                                            <p class="text-sm"><span class="font-medium">Banco:</span>
+                                                {{ $paquete->empresa->nombrebanco }}</p>
                                             <p class="text-sm"><span class="font-medium">Cuenta:</span>
-                                                123-456789-01-23</p>
+                                                {{ $paquete->empresa->numero_cuenta }}</p>
                                             <p class="text-sm"><span class="font-medium">CCI:</span>
-                                                00312300456789012345</p>
-                                            <p class="text-sm"><span class="font-medium">Titular:</span> Turismo
-                                                Adventure SAC</p>
+                                                {{ $paquete->empresa->numero_cci }}</p>
+                                            <p class="text-sm"><span class="font-medium">Titular:</span>
+                                                {{ $paquete->empresa->nameempresa }}</p>
                                             <p class="text-sm"><span class="font-medium">Monto:</span>
                                                 S/.{{ number_format(
                                                     $paquete->det_paquete->first()->promos

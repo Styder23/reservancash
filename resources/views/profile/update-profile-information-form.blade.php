@@ -1,5 +1,5 @@
 <div class="max-w-full">
-    <form wire:submit.prevent="updateProfileInformation" class="space-y-6">
+    <form wire:submit.prevent="updateProfileInformation" class="mt-6 space-y-6" enctype="multipart/form-data">
         <!-- Header -->
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
@@ -345,6 +345,9 @@
                                         "
                                         accept="image/jpeg,image/png,image/jpg" />
 
+                                    @error('qr_yape')
+                                        <div class="mt-1 text-sm text-red-600">{{ $message }}</div>
+                                    @enderror
                                     <!-- Formulario oculto para eliminar -->
                                     @if ($empresa->qr_yape)
                                         <form id="delete-qr-yape-form" method="POST"
