@@ -47,16 +47,25 @@ class PaquetePersonalizado extends Component
 
     public function getReservasProperty()
     {
-        return Reservas::with(['paquete', 'users'])
-            ->where('fk_idusers', Auth::id())
-            ->when($this->filtroEstado, function($query) {
-                $query->where('estado', $this->filtroEstado);
-            })
-            ->when($this->fechaFiltro, function($query) {
-                $query->whereDate('fechareserva', $this->fechaFiltro);
-            })
-            ->orderBy('fechareserva', 'desc')
-            ->paginate(10);
+        $query = Reservas::with(['paquete', 'users'])
+            ->where('fk_idusers', Auth::id());
+            // Quita o haz condicional el ->whereIn('estado', ['pendiente', 'confirmada'])
+
+        $query->when($this->filtroEstado, function($q) {
+            $q->where('estado', $this->filtroEstado);
+        });
+        if (empty($this->filtroEstado)) {
+            $query->whereIn('estado', ['pendiente', 'confirmada','cancelada']); // Default view
+        } else {
+            $query->where('estado', $this->filtroEstado); // Specific filter
+        }
+
+
+        $query->when($this->fechaFiltro, function($q) {
+            $q->whereDate('fechareserva', $this->fechaFiltro);
+        });
+        
+        return $query->orderBy('fechareserva', 'desc')->paginate(10);
     }
 
     public function render()

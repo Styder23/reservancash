@@ -132,7 +132,7 @@ class Reservas extends Component
             ]);
         }
     }
-
+    
     public function cancelarReserva()
     {
         $this->validate([

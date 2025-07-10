@@ -32,4 +32,10 @@ class UserItinerario extends Model
     {
         return $this->hasMany(RespuestasComentarios::class, 'fk_idcomentario');
     }
+
+
+    public function userItinerarios()
+    {
+        return $this->hasMany(UserItinerario::class, 'fk_idusers');
+    }
 }

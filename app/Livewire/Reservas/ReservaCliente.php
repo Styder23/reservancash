@@ -116,7 +116,14 @@ class ReservaCliente extends Component
             })
             ->orderBy('fechareserva', 'desc')
             ->paginate(10);
-    }
+  
+    $query->when($this->fechaFiltro, function($q) {
+        $q->whereDate('fechareserva', $this->fechaFiltro);
+    });
+    
+    return $query->orderBy('fechareserva', 'desc')->paginate(10);
+}
+    
     
     public function render()
     {

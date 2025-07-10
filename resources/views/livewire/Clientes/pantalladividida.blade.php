@@ -12,85 +12,89 @@
 
             <!-- Columna Izquierda -->
             <div class="bg-white p-4 rounded-xl shadow-sm">
+                <!-- Buscador -->
+                <div class="panel-izquierdo">
+    <div class="flex items-center mb-4">
+        <button wire:click="$set('paqueteIzquierdaId', null)"
+            class="mr-3 p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none"
+            title="Regresar">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="flex-1 relative"> {{-- Añadido 'relative' para posicionar el SVG --}}
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <input type="text" wire:model.live="busquedaIzquierda"
+                class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Buscar destino...">
+            <div class="absolute left-3 top-3.5 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+    </div>
 
-                <div class="flex items-center mb-4">
-                    <button wire:click="$set('paqueteIzquierdaId', null)"
-                        class="mr-3 p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none"
-                        title="Regresar">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <div class="flex-1">
-                        <!-- Aquí va el input del buscador -->
-                        <input type="text" wire:model.defer="busquedaIzquierda" wire:keydown.enter="filtrarIzquierda"
-                            class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            placeholder="Buscar destino...">
-                        <div class="absolute left-3 top-3.5 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+        <div>
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <select class="w-full p-2 border rounded-lg text-sm" wire:model.live="filtroPrecioIzquierda">
+                <option value="">Precio</option>
+                <option value="asc">Menor a mayor</option>
+                <option value="desc">Mayor a menor</option>
+            </select>
+        </div>
+        <div>
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <select class="w-full p-2 border rounded-lg text-sm" wire:model.live="filtroDestinoIzquierda">
+                <option value="">Tipo de Destino</option>
+                @foreach ($tiposDestino as $tipo)
+                    <option value="{{ $tipo }}">{{ $tipo }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <select class="w-full p-2 border rounded-lg text-sm" wire:model.live="filtroDistritoIzquierda">
+                <option value="">Distritos</option>
+                @foreach ($distritos as $distrito)
+                    <option value="{{ $distrito->namedistrito }}">{{ $distrito->namedistrito }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div></div> {{-- Espacio en blanco para la cuadrícula --}}
+        
+        {{-- ELIMINADO: Botón aplicar (ya no es necesario con wire:model.live) --}}
+        
+        <div class="col-span-2 flex justify-center"> {{-- Ahora ocupa 2 columnas si no hay "aplicar" --}}
+            <button wire:click="limpiarFiltrosIzquierda"
+                class="w-full max-w-xs px-6 py-2 rounded bg-red-500 text-white hover:bg-red-700 transition text-sm"
+                title="Reestablecer filtros">
+                Reestablecer
+            </button>
+        </div>
+    </div>
+</div>
 
-                <!-- Filtros -->
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <!-- Select Precio (mitad) -->
-                    <div>
-                        <select class="w-full p-2 border rounded-lg text-sm"
-                            wire:model.defer="filtroPrecioIzquierdaTemp">
-                            <option value="">Precio</option>
-                            <option value="asc">Menor a mayor</option>
-                            <option value="desc">Mayor a menor</option>
-                        </select>
-                    </div>
-                    <!-- Fechas (mitad) -->
-                    <div class="flex gap-2">
-                        <input type="date" wire:model.defer="filtroFechaInicioIzquierdaTemp"
-                            class="w-1/2 p-2 border rounded-lg">
-                        <input type="date" wire:model.defer="filtroFechaFinIzquierdaTemp"
-                            class="w-1/2 p-2 border rounded-lg">
-                    </div>
-                    <!-- Select Tipo de Destino (mitad) -->
-                    <div>
-                        <select class="w-full p-2 border rounded-lg text-sm"
-                            wire:model.defer="filtroDestinoIzquierdaTemp">
-                            <option value="">Tipo de Destino</option>
-                            @foreach ($tiposDestino as $tipo)
-                                <option value="{{ $tipo }}">{{ $tipo }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <!-- Botón aplicar (mitad) -->
-                    <div>
-                        <button wire:click="aplicarFiltrosIzquierda"
-                            class="w-full px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition text-sm"
-                            title="Aplicar filtros">
-                            Aplicar
-                        </button>
-                    </div>
-                </div>
 
                 <!-- Columna Izquierda -->
                 <div class="bg-white p-4 rounded-xl shadow-sm h-[calc(100vh-120px)] overflow-y-auto">
-                    @if ($paqueteIzquierdaId)
-                        @php
-                            $paquete = $paquetesIzquierda->firstWhere('id', $paqueteIzquierdaId);
-                        @endphp
-                        @include('livewire.Paquetes.detalle-paquete', ['paquete' => $paquete])
+                    @if ($paqueteIzquierda)
+                        @include('livewire.Paquetes.detalle-paquete', ['paquete' => $paqueteIzquierda])
                         <button wire:click="$set('paqueteIzquierdaId', null)"
                             class="mt-4 text-sm text-blue-600 hover:underline">Volver a la lista</button>
                     @else
                         <h2 class="text-lg font-bold mb-4 text-green-700">Selecciona un paquete para la izquierda</h2>
                         <div class="grid grid-cols-1 gap-8">
+                            {{-- Debug temporal --}}
+                            {{-- @foreach ($paquetesIzquierda as $p) {{ $p->id }} @endforeach --}}
                             @foreach ($paquetesIzquierda as $paquete)
                                 <div wire:click="seleccionarIzquierda({{ $paquete->id }})"
                                     class="cursor-pointer bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 relative flex flex-col h-[420px] min-h-[420px] max-h-[420px]
-            {{ $paqueteIzquierdaId == $paquete->id ? 'ring-2 ring-green-500' : '' }}">
+                                    {{ $paqueteIzquierdaId == $paquete->id ? 'ring-2 ring-green-500' : '' }}">
                                     @php
                                         $detalles = $paquete->detalles ?? collect();
                                         $detallePromo = $detalles->first(function ($d) {
@@ -182,7 +186,8 @@
 
                                             <div class="flex-1"></div>
                                             <div class="w-full flex justify-end mt-4">
-                                                <a href=""
+                                                <a href="#"
+                                                    wire:click.prevent="seleccionarIzquierda({{ $paquete->id }})"
                                                     class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
                                                     Ver detalles
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1"
@@ -212,76 +217,80 @@
             <!-- Columna Derecha -->
             <div class="bg-white p-4 rounded-xl shadow-sm">
                 {{-- boton atras y buscador --}}
-                <div class="flex items-center mb-4">
-                    <button wire:click="$set('paqueteDerechaId', null)"
-                        class="mr-3 p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none"
-                        title="Regresar">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <div class="flex-1">
-                        <!-- Aquí va el input del buscador -->
-                        <input type="text" wire:model.defer="busquedaDerecha" wire:keydown.enter="filtrarDerecha"
-                            class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            placeholder="Buscar destino...">
-                        <div class="absolute left-3 top-3.5 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                <div class="panel-derecho">
+    <div class="flex items-center mb-4">
+        <button wire:click="$set('paqueteDerechaId', null)"
+            class="mr-3 p-2 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none"
+            title="Regresar">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="flex-1 relative"> {{-- Añadido 'relative' para posicionar el SVG --}}
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <input type="text" wire:model.live="busquedaDerecha"
+                class="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Buscar destino...">
+            <div class="absolute left-3 top-3.5 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+    </div>
 
-                <!-- Filtros -->
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <!-- Select Precio (mitad) -->
-                    <div>
-                        <select class="w-full p-2 border rounded-lg text-sm"
-                            wire:model.defer="filtroPrecioDerechaTemp">
-                            <option value="">Precio</option>
-                            <option value="asc">Menor a mayor</option>
-                            <option value="desc">Mayor a menor</option>
-                        </select>
-                    </div>
-                    <!-- Fechas (mitad) -->
-                    <div class="flex gap-2">
-                        <input type="date" wire:model.defer="filtroFechaInicioDerechaTemp"
-                            class="w-1/2 p-2 border rounded-lg">
-                        <input type="date" wire:model.defer="filtroFechaFinDerechaTemp"
-                            class="w-1/2 p-2 border rounded-lg">
-                    </div>
-                    <!-- Select Tipo de Destino (mitad) -->
-                    <div>
-                        <select class="w-full p-2 border rounded-lg text-sm"
-                            wire:model.defer="filtroDestinoDerechaTemp">
-                            <option value="">Tipo de Destino</option>
-                            @foreach ($tiposDestino as $tipo)
-                                <option value="{{ $tipo }}">{{ $tipo }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <!-- Botón aplicar (mitad) -->
-                    <div>
-                        <button wire:click="aplicarFiltrosDerecha"
-                            class="w-full px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition text-sm"
-                            title="Aplicar filtros">
-                            Aplicar
-                        </button>
-                    </div>
-                </div>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+        <div>
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <select class="w-full p-2 border rounded-lg text-sm"
+                wire:model.live="filtroPrecioDerecha">
+                <option value="">Precio</option>
+                <option value="asc">Menor a mayor</option>
+                <option value="desc">Mayor a menor</option>
+            </select>
+        </div>
+        <div>
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <select class="w-full p-2 border rounded-lg text-sm"
+                wire:model.live="filtroDestinoDerecha">
+                <option value="">Tipo de Destino</option>
+                @foreach ($tiposDestino as $tipo)
+                    <option value="{{ $tipo }}">{{ $tipo }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            {{-- CAMBIO CLAVE: wire:model.live para actualización en tiempo real --}}
+            <select class="w-full p-2 border rounded-lg text-sm"
+                wire:model.live="filtroDistritoDerecha">
+                <option value="">Distritos</option>
+                @foreach ($distritos as $distrito)
+                    <option value="{{ $distrito->namedistrito }}">{{ $distrito->namedistrito }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div></div> {{-- Espacio en blanco para la cuadrícula --}}
+
+        {{-- ELIMINADO: Botón aplicar (ya no es necesario con wire:model.live) --}}
+
+        <div class="col-span-2 flex justify-center"> {{-- Ahora ocupa 2 columnas si no hay "aplicar" --}}
+            <button wire:click="limpiarFiltrosDerecha"
+                class="w-full max-w-xs px-6 py-2 rounded bg-red-500 text-white hover:bg-red-700 transition text-sm"
+                title="Reestablecer filtros">
+                Reestablecer
+            </button>
+        </div>
+    </div>
+</div>
 
                 <!-- Columna Derecha -->
                 <div class="bg-white p-4 rounded-xl shadow-sm h-[calc(100vh-120px)] overflow-y-auto">
-                    @if ($paqueteDerechaId)
-                        @php
-                            $paquete = $paquetes->firstWhere('id', $paqueteDerechaId);
-                        @endphp
-                        @include('livewire.Paquetes.detalle-paquete', ['paquete' => $paquete])
+                    @if ($paqueteDerecha)
+                        @include('livewire.Paquetes.detalle-paquete', ['paquete' => $paqueteDerecha])
                         <button wire:click="$set('paqueteDerechaId', null)"
                             class="mt-4 text-sm text-blue-600 hover:underline">Volver a la lista</button>
                     @else
@@ -290,7 +299,6 @@
                             @foreach ($paquetesDerecha as $paquete)
                                 <div wire:click="seleccionarDerecha({{ $paquete->id }})"
                                     class="cursor-pointer bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 relative flex flex-col h-[420px] min-h-[420px] max-h-[420px]">
-
                                     @php
                                         $detalles = $paquete->detalles ?? collect();
                                         $detallePromo = $detalles->first(function ($d) {
