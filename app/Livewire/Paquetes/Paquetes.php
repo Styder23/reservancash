@@ -21,7 +21,7 @@ class Paquetes extends Component
     public $distritos;
 
     // Estos serán los que se actualicen en tiempo real desde el input
-    public $busquedaIzquierda = ''; 
+    public $busquedaIzquierda = '';
     public $paqueteIzquierdaId = null;
 
     // Estos serán los que se actualicen en tiempo real desde los select
@@ -37,9 +37,9 @@ class Paquetes extends Component
     public function mount()
     {
         $this->paquetesContactados = session()->get('paquetesContactados', []);
-        $this->distritos = Distritos::orderBy('namedistrito')->get(); 
+        $this->distritos = Distritos::orderBy('namedistrito')->get();
         $this->tiposDestino = TipoDestinos::pluck('nametipo_destinos')->toArray();
-        
+
 
         if (Auth::check()) {
             $this->cargarFavoritos();
@@ -52,10 +52,10 @@ class Paquetes extends Component
             ->where('favoritable_type', ModelPaquetes::class)
             ->pluck('favoritable_id')
             ->toArray();
-        
+
         $this->favoritos = $favoritosUsuario;
     }
-    
+
     public function toggleFavorito($paqueteId)
     {
         if (!Auth::check()) {
@@ -64,7 +64,7 @@ class Paquetes extends Component
         }
 
         $userId = Auth::id();
-        
+
         $favoritoExistente = favoritos::where('fk_iduser', $userId)
             ->where('favoritable_id', $paqueteId)
             ->where('favoritable_type', ModelPaquetes::class)
@@ -72,7 +72,7 @@ class Paquetes extends Component
 
         if ($favoritoExistente) {
             $favoritoExistente->delete();
-            $this->favoritos = array_filter($this->favoritos, function($id) use ($paqueteId) {
+            $this->favoritos = array_filter($this->favoritos, function ($id) use ($paqueteId) {
                 return $id != $paqueteId;
             });
             session()->flash('success', 'Paquete removido de favoritos');
@@ -93,44 +93,84 @@ class Paquetes extends Component
     }
 
     // El método 'render' se encargará de recalcular la lista filtrada cada vez que una propiedad con wire:model.live cambie.
+    /*public function render()
+    {
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+
+        $paquetesFiltrados = $this->filtrarPaquetes(
+            $this->busquedaIzquierda, // Ahora se usa directamente esta propiedad
+            $this->filtroPrecioIzquierda, // Ahora se usa directamente esta propiedad
+            $this->filtroDestinoIzquierda, // Ahora se usa directamente esta propiedad
+            $this->filtroDistritoIzquierda // Ahora se usa directamente esta propiedad
+        );
+
+        $paqueteIzquierda = null;
+        if ($this->paqueteIzquierdaId) {
+            $paqueteIzquierda = ModelPaquetes::with([
+                'empresa',
+                'empresa.replegal.personas.user',
+                'imagenes',
+                'det_paquete.destino',
+                'det_paquete.promos',
+                'ser_paquete.servicio.Det_servicio',
+                'equi_paquete.equipo.Det_equipo',
+                'dis_paquete',
+                'reservas',
+                'comentarios.users',
+                'comentarios.respuestas.usuario',
+                'itinerarios.itinerariosRutas.ruta.rutasParadas.parada'
+            ])->find($this->paqueteIzquierdaId);
+        }
+
+        return view('livewire.paquetes.paquetes', [
+            'paquetes' => $paquetesFiltrados,
+            'paqueteIzquierda' => $paqueteIzquierda,
+            'distritos' => $this->distritos,
+            'tiposDestino' => $this->tiposDestino,
+        ])->layout($layout);
+    }*/
+
     public function render()
-{
-    $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+    {
+        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
 
-    $paquetesFiltrados = ModelPaquetes::whereHas('empresa.replegal.persona.user', function ($query) {
-        $query->where('estado_usu', 1);
-    })->when($this->busquedaIzquierda, function ($query) {
-        // Aquí tu filtro por búsqueda, precio, etc.
-    })
-    // ...agrega aquí tus otros filtros necesarios...
-    ->get();
+        $paquetesFiltrados = ModelPaquetes::whereHas('empresa.replegal.persona.user', function ($query) {
+            $query->where('estado_usu', 1);
+        })->when($this->busquedaIzquierda, function ($query) { })
 
-    $paqueteIzquierda = null;
-    if ($this->paqueteIzquierdaId) {
-        $paqueteIzquierda = ModelPaquetes::with([
-            'empresa',
-            'empresa.replegal.persona.user',
-            'imagenes',
-            'det_paquete.destino',
-            'det_paquete.promos',
-            'ser_paquete.servicio.Det_servicio',
-            'equi_paquete.equipo.Det_equipo',
-            'dis_paquete',
-            'reservas',
-            'comentarios.users',
-            'comentarios.respuestas.usuario',
-            'itinerarios.itinerariosRutas.ruta.rutasParadas.parada'
-        ])->find($this->paqueteIzquierdaId);
+            ->get();
+        $paquetesFiltrados = $this->filtrarPaquetes(
+            $this->busquedaIzquierda, // Ahora se usa directamente esta propiedad
+            $this->filtroPrecioIzquierda, // Ahora se usa directamente esta propiedad
+            $this->filtroDestinoIzquierda, // Ahora se usa directamente esta propiedad
+            $this->filtroDistritoIzquierda // Ahora se usa directamente esta propiedad
+        );
+
+        $paqueteIzquierda = null;
+        if ($this->paqueteIzquierdaId) {
+            $paqueteIzquierda = ModelPaquetes::with([
+                'empresa',
+                'empresa.replegal.persona.user',
+                'imagenes',
+                'det_paquete.destino',
+                'det_paquete.promos',
+                'ser_paquete.servicio.Det_servicio',
+                'equi_paquete.equipo.Det_equipo',
+                'dis_paquete',
+                'reservas',
+                'comentarios.users',
+                'comentarios.respuestas.usuario',
+                'itinerarios.itinerariosRutas.ruta.rutasParadas.parada'
+            ])->find($this->paqueteIzquierdaId);
+        }
+
+        return view('livewire.paquetes.paquetes', [
+            'paquetes' => $paquetesFiltrados,
+            'paqueteIzquierda' => $paqueteIzquierda,
+            'distritos' => $this->distritos,
+            'tiposDestino' => $this->tiposDestino,
+        ])->layout($layout);
     }
-
-    return view('livewire.paquetes.paquetes', [
-        'paquetes' => $paquetesFiltrados,
-        'paqueteIzquierda' => $paqueteIzquierda,
-        'distritos' => $this->distritos,
-        'tiposDestino' => $this->tiposDestino,
-    ])->layout($layout);
-}
-
     private function filtrarPaquetes($busqueda, $filtroPrecio, $filtroDestino, $filtroDistrito)
     {
         $query = ModelPaquetes::query();
@@ -157,16 +197,16 @@ class Paquetes extends Component
                 });
             });
         });
-        
+
         $query->with([
-            'det_paquete.promos', 
-            'det_paquete', 
-            'imagenes' 
+            'det_paquete.promos',
+            'det_paquete',
+            'imagenes'
         ]);
 
         return $query->get();
     }
-    
+
     // Ejemplo de un "updated" hook si necesitaras lógica adicional:
     public function updatedBusquedaIzquierda($value)
     {
