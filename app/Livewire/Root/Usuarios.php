@@ -45,18 +45,18 @@ class Usuarios extends Component
     {
         $this->tiposUsuario = TipoUsuarios::all();
     }
-    
+
     public function render()
     {
         $usuarios = User::with(['tipousu', 'persona'])
-            ->when($this->search, function($query) {
+            ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('persona', function($q) {
-                          $q->where('nombre', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('persona', function ($q) {
+                        $q->where('nombre', 'like', '%' . $this->search . '%')
                             ->orWhere('apellidos', 'like', '%' . $this->search . '%')
                             ->orWhere('dni', 'like', '%' . $this->search . '%');
-                      });
+                    });
             })
             ->latest()
             ->paginate(5);
@@ -82,6 +82,7 @@ class Usuarios extends Component
         $this->form = [
             'name' => $usuario->name,
             'email' => $usuario->email,
+            'email' => $usuario->estado,
             'fk_idtipousu' => $usuario->fk_idtipousu,
             'password' => '',
             // Datos de persona si existe
@@ -94,6 +95,26 @@ class Usuarios extends Component
         
         $this->modalAbierto = true;
     }
+    public function editar1($id, $nuevoEstado = null)
+    {
+        $this->resetValidation();
+        $usuario = User::with('persona')->findOrFail($id);
+        $this->usuarioId = $id;
+
+        // Cambiar el estado si se proporciona
+        if ($nuevoEstado !== null) {
+            $usuario->estado_usu = $nuevoEstado;
+            $usuario->save();
+        }
+
+        $this->editando = true;
+
+        $this->form = [
+        
+            'estado_usu' => $usuario->estado_usu,
+            
+        ];
+    }
 
     public function guardar()
     {
@@ -104,7 +125,7 @@ class Usuarios extends Component
             'form.password' => $this->editando ? 'nullable|min:6' : 'required|min:6',
             'foto' => 'nullable|image|max:1024',
             // Validaciones para persona
-            'form.dni' => 'required|string|max:8|unique:personas,dni' . ($this->editando && isset($this->form['dni']) ? ','.User::find($this->usuarioId)->persona?->id : ''),
+            'form.dni' => 'required|string|max:8|unique:personas,dni' . ($this->editando && isset($this->form['dni']) ? ',' . User::find($this->usuarioId)->persona?->id : ''),
             'form.nombre' => 'required|string|max:255',
             'form.apellidos' => 'required|string|max:255',
             'form.telefono' => 'nullable|string|max:15',
@@ -134,7 +155,7 @@ class Usuarios extends Component
 
             // Crear o actualizar usuario
             $usuario = $this->editando ? User::findOrFail($this->usuarioId) : new User();
-            
+
             $userData = [
                 'name' => $this->form['name'],
                 'email' => $this->form['email'],
@@ -164,10 +185,9 @@ class Usuarios extends Component
 
             $this->modalAbierto = false;
             $this->reset(['form', 'foto', 'usuarioId', 'editando']);
-            
+
             $mensaje = $this->editando ? 'Usuario actualizado exitosamente.' : 'Usuario creado exitosamente.';
             session()->flash('message', $mensaje);
-
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Error al guardar: ' . $e->getMessage());
@@ -186,11 +206,11 @@ class Usuarios extends Component
             if ($this->usuarioEliminar->profile_photo_path) {
                 Storage::disk('public')->delete($this->usuarioEliminar->profile_photo_path);
             }
-            
+
             $this->usuarioEliminar->delete();
             $this->modalConfirmacion = false;
             $this->usuarioEliminar = null;
-            
+
             session()->flash('message', 'Usuario eliminado correctamente.');
         } catch (\Exception $e) {
             session()->flash('error', 'Error al eliminar usuario: ' . $e->getMessage());

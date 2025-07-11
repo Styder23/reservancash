@@ -217,6 +217,107 @@
                 });
             });
         });
+
+
+
+
+
+
+
+
+       // Solo mostrar menú cuando cargue
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatbotBox = document.getElementById('chatbot-box');
+
+        window.toggleChatbot = function () {
+            chatbotBox.classList.toggle('hidden');
+            if (!chatbotBox.classList.contains('hidden')) {
+                mostrarMenuPrincipal();
+            }
+        };
+    });
+
+    function mostrarMenuPrincipal() {
+        const chatbotBody = document.getElementById('chatbot-body');
+        chatbotBody.innerHTML = `
+            <p class="mb-2 text-gray-700">¿Qué deseas consultar?</p>
+            <button onclick="mostrarPaquetes()" class="block w-full text-left p-2 mb-1 bg-emerald-100 rounded hover:bg-emerald-200 text-sm">📦 Ver paquetes turísticos</button>
+            <button onclick="mostrarEmpresas()" class="block w-full text-left p-2 mb-1 bg-emerald-100 rounded hover:bg-emerald-200 text-sm">🏢 Ver empresas de turismo</button>
+            <button onclick="mostrarDestinos()" class="block w-full text-left p-2 mb-1 bg-emerald-100 rounded hover:bg-emerald-200 text-sm">🗺️ Ver destinos turísticos</button>
+        `;
+    }
+
+    async function mostrarPaquetes() {
+        const chatbotBody = document.getElementById('chatbot-body');
+        const res = await fetch('/chatbot/paquetes');
+        const data = await res.json();
+
+        chatbotBody.innerHTML = `<p class="mb-2 text-gray-700">Paquetes turísticos disponibles:</p>`;
+        data.forEach(p => {
+            const button = document.createElement('button');
+            button.className = 'block w-full text-left p-2 mb-1 bg-gray-100 rounded hover:bg-gray-200 text-sm';
+            button.innerText = `📦 ${p.nombrepaquete}`;
+            button.onclick = () => mostrarDetallePaquete(p.id);
+            chatbotBody.appendChild(button);
+        });
+    }
+
+    async function mostrarDetallePaquete(id) {
+        const chatbotBody = document.getElementById('chatbot-body');
+        const res = await fetch(`/chatbot/paquete/${id}`);
+        const data = await res.json();
+
+        chatbotBody.innerHTML += `
+            <div class="mb-2 text-left mt-3">
+                <span class="inline-block bg-gray-200 text-black p-2 rounded-lg whitespace-pre-line">
+📦 *${data.nombrepaquete}*
+🗺️ Destinos: ${data.destinos}
+💵 Precio base: S/. ${data.precio_base}
+👥 Incluye: ${data.personas_incluidas} persona(s)
+🏢 Empresa: ${data.empresa}
+📞 Teléfono: ${data.telefono}
+                </span>
+            </div>
+        `;
+
+        setTimeout(() => mostrarMenuPrincipal(), 3000);
+    }
+
+    async function mostrarEmpresas() {
+        const chatbotBody = document.getElementById('chatbot-body');
+        const res = await fetch('/chatbot/empresas');
+        const data = await res.json();
+
+        chatbotBody.innerHTML = `<p class="mb-2 text-gray-700">Empresas disponibles:</p>`;
+        data.forEach(e => {
+            chatbotBody.innerHTML += `
+                <div class="mb-2 bg-gray-100 p-2 rounded text-sm">
+🏢 ${e.nameempresa}<br>
+📍 Dirección: ${e.direccionempresa}<br>
+📞 Teléfono: ${e.telefonoempresa}
+                </div>
+            `;
+        });
+
+        setTimeout(() => mostrarMenuPrincipal(), 5000);
+    }
+
+    async function mostrarDestinos() {
+        const chatbotBody = document.getElementById('chatbot-body');
+        const res = await fetch('/chatbot/destinos');
+        const data = await res.json();
+
+        chatbotBody.innerHTML = `<p class="mb-2 text-gray-700">Destinos disponibles:</p>`;
+        data.forEach(d => {
+            chatbotBody.innerHTML += `
+                <div class="mb-1 bg-gray-100 p-2 rounded text-sm">
+🗺️ ${d.nombredestino}
+                </div>
+            `;
+        });
+
+        setTimeout(() => mostrarMenuPrincipal(), 4000);
+    }
     </script>
 </body>
 

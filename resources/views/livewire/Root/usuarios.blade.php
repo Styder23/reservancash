@@ -59,6 +59,9 @@
                     <th class="p-4">
                         <i class="fas fa-clock mr-2"></i>Último Acceso
                     </th>
+                    <th class="p-4">
+                        <i class="fas fa-clock mr-2"></i>Estado
+                    </th>
                     <th class="p-4 text-right">
                         <i class="fas fa-cogs mr-2"></i>Acciones
                     </th>
@@ -92,6 +95,18 @@
                         </td>
                         <td class="p-4">
                             {{ $user->ultimo_acceso ? \Carbon\Carbon::parse($user->ultimo_acceso)->diffForHumans() : 'Nunca' }}
+                        </td>
+                        <td class="p-4 flex items-center">
+                            <button
+                                class="px-3 py-1 rounded-l-full text-white {{ $user->estado_usu == 1 ? 'bg-green-500' : 'bg-gray-300' }}"
+                                wire:click="editar1({{ $user->id }}, 0)">
+                                Activo
+                            </button>
+                            <button
+                                class="px-3 py-1 rounded-r-full text-white {{ $user->estado_usu == 0 ? 'bg-red-500' : 'bg-gray-300' }}"
+                                wire:click="editar1({{ $user->id }}, 1)">
+                                Inactivo
+                            </button>
                         </td>
                         <td class="p-4 text-right space-x-2">
                             <button wire:click="editar({{ $user->id }})"

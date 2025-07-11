@@ -94,40 +94,42 @@ class Paquetes extends Component
 
     // El método 'render' se encargará de recalcular la lista filtrada cada vez que una propiedad con wire:model.live cambie.
     public function render()
-    {
-        $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
+{
+    $layout = auth()->check() ? 'layouts.prueba' : 'layouts.guest';
 
-        $paquetesFiltrados = $this->filtrarPaquetes(
-            $this->busquedaIzquierda, // Ahora se usa directamente esta propiedad
-            $this->filtroPrecioIzquierda, // Ahora se usa directamente esta propiedad
-            $this->filtroDestinoIzquierda, // Ahora se usa directamente esta propiedad
-            $this->filtroDistritoIzquierda // Ahora se usa directamente esta propiedad
-        );
-        
-        $paqueteIzquierda = null;
-        if ($this->paqueteIzquierdaId) {
-            $paqueteIzquierda = ModelPaquetes::with([
-                'empresa',
-                'imagenes',
-                'det_paquete.destino',
-                'det_paquete.promos',
-                'ser_paquete.servicio.Det_servicio',
-                'equi_paquete.equipo.Det_equipo',
-                'dis_paquete',
-                'reservas',
-                'comentarios.users',
-                'comentarios.respuestas.usuario',
-                'itinerarios.itinerariosRutas.ruta.rutasParadas.parada'
-            ])->find($this->paqueteIzquierdaId);
-        }
+    $paquetesFiltrados = ModelPaquetes::whereHas('empresa.replegal.persona.user', function ($query) {
+        $query->where('estado_usu', 1);
+    })->when($this->busquedaIzquierda, function ($query) {
+        // Aquí tu filtro por búsqueda, precio, etc.
+    })
+    // ...agrega aquí tus otros filtros necesarios...
+    ->get();
 
-        return view('livewire.paquetes.paquetes', [
-            'paquetes' => $paquetesFiltrados, 
-            'paqueteIzquierda' => $paqueteIzquierda,
-            'distritos' => $this->distritos,
-            'tiposDestino' => $this->tiposDestino,
-        ])->layout($layout);
+    $paqueteIzquierda = null;
+    if ($this->paqueteIzquierdaId) {
+        $paqueteIzquierda = ModelPaquetes::with([
+            'empresa',
+            'empresa.replegal.persona.user',
+            'imagenes',
+            'det_paquete.destino',
+            'det_paquete.promos',
+            'ser_paquete.servicio.Det_servicio',
+            'equi_paquete.equipo.Det_equipo',
+            'dis_paquete',
+            'reservas',
+            'comentarios.users',
+            'comentarios.respuestas.usuario',
+            'itinerarios.itinerariosRutas.ruta.rutasParadas.parada'
+        ])->find($this->paqueteIzquierdaId);
     }
+
+    return view('livewire.paquetes.paquetes', [
+        'paquetes' => $paquetesFiltrados,
+        'paqueteIzquierda' => $paqueteIzquierda,
+        'distritos' => $this->distritos,
+        'tiposDestino' => $this->tiposDestino,
+    ])->layout($layout);
+}
 
     private function filtrarPaquetes($busqueda, $filtroPrecio, $filtroDestino, $filtroDistrito)
     {

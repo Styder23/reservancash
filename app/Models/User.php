@@ -34,6 +34,7 @@ class User extends Authenticatable
         'fk_idtipousu',
         'intentos_fallidos',
         'bloqueado_hasta',
+        'estado_usu',
         'ultimo_acceso'
     ];
 

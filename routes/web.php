@@ -52,6 +52,7 @@ use App\Livewire\Root\Usuarios;
 use App\Livewire\Root\DatosGenerales;
 
 
+use App\Http\Controllers\ChatbotController;
 
 
 Route::get('/', function () {
@@ -89,6 +90,18 @@ Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
 Route::get('/register', [CustomRegisterController::class, 'create'])->name('register');
 Route::post('/register', [CustomRegisterController::class, 'store']);
+
+
+
+
+Route::post('/chatbot', [ChatbotController::class, 'handle']);
+Route::get('/chatbot/paquetes', [ChatbotController::class, 'listarPaquetes']);
+Route::get('/chatbot/paquete/{id}', [ChatbotController::class, 'detallePaquete']);
+Route::get('/chatbot/empresas', [ChatbotController::class, 'listarEmpresas']);
+Route::get('/chatbot/destinos', [ChatbotController::class, 'listarDestinos']);
+
+
+
 
 
 Route::middleware([
